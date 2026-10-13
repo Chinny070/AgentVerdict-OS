@@ -36,6 +36,12 @@ export default function AppealsTribunal() {
   const [finalizeUpdate, setFinalizeUpdate] = useState<TxUpdate | null>(null);
   const [finalizing, setFinalizing] = useState(false);
 
+  // Stage 6: permissionless challenge-resolution timeout recovery. See
+  // docs/STAGE_6_MIGRATION_NOTE.md. Not available on the deployed
+  // StudioNet instance -- resolution_deadline reads back empty there.
+  const [timeoutUpdate, setTimeoutUpdate] = useState<TxUpdate | null>(null);
+  const [resolvingByTimeout, setResolvingByTimeout] = useState(false);
+
   const handleChallenge = async () => {
     if (!wallet || !address) return toast.push("error", "Connect a wallet and configure a contract address.");
     setChallenging(true);
@@ -53,6 +59,29 @@ export default function AppealsTribunal() {
       }
     } finally {
       setChallenging(false);
+    }
+  };
+
+  const handleResolveByTimeout = async () => {
+    if (!wallet || !address) return toast.push("error", "Connect a wallet and configure a contract address.");
+    setResolvingByTimeout(true);
+    try {
+      const result = await writes.resolveChallengeByTimeout(
+        { wallet, address: address as `0x${string}`, onUpdate: setTimeoutUpdate },
+        challengeId
+      );
+      setTimeoutUpdate(result);
+      if (result.phase === "FAILED") toast.push("error", `Timeout resolution failed: ${result.error}`);
+      else {
+        toast.push(
+          "success",
+          "Resolved by timeout: original verdict upheld, challenge window reopened. No admin judgment was applied."
+        );
+        challengeState.refresh();
+        agreementState.refresh();
+      }
+    } finally {
+      setResolvingByTimeout(false);
     }
   };
 
@@ -79,6 +108,17 @@ export default function AppealsTribunal() {
   const deadlinePassed = verdictState.status === "ready" ? Date.now() > Date.parse(verdictState.data.challenge_deadline) : false;
   const canChallenge = agreementState.status === "ready" && agreementState.data.state === "CHALLENGE_WINDOW" && !deadlinePassed;
   const canFinalize = agreementState.status === "ready" && agreementState.data.state === "CHALLENGE_WINDOW" && deadlinePassed;
+
+  // Stage 6: eligible once the looked-up challenge's resolution_deadline
+  // (admin-response SLA) has passed while it is still OPEN. Permissionless
+  // by design -- no party/admin check, matching the contract.
+  const hasResolutionDeadline = challengeState.status === "ready" && Boolean(challengeState.data.resolution_deadline);
+  const resolutionDeadlinePassed =
+    challengeState.status === "ready" && hasResolutionDeadline
+      ? Date.now() > Date.parse(challengeState.data.resolution_deadline)
+      : false;
+  const canResolveByTimeout =
+    challengeState.status === "ready" && challengeState.data.state === "OPEN" && resolutionDeadlinePassed;
 
   return (
     <div>
@@ -137,6 +177,33 @@ export default function AppealsTribunal() {
                   </button>
                 )}
                 {challengeId && challengeState.status === "error" && <p role="alert">{challengeState.error}</p>}
+              </div>
+
+              <div className="panel" style={{ marginTop: 12 }}>
+                <h3>Permissionless timeout recovery</h3>
+                <p className="field-help">
+                  Stage 6 fix for an unresolved challenge (docs/STAGE_6_MIGRATION_NOTE.md). Available to
+                  any wallet once the looked-up challenge's admin resolution deadline has passed while it
+                  is still OPEN. Deterministically upholds the original verdict — never the challenge —
+                  and reopens the challenge window, the same effect as an admin rejection. Not available
+                  on the currently deployed StudioNet contract.
+                </p>
+                {!canResolveByTimeout && (
+                  <p className="field-help" style={{ color: "var(--tangerine)" }}>
+                    Not eligible right now — look up an OPEN challenge above whose resolution deadline has
+                    passed.
+                  </p>
+                )}
+                <button
+                  className="btn btn-ghost"
+                  disabled={!wallet || !canResolveByTimeout || resolvingByTimeout}
+                  onClick={handleResolveByTimeout}
+                >
+                  {resolvingByTimeout ? "Submitting…" : "Resolve by timeout"}
+                </button>
+                <div style={{ marginTop: 10 }}>
+                  <TxProgress update={timeoutUpdate} />
+                </div>
               </div>
             </div>
 

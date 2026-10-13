@@ -8,12 +8,18 @@ import { CONTRACT_METHODS, getMethodSpec } from "./schema";
  * being updated, these specific assertions should start failing.
  */
 describe("CONTRACT_METHODS manifest", () => {
-  it("includes exactly the documented 39 public methods (12 view + 27 write) per docs/FINAL_HANDOFF.md", () => {
-    expect(CONTRACT_METHODS).toHaveLength(39);
+  it("includes exactly the documented 40 public methods (12 view + 28 write) per genvm-lint --json (Stage 6 added resolve_challenge_by_timeout)", () => {
+    expect(CONTRACT_METHODS).toHaveLength(40);
     const viewCount = CONTRACT_METHODS.filter((m) => m.mutability === "view").length;
     const writeCount = CONTRACT_METHODS.filter((m) => m.mutability === "write").length;
     expect(viewCount).toBe(12);
-    expect(writeCount).toBe(27);
+    expect(writeCount).toBe(28);
+  });
+
+  it("resolve_challenge_by_timeout takes only a challenge_id (permissionless by design, see docs/STAGE_6_MIGRATION_NOTE.md)", () => {
+    const spec = getMethodSpec("resolve_challenge_by_timeout");
+    expect(spec?.mutability).toBe("write");
+    expect(spec?.params.map((p) => p.name)).toEqual(["challenge_id"]);
   });
 
   it("create_agreement has the exact parameter order the contract expects", () => {

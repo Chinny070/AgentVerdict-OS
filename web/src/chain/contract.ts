@@ -112,8 +112,18 @@ export interface ChallengeView {
   grounds: string;
   submitted_at: string;
   deadline: string;
-  state: "OPEN" | "UPHELD" | "REJECTED";
+  // TIMEOUT_REJECTED (Stage 6): resolve_challenge_by_timeout fired because
+  // the admin never called resolve_challenge before resolution_deadline.
+  // Same effect as REJECTED (original verdict upheld), tagged distinctly
+  // for an unambiguous audit trail. NOT available on the deployed
+  // StudioNet instance -- see docs/STAGE_6_MIGRATION_NOTE.md.
+  state: "OPEN" | "UPHELD" | "REJECTED" | "TIMEOUT_REJECTED";
   resolution: string;
+  /** Stage 6: admin-response SLA, set when the challenge was filed.
+   * After this passes with the challenge still OPEN, anyone may call
+   * resolve_challenge_by_timeout. Absent (empty string) when read from
+   * the currently-deployed StudioNet instance, which predates Stage 6. */
+  resolution_deadline: string;
 }
 
 export interface SettlementView {
@@ -276,6 +286,12 @@ export const writes = {
     write("challenge_verdict", [agreementId, grounds], opts),
   resolveChallenge: (opts: WriteOptions, challengeId: string, upheld: boolean, resolution: string) =>
     write("resolve_challenge", [challengeId, upheld, resolution], opts),
+  /** Stage 6. Permissionless -- any connected wallet may call this once
+   * resolution_deadline has passed with the challenge still OPEN. Not
+   * present on the deployed StudioNet instance; see
+   * docs/STAGE_6_MIGRATION_NOTE.md. */
+  resolveChallengeByTimeout: (opts: WriteOptions, challengeId: string) =>
+    write("resolve_challenge_by_timeout", [challengeId], opts),
 
   finalizeVerdict: (opts: WriteOptions, agreementId: string) => write("finalize_verdict", [agreementId], opts),
   requestRework: (opts: WriteOptions, agreementId: string, reason: string) => write("request_rework", [agreementId, reason], opts),

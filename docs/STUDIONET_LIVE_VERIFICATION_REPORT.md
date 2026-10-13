@@ -150,3 +150,15 @@ surfaced by this live run that did not appear in prior direct-mode testing,
 and finding 4 (the pickling warning) needs a follow-up root-cause pass before
 being dismissed as benign. Neither finding invalidates what was proven
 working; both are now tracked, not hidden.
+
+## Stage 6 follow-up (2026-10-14)
+
+Findings 3 and 4 above were both root-caused and fixed **in contract source
+only** -- see `docs/STAGE_6_MIGRATION_NOTE.md` for the full fix, design
+rationale, and test evidence, and `docs/SECURITY_THREAT_MODEL.md` items 8-9
+for the updated threat-model entries. Neither fix is live on the deployed
+instance at `0xb222305575ee8af1255d8aCd196280b405B54Baf` -- GenVM contracts
+are deployed-code-immutable, so a future redeploy of the fixed source would
+be a new contract at a new address with no automatic state migration from
+`A-1`/`A-2` and the existing module/policy/passport registry. Both
+agreements are already `FINALIZED` and are unaffected either way.

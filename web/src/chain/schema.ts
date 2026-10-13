@@ -120,15 +120,22 @@ export const CONTRACT_METHODS: MethodSpec[] = [
   { name: "get_verdict", mutability: "view", params: [str("agreement_id")], returns: "dict", summary: "Read the latest verdict for an agreement." },
 
   // challenges
-  { name: "challenge_verdict", mutability: "write", params: [str("agreement_id"), str("grounds")], returns: "str (challenge_id)", summary: "Either party, within the challenge window." },
+  { name: "challenge_verdict", mutability: "write", params: [str("agreement_id"), str("grounds")], returns: "str (challenge_id)", summary: "Either party, within the challenge window. Sets a resolution_deadline for admin response (Stage 6)." },
   {
     name: "resolve_challenge",
     mutability: "write",
     params: [str("challenge_id"), bool("upheld"), str("resolution")],
     returns: "None",
-    summary: "Admin-only. Resolves an open challenge.",
+    summary: "Admin-only. Resolves an open challenge before its resolution_deadline.",
   },
-  { name: "get_challenge", mutability: "view", params: [str("challenge_id")], returns: "dict", summary: "Read a challenge." },
+  {
+    name: "resolve_challenge_by_timeout",
+    mutability: "write",
+    params: [str("challenge_id")],
+    returns: "None",
+    summary: "Stage 6. Anyone, only after resolution_deadline has passed with no admin action. Deterministically upholds the original verdict (never the challenge) and reopens the challenge window — the same effect as resolve_challenge(upheld=false), tagged TIMEOUT_REJECTED for an unambiguous audit trail. NOT available on the deployed StudioNet instance (0xb222305575ee8af1255d8aCd196280b405B54Baf) — see docs/STAGE_6_MIGRATION_NOTE.md.",
+  },
+  { name: "get_challenge", mutability: "view", params: [str("challenge_id")], returns: "dict", summary: "Read a challenge, including resolution_deadline and state (OPEN/UPHELD/REJECTED/TIMEOUT_REJECTED)." },
 
   // finalization / recovery / settlement
   { name: "finalize_verdict", mutability: "write", params: [str("agreement_id")], returns: "None", summary: "Anyone, after the challenge window closes with no open challenge." },

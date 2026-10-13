@@ -372,6 +372,16 @@ class Challenge:
     deadline: str
     state: str
     resolution: str
+    # Stage 6 field (appended at END per storage-layout rules -- never
+    # inserted mid-struct). Set once, at filing time in challenge_verdict,
+    # to the same duration as the policy's challenge_window_seconds (see
+    # docs/STAGE_6_MIGRATION_NOTE.md and docs/SECURITY_THREAT_MODEL.md
+    # item 8 for the reasoning): it reuses an SLA the agreement's own
+    # policy template already encodes, rather than inventing a second,
+    # independently-governed timing constant. Read by
+    # resolve_challenge_by_timeout to permissionlessly unstick a
+    # CHALLENGED agreement whose admin never called resolve_challenge.
+    resolution_deadline: str
 
 
 @allow_storage
@@ -945,7 +955,37 @@ class AgentVerdictOS(gl.Contract):
     # ------------------------------------------------------------------
 
     def _run_llm_adjudication(self, rubric_json, evidence_rows, instructions):
-        bounded_rows = evidence_rows[:MAX_EVIDENCE_SOURCES]
+        # Stage 6 fix (docs/SECURITY_THREAT_MODEL.md item 9). evidence_rows
+        # contains @allow_storage EvidencePacket instances: each one is a
+        # live storage-backed proxy carrying a `_storage_slot` reference
+        # into the contract's storage manager, not a plain value, even
+        # though its *fields* are declared str. gl.vm.run_nondet (see the
+        # pinned v0.2.16 SDK's genlayer/gl/vm.py) serializes leader_fn and
+        # validator_fn with cloudpickle before executing them -- so if
+        # either closure captures one of those storage-backed objects
+        # (previously: the whole `row` via `bounded_rows = evidence_rows[
+        # :MAX_EVIDENCE_SOURCES]`), pickling the closure also pickles the
+        # proxy's storage slot, which reaches the storage manager
+        # singleton's own __getstate__ override and fires exactly the
+        # observed warning: "Detected pickling storage class. Reading
+        # storage in nondet mode is not supported"
+        # (genlayer/gl/_internal/storage.py:21 in the pinned SDK).
+        # Both live StudioNet runs still returned correct results because
+        # the pickled proxy's cached field reads happened to still resolve
+        # correctly inside the sandboxed leader/validator process -- but
+        # relying on that is exactly the fragile, unverified path the
+        # warning is telling us not to rely on. Fix: extract plain,
+        # storage-detached str values into ordinary dicts HERE, strictly
+        # before leader_fn/validator_fn are defined below, so neither
+        # closure ever captures anything but plain Python immutables.
+        bounded_rows = [
+            {
+                "evidence_id": str(row.evidence_id),
+                "criterion_id": str(row.criterion_id),
+                "url": str(row.url),
+            }
+            for row in evidence_rows[:MAX_EVIDENCE_SOURCES]
+        ]
 
         def build_prompt(snapshot):
             blocks = []
@@ -986,7 +1026,7 @@ class AgentVerdictOS(gl.Contract):
                 excerpt = ""
                 ok = False
                 try:
-                    response = gl.nondet.web.get(row.url)
+                    response = gl.nondet.web.get(row["url"])
                     status_code = response.status
                     if 200 <= status_code < 300:
                         body = response.body
@@ -1002,8 +1042,8 @@ class AgentVerdictOS(gl.Contract):
                     excerpt = ""
                     ok = False
                 snapshot.append({
-                    "evidence_id": row.evidence_id,
-                    "criterion_id": row.criterion_id,
+                    "evidence_id": row["evidence_id"],
+                    "criterion_id": row["criterion_id"],
                     "status_code": status_code,
                     "ok": ok,
                     "excerpt": excerpt,
@@ -1186,6 +1226,10 @@ class AgentVerdictOS(gl.Contract):
 
         self.challenge_counter = self.challenge_counter + 1
         challenge_id = "C-" + str(int(self.challenge_counter))
+        policy = self.policy_templates[ag.policy_id]
+        resolution_deadline = _iso(
+            self._now_dt() + datetime.timedelta(seconds=int(policy.challenge_window_seconds))
+        )
         self.challenges[challenge_id] = Challenge(
             challenge_id=challenge_id,
             agreement_id=agreement_id,
@@ -1196,12 +1240,28 @@ class AgentVerdictOS(gl.Contract):
             deadline=verdict.challenge_deadline,
             state="OPEN",
             resolution="",
+            resolution_deadline=resolution_deadline,
         )
         self.challenges_by_agreement[agreement_id] = existing_csv + ("," if existing_csv else "") + challenge_id
 
         ag.state = ST_CHALLENGED
         self.agreements[agreement_id] = ag
         return challenge_id
+
+    def _reopen_challenge_window(self, ag, verdict, policy):
+        """Shared effect for every 'the challenge did not stand' outcome --
+        admin REJECTED and timeout TIMEOUT_REJECTED alike route through
+        this single implementation so the two paths can never diverge.
+        Reopens a fresh challenge window on the SAME verdict/attempt (no
+        new verdict, no reputation event here -- those only ever happen
+        in finalize_verdict's existing tail, unchanged by Stage 6).
+        """
+        new_deadline = _iso(self._now_dt() + datetime.timedelta(seconds=int(policy.challenge_window_seconds)))
+        verdict.challenge_deadline = new_deadline
+        self.verdicts[ag.agreement_id] = verdict
+        self.verdicts[ag.agreement_id + "#" + str(int(verdict.attempt_no))] = verdict
+        ag.state = ST_CHALLENGE_WINDOW
+        self.agreements[ag.agreement_id] = ag
 
     @gl.public.write
     def resolve_challenge(self, challenge_id: str, upheld: bool, resolution: str) -> None:
@@ -1221,15 +1281,86 @@ class AgentVerdictOS(gl.Contract):
 
         if upheld:
             ag.state = ST_REEVALUATING
+            self.agreements[ch.agreement_id] = ag
         else:
             policy = self.policy_templates[ag.policy_id]
             verdict = self.verdicts[ag.agreement_id]
-            new_deadline = _iso(self._now_dt() + datetime.timedelta(seconds=int(policy.challenge_window_seconds)))
-            verdict.challenge_deadline = new_deadline
-            self.verdicts[ag.agreement_id] = verdict
-            self.verdicts[ag.agreement_id + "#" + str(int(verdict.attempt_no))] = verdict
-            ag.state = ST_CHALLENGE_WINDOW
-        self.agreements[ch.agreement_id] = ag
+            self._reopen_challenge_window(ag, verdict, policy)
+
+    @gl.public.write
+    def resolve_challenge_by_timeout(self, challenge_id: str) -> None:
+        """Permissionless griefing/deadlock recovery (Stage 6 fix for
+        docs/SECURITY_THREAT_MODEL.md item 8). Before this method existed,
+        an admin who never called resolve_challenge left an agreement
+        stuck in CHALLENGED forever: finalize_verdict's window check only
+        ever fires in CHALLENGE_WINDOW, a state filing a challenge leaves
+        and no path other than resolve_challenge re-enters.
+
+        Eligibility -- deliberately NOT restricted to the challenger or
+        the agreement's parties (no _require_party/_require_admin check
+        here), because:
+          1. The outcome is fully deterministic and identical no matter
+             who calls it (see below) -- there is no discretion to
+             usurp, so there is nothing an "unauthorized" caller could
+             exploit by calling it themselves.
+          2. Restricting the caller would reintroduce exactly the
+             liveness bottleneck this method exists to remove: if only
+             the challenger could call it, an absent or malicious
+             challenger could extend the same deadlock the admin's
+             inaction created.
+          3. This mirrors the existing permissionless pattern already
+             used by finalize_verdict and expire_agreement elsewhere in
+             this contract -- callable by anyone, gated purely by
+             deterministic state + time checks.
+
+        Outcome -- timeout ALWAYS upholds the original verdict (the same
+        effect as an admin resolve_challenge(upheld=False)); it never
+        auto-upholds the challenge. Per spec invariant 8 ("no automatic
+        high-stakes penalties based only on inferred collusion or
+        speculative causality"), the admin's silence is not evidence the
+        challenge had merit -- defaulting to "challenge wins" on timeout
+        would let anyone force a verdict reversal for free simply by
+        filing a challenge and waiting, which is a strictly worse
+        griefing vector than the one being fixed. Upholding the original
+        verdict instead preserves the real leader/validator-adjudicated
+        consensus result and only unblocks the state machine; the
+        challenger/counterparty retains the option to escalate off-chain
+        or through protocol governance. See
+        docs/STAGE_6_MIGRATION_NOTE.md for the full alternatives
+        analysis.
+
+        Implementation note: routes through the exact same
+        `_reopen_challenge_window` helper `resolve_challenge`'s REJECTED
+        branch uses -- no parallel settlement/reputation logic is
+        introduced. Replay-safe: the `ch.state != "OPEN"` guard below
+        means a second call always reverts with "challenge already
+        resolved", identical to resolve_challenge's own idempotency
+        pattern.
+        """
+        if challenge_id not in self.challenges:
+            raise gl.vm.UserError(ERROR_EXPECTED + " challenge not found")
+        ch = self.challenges[challenge_id]
+        if ch.state != "OPEN":
+            raise gl.vm.UserError(ERROR_EXPECTED + " challenge already resolved")
+        ag = self._get_agreement(ch.agreement_id)
+        if ag.state != ST_CHALLENGED:
+            raise gl.vm.UserError(ERROR_EXPECTED + " agreement is not in CHALLENGED state")
+        if self._now_dt() < _parse_iso(ch.resolution_deadline):
+            raise gl.vm.UserError(ERROR_EXPECTED + " resolution deadline has not passed yet")
+
+        # Tagged distinctly from a normal admin REJECTED so this audit
+        # trail is unambiguous after the fact (Stage 6 requirement).
+        ch.state = "TIMEOUT_REJECTED"
+        ch.resolution = (
+            "[TIMEOUT] admin did not call resolve_challenge before the resolution "
+            "deadline; original verdict upheld automatically, no discretionary "
+            "judgment applied"
+        )[:500]
+        self.challenges[challenge_id] = ch
+
+        policy = self.policy_templates[ag.policy_id]
+        verdict = self.verdicts[ag.agreement_id]
+        self._reopen_challenge_window(ag, verdict, policy)
 
     @gl.public.view
     def get_challenge(self, challenge_id: str) -> dict:
@@ -1246,6 +1377,7 @@ class AgentVerdictOS(gl.Contract):
             "deadline": c.deadline,
             "state": c.state,
             "resolution": c.resolution,
+            "resolution_deadline": c.resolution_deadline,
         }
 
     # ------------------------------------------------------------------

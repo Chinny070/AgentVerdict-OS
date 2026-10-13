@@ -40,5 +40,13 @@
   "last_verified_live": {
     "date": "2026-10-13",
     "result": "Two full agreement lifecycles (happy path + challenge/reject path) completed successfully on real StudioNet consensus, 5/5 validators throughout. Two open findings surfaced live, not previously caught by direct-mode testing: unbounded challenge-resolution latency, and a nondet-mode storage pickling warning on request_evaluation (execution still succeeded both times). See docs/SECURITY_THREAT_MODEL.md items 8-9 and docs/STUDIONET_LIVE_VERIFICATION_REPORT.md."
+  },
+  "stage_6_fix_status": {
+    "date": "2026-10-14",
+    "applies_to": "contracts/agentverdict.py source only -- NOT the deployed instance below",
+    "deployed_instance_has_stage_6_fix": false,
+    "reason": "GenVM intelligent contracts are deployed-code-immutable (no in-place upgrade path was found or used for this deployment -- see docs/STAGE_6_MIGRATION_NOTE.md for the evidence and its limits). The contract source now has (1) a resolution_deadline field on Challenge plus a permissionless resolve_challenge_by_timeout method fixing the unbounded challenge-resolution-latency gap (SECURITY_THREAT_MODEL.md item 8), and (2) a fix to _run_llm_adjudication's storage-pickling access pattern (item 9). Neither change can reach 0xb222305575ee8af1255d8aCd196280b405B54Baf without a brand-new deployment to a brand-new address with no automatic state migration from the old one. This agent has no StudioNet signing key and did not deploy anything.",
+    "live_instance_residual_risk": "Any future agreement created on 0xb222305575ee8af1255d8aCd196280b405B54Baf that gets challenged, whose admin never calls resolve_challenge, can still become permanently stuck in CHALLENGED with no path to finalization/settlement/reputation -- exactly as before this session. A-1 and A-2 are both already FINALIZED and are not retroactively affected either way.",
+    "source_hash_note": "deployments/studionet.json's source_hash field above still reflects the PRE-Stage-6 deployed source; it intentionally has not been recomputed/updated here because doing so would misrepresent what is actually running at contract_address."
   }
 }

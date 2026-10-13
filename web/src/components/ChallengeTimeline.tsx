@@ -11,6 +11,14 @@ export function ChallengeTimeline({ verdict, challenge }: ChallengeTimelineProps
   const now = Date.now();
   const deadlinePassed = verdict ? now > Date.parse(verdict.challenge_deadline) : false;
 
+  // Stage 6: resolution_deadline is empty on challenges read from the
+  // currently-deployed StudioNet instance (predates this field) -- guard
+  // against treating "" as a passed deadline.
+  const hasResolutionDeadline = Boolean(challenge?.resolution_deadline);
+  const resolutionDeadlinePassed =
+    challenge && hasResolutionDeadline ? now > Date.parse(challenge.resolution_deadline) : false;
+  const timeoutRecoveryEligible = challenge?.state === "OPEN" && resolutionDeadlinePassed;
+
   const steps = [
     { label: "Provisional verdict issued", done: Boolean(verdict) },
     { label: "Challenge window open", done: Boolean(verdict) && !deadlinePassed },
@@ -51,6 +59,33 @@ export function ChallengeTimeline({ verdict, challenge }: ChallengeTimelineProps
           <StatusBadge state={challenge.state} />
           <p style={{ marginTop: 6 }}>{challenge.grounds}</p>
           {challenge.resolution && <p className="field-help">Resolution: {challenge.resolution}</p>}
+          {challenge.state === "OPEN" && hasResolutionDeadline && (
+            <p className="field-help" style={{ marginTop: 6 }}>
+              Admin resolution deadline:{" "}
+              <time dateTime={challenge.resolution_deadline}>{challenge.resolution_deadline}</time>{" "}
+              {resolutionDeadlinePassed ? (
+                <span style={{ color: "var(--tangerine)" }}>
+                  (passed — eligible for permissionless timeout recovery)
+                </span>
+              ) : (
+                "(admin may still resolve_challenge)"
+              )}
+            </p>
+          )}
+          {challenge.state === "OPEN" && !hasResolutionDeadline && (
+            <p className="field-help" style={{ marginTop: 6 }}>
+              No admin resolution deadline recorded on this challenge — it predates the
+              Stage 6 timeout-recovery fix (see docs/STAGE_6_MIGRATION_NOTE.md). Only the
+              admin's own resolve_challenge can unstick this agreement if challenged.
+            </p>
+          )}
+          {timeoutRecoveryEligible && (
+            <p className="field-help" style={{ marginTop: 6, color: "var(--mint)" }}>
+              Timeout recovery is available: any wallet may now call
+              resolve_challenge_by_timeout to deterministically uphold the original
+              verdict and reopen the challenge window.
+            </p>
+          )}
         </div>
       )}
     </div>
