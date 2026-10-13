@@ -1,22 +1,44 @@
 {
-  "status": "NOT_DEPLOYED",
-  "reason": "This agent has no StudioNet signing key; deploying was treated as a hard operating boundary and was never attempted. See docs/DEPLOYMENT_RUNBOOK.md for the exact commands a human with a signing key should run, and docs/FINAL_HANDOFF.md for the full blocker record.",
+  "status": "DEPLOYED",
+  "reason": "Deployed by the user directly through the GenLayer Studio web UI (this agent has no StudioNet signing key and never attempted or performed the deployment itself). Bootstrapped (modules + policy templates) and verified live with two full agreement lifecycles on 2026-10-13 -- see docs/STUDIONET_LIVE_VERIFICATION_REPORT.md for the complete call-by-call record.",
   "network": "studionet",
   "chain_id": 61999,
   "rpc": "https://studio.genlayer.com/api",
-  "contract_address": null,
+  "contract_address": "0xb222305575ee8af1255d8aCd196280b405B54Baf",
   "deploy_tx_hash": null,
+  "deploy_tx_hash_note": "Not recorded by this agent -- the user deployed directly via Studio before this session resumed; only the resulting address and a successful get_protocol_stats read were reported. If needed, retrieve it from Studio's transaction history for this contract address.",
   "source_file": "contracts/agentverdict.py",
-  "source_hash": null,
-  "schema": null,
+  "source_hash": "sha256:7b286f034540e12b153bca0e343bde0073e304c202bc61e7e80e676fe138aa5e",
+  "schema": "see docs/GENLAYER_CAPABILITY_MATRIX.md and web/src/chain/schema.ts (39 public methods, 12 view / 27 write, transcribed directly from contracts/agentverdict.py)",
   "bootstrap_tx_hashes": {
     "register_module_api_delivery": null,
     "register_module_agent_task": null,
-    "register_policy_template": null
+    "register_policy_template_smoke_test_v1": null,
+    "register_policy_template_default_v1": null,
+    "register_policy_template_smoke_test_v2": "0x71e735e7fd512ccb5cc21d589424671d6aab4971c0f3b44e856cf38b59c8911d"
+  },
+  "bootstrap_tx_hash_note": "The first four bootstrap calls' tx hashes were not captured in this file at the time they were run; only register_policy_template(smoke-test-v2) was recorded. All five bootstrap calls are independently confirmed SUCCESSFUL via Studio's own transaction detail panel at the time -- see conversation record and docs/STUDIONET_LIVE_VERIFICATION_REPORT.md.",
+  "live_verification_runs": {
+    "A-1": {
+      "policy_id": "smoke-test-v1",
+      "module_id": "api-delivery",
+      "path": "happy path: create -> propose -> accept -> activate -> open_evidence -> submit_evidence x2 -> request_evaluation (PASS, LOW uncertainty) -> finalize_verdict",
+      "final_state": "FINALIZED"
+    },
+    "A-2": {
+      "policy_id": "smoke-test-v2",
+      "module_id": "api-delivery",
+      "path": "challenge path: create -> propose -> accept -> activate -> open_evidence -> submit_evidence -> request_evaluation (PASS, LOW uncertainty) -> challenge_verdict -> resolve_challenge (upheld=false) -> finalize_verdict",
+      "final_state": "FINALIZED"
+    }
   },
   "last_verified_local_lint": {
     "command": "genvm-lint check contracts/agentverdict.py --json",
-    "result": "ok:true, see docs/TEST_EVIDENCE.md",
+    "result": "ok:true, 39 methods (12 view / 27 write), 0 ctor params -- see docs/TEST_EVIDENCE.md and the 2026-10-13 pre-deployment audit (commit ea4ccce)",
     "date": "2026-10-13"
+  },
+  "last_verified_live": {
+    "date": "2026-10-13",
+    "result": "Two full agreement lifecycles (happy path + challenge/reject path) completed successfully on real StudioNet consensus, 5/5 validators throughout. Two open findings surfaced live, not previously caught by direct-mode testing: unbounded challenge-resolution latency, and a nondet-mode storage pickling warning on request_evaluation (execution still succeeded both times). See docs/SECURITY_THREAT_MODEL.md items 8-9 and docs/STUDIONET_LIVE_VERIFICATION_REPORT.md."
   }
 }
