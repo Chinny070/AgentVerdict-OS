@@ -1,4 +1,16 @@
-# Feature Implementation Ledger (final — Stage 6)
+# Feature Implementation Ledger (updated — Stage 4 frontend)
+
+**Stage 4 update (this session):** the `web/` frontend (React + TypeScript +
+Vite, `genlayer-js@1.1.8` pinned) was built, wired to the contract's real
+schema, and verified: `npm run typecheck` clean, `npx vitest run` 18/18
+passing, `npm run build` succeeds, and the built app was exercised in a real
+browser (see `docs/FINAL_HANDOFF.md` section "Stage 4 frontend" for the full
+report). This changes the status of several rows below from "UI deferred"
+to IMPLEMENTED on the frontend side specifically — the on-chain contract
+itself is unchanged from Stage 3 (commit `28e00b6`). No StudioNet deployment
+exists yet, so every chain-dependent screen was verified only against its
+honest "no contract configured" / real-RPC-error empty states, never
+against live data.
 
 This supersedes the Stage 0 initial version of this file (which recorded
 the *plan*; this records what was actually **built, tested, and
@@ -21,14 +33,14 @@ values used below:
 | 5 | Autonomous Recovery Engine | IMPLEMENTED | `request_rework`, `acknowledge_recovery`, `terminate_agreement`; `tests/direct/test_disputes.py` |
 | 6 | Evidence Authenticity Firewall | IMPLEMENTED | URL scheme/length/SSRF/replay checks in `submit_evidence`; `tests/direct/test_evidence.py` |
 | 9 | Contradiction Detection Engine | IMPLEMENTED | `_apply_contradiction_downgrade` deterministically overrides LLM claims about unreachable evidence; `tests/direct/test_api_delivery.py` |
-| 13 | Evidence Freshness Monitor | IMPLEMENTED (contract-side) | `EvidencePacket.submitted_at` + recorded fetch `status_code` per criterion; UI display of computed "age" deferred to Stage 4 (not started) |
+| 13 | Evidence Freshness Monitor | IMPLEMENTED | `EvidencePacket.submitted_at` + recorded fetch `status_code` per criterion; Stage 4 frontend now computes and displays a client-side "age" label from the real on-chain timestamp in Evidence Observatory (`web/src/features/evidence/EvidenceObservatory.tsx`) |
 | 15 | Verdict Explanation Graph | IMPLEMENTED | criterion → `evidence_ids` → `module_version` → `outcome`, all in `get_verdict`; `tests/direct/test_api_delivery.py` |
 | 16 | Agent Identity/Capability Passport | IMPLEMENTED | `register_agent`/`AgentPassport`; `tests/direct/test_access_control.py` |
 | 18 | Delegation Accountability | IMPLEMENTED | `delegate_scope`/`accept_delegation`/`revoke_delegation`, forgery-proof (always keyed off real `sender`); `tests/direct/test_access_control.py` |
 | 19 | Agent Spending and Permission Firewall | PARTIAL | expiration/acceptance/revocation are enforced (`_is_accepted_delegate_of`); the numeric `spend_cap_atto` field exists on `Delegation` and is stored/read, but no money-moving method in this build consumes it yet (no payable methods exist at all — see feature 39/`PROTOCOL_ARCHITECTURE.md` section 5), so the cap is not yet exercised against a real spend path |
 | 26 | Verifiable Verdict Receipts | IMPLEMENTED | `get_audit_receipt` combines policy hash, evidence root, decision, settlement status; exercised indirectly via `tests/direct/test_disputes.py` |
 | 30 | Versioned Evaluation Modules | IMPLEMENTED | `modules` keyed `module_id@version`, immutable, agreements bind the version frozen at creation; `tests/direct/test_agent_task.py::test_agent_task_module_version_bound_to_agreement`, `tests/direct/test_access_control.py::test_register_module_rejects_duplicate_version` |
-| 32 | Contract Observability Dashboard | IMPLEMENTED | `get_protocol_stats`; `tests/direct/test_settlement.py::test_settlement_disabled_by_default` reads it |
+| 32 | Contract Observability Dashboard | IMPLEMENTED | `get_protocol_stats`; `tests/direct/test_settlement.py::test_settlement_disabled_by_default` reads it. Stage 4 frontend renders it live in Protocol Telemetry (`web/src/features/telemetry/ProtocolTelemetry.tsx`), with an honest "no contract configured" empty state and no fabricated activity feed |
 | 35 | Anti-Prompt-Injection Evidence Gateway | IMPLEMENTED | every evidence excerpt wrapped `BEGIN/END_DATA_NOT_INSTRUCTIONS` before prompting; `tests/direct/test_evidence.py::test_prompt_injection_payload_is_inert`, `test_malicious_evidence_content_does_not_change_decision_path` |
 | 38 | Appeals/Reconsideration | IMPLEMENTED | `challenge_verdict`/`resolve_challenge`; `tests/direct/test_disputes.py` |
 | 39 | Settlement Safety Vault | IMPLEMENTED (safe disabled mode) | `settlement_native_transfer_enabled` defaults `False`; flipping it on honestly blocks `record_settlement` with a clear unverified-stub error rather than a silent fake transfer; `tests/direct/test_settlement.py` |
@@ -39,7 +51,7 @@ values used below:
 
 | # | Feature | Status | Notes |
 |---|---|---|---|
-| 1 | Counterfactual Verdict Simulator | DEFERRED | Frontend ("Simulation Chamber") concept; no contract-side blocker, just not built this session |
+| 1 | Counterfactual Verdict Simulator | PARTIAL | Stage 4 built "Simulation Chamber" (`web/src/features/developer/SimulationChamber.tsx`): a client-side, clearly-labeled "Advisory · non-binding" illustration of the contract's deterministic `_derive_remedy`/settlement-amount rules only. It never calls the chain, never predicts an LLM decision, and is explicitly not a real counterfactual re-evaluation |
 | 3 | Multi-Agent Causality Engine | PARTIAL | The agent-task module conservatively reports `INSUFFICIENT_EVIDENCE`/`HIGH` uncertainty rather than fabricating per-delegate blame (`tests/direct/test_agent_task.py::test_agent_task_multi_delegate_inconclusive_causality`); a dedicated dependency/causality graph structure was not built |
 | 7 | Source Reliability Graph | DEFERRED | |
 | 8 | Semantic Agreement Compiler | DEFERRED | Rubric is authored off-chain by the caller and frozen on-chain; no NL→rubric compiler exists |
@@ -73,12 +85,13 @@ values used below:
 
 ## Additional foundational features (spec section 6 addendum)
 
-Natural-language task agreements (authored off-chain, frozen on-chain — IMPLEMENTED for the frozen half), milestone/retroactive settlement (simplified to single-cycle-per-agreement — PARTIAL, see `docs/PROTOCOL_ARCHITECTURE.md` section 3), multi-agent dependencies (delegation lineage only — PARTIAL), evidence provenance (`EvidencePacket` — IMPLEMENTED), standardized citations (`Finding.evidence_ids` — IMPLEMENTED), explainable outcomes (`reason` + `limitations_json` — IMPLEMENTED), structured uncertainty (`Verdict.uncertainty` — IMPLEMENTED), deterministic authorization (state-machine guards — IMPLEMENTED), identity/permissions (IMPLEMENTED), rubric versioning (`PolicyTemplate.revision` — IMPLEMENTED), portable reputation (DEFERRED, see feature 27), recovery (IMPLEMENTED), settlement receipts (IMPLEMENTED), extension registry (`modules` — IMPLEMENTED), human intervention (`resolve_challenge`, centralized — PARTIAL, see `docs/SECURITY_THREAT_MODEL.md`), governance with bounded powers (admin surface is intentionally small — IMPLEMENTED as scoped), auditable lifecycle (per-attempt verdict history keys — IMPLEMENTED), developer integration (DEFERRED, Stage 5), responsive frontend (DEFERRED, Stage 4, not started).
+Natural-language task agreements (authored off-chain, frozen on-chain — IMPLEMENTED for the frozen half), milestone/retroactive settlement (simplified to single-cycle-per-agreement — PARTIAL, see `docs/PROTOCOL_ARCHITECTURE.md` section 3), multi-agent dependencies (delegation lineage only — PARTIAL), evidence provenance (`EvidencePacket` — IMPLEMENTED), standardized citations (`Finding.evidence_ids` — IMPLEMENTED), explainable outcomes (`reason` + `limitations_json` — IMPLEMENTED), structured uncertainty (`Verdict.uncertainty` — IMPLEMENTED), deterministic authorization (state-machine guards — IMPLEMENTED), identity/permissions (IMPLEMENTED), rubric versioning (`PolicyTemplate.revision` — IMPLEMENTED), portable reputation (DEFERRED, see feature 27), recovery (IMPLEMENTED), settlement receipts (IMPLEMENTED), extension registry (`modules` — IMPLEMENTED), human intervention (`resolve_challenge`, centralized — PARTIAL, see `docs/SECURITY_THREAT_MODEL.md`), governance with bounded powers (admin surface is intentionally small — IMPLEMENTED as scoped), auditable lifecycle (per-attempt verdict history keys — IMPLEMENTED), developer integration (DEFERRED, Stage 5; Adapter Foundry documents the two real modules but there is no third-party SDK yet), responsive frontend (IMPLEMENTED this session — see `web/`, verified at desktop and 375px mobile widths with no horizontal overflow, keyboard focus states, and `prefers-reduced-motion` respected in `web/src/design/tokens.css`).
 
 ## Totals
 
 - **40/40 features explicitly accounted for** — none silently dropped.
-- **15 IMPLEMENTED, 7 PARTIAL (each with a stated real subset and a stated gap), 17 DEFERRED, 1 DESIGN-SATISFIED.**
+- **15 IMPLEMENTED, 8 PARTIAL (each with a stated real subset and a stated gap), 16 DEFERRED, 1 DESIGN-SATISFIED**, after this session's Stage 4 update moved feature 1 (Counterfactual Verdict Simulator) from DEFERRED to PARTIAL (a real, clearly-labeled advisory frontend now exists; see `web/src/features/developer/SimulationChamber.tsx`).
+- The Stage 4 frontend itself (`web/`) is a cross-cutting deliverable, not a single numbered feature: it gives real UI to features 2, 4, 5, 6, 9, 13, 15, 16, 18, 19, 26, 30, 32, 35, 38, 39 (all P0) plus 1, 24, 25, 37 (P1, partial), all gated honestly behind "no contract configured" until a real StudioNet address exists.
 - Every IMPLEMENTED and PARTIAL claim above is backed by a named, passing
   test in `tests/direct/`, re-run and confirmed in this session
   (`docs/TEST_EVIDENCE.md`) — not asserted from memory.

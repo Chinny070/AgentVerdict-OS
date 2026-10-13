@@ -29,18 +29,29 @@ hosted database, no relayer — see spec section 0.
   integration testing, with the exact blockers recorded (`docs/FINAL_HANDOFF.md`,
   `docs/TEST_EVIDENCE.md`).
 
+- A frontend (`web/`, Stage 4): React + TypeScript + Vite, `genlayer-js@1.1.8`
+  pinned, all 13 P0 screens plus Landing and a P1 Simulation Chamber,
+  typechecked, unit-tested (18/18 passing), production-built, and verified
+  in a real browser against a configurable (empty-by-default) contract
+  address — see `docs/FINAL_HANDOFF.md` section 8 for the full report.
+
 ## What does not exist yet
 
-- Frontend (Stage 4) — not started.
 - A real StudioNet deployment — not performed (no signing key access, a
   hard operating boundary for this agent regardless of brief wording).
+  `deployments/studionet.json` still reads `NOT_DEPLOYED`.
 - Passing integration tests against real multi-validator consensus with a
   live LLM — blocked on a diagnosed GLSim tooling gap plus no LLM provider
   key; see `docs/FINAL_HANDOFF.md`.
+- Any live wallet-signed write or live contract read in the frontend — it
+  was proven to make a real RPC round-trip to StudioNet (a genuine
+  "contract not found" response for a test address), but no real deployed
+  contract exists yet to read from or write to.
 
 Never treat any of the above as "coming soon" marketing — see the explicit
-verdict in `docs/FINAL_HANDOFF.md`: **CONDITIONALLY READY**, contract-side
-only.
+verdict in `docs/FINAL_HANDOFF.md`: **CONDITIONALLY READY** — contract-side
+proven, frontend built and self-tested, end-to-end chain integration still
+unverified live.
 
 ## Reproduce the verified results yourself
 
@@ -72,6 +83,22 @@ a network nor a key. Deployment and live-network integration testing need
 a human with their own signing key and/or LLM provider key; exact commands
 are in `docs/DEPLOYMENT_RUNBOOK.md`.
 
+```bash
+# 4. Frontend: typecheck, test, build (no network, no wallet required)
+cd web
+npm ci
+npm run typecheck
+npx vitest run
+npm run build
+
+# 5. (Optional) preview the built app locally
+npm run preview -- --host 127.0.0.1 --port 4173
+# Open http://localhost:4173 — every screen renders an honest
+# "no contract configured" empty state until you set a real deployed
+# address on the Settings screen (stored only in your browser's
+# localStorage, never committed or treated as canonical state).
+```
+
 ## Repository layout
 
 ```
@@ -84,7 +111,8 @@ docs/                         capability matrix, architecture, state machine,
                                feature ledger, final handoff
 deployments/studionet.json    explicit NOT_DEPLOYED record, not a placeholder
                                pretending to be real
-web/                           not started yet (Stage 4)
+web/                          React + TypeScript + Vite frontend (Stage 4),
+                               see web/src/{chain,components,features,design}
 ```
 
 ## License

@@ -204,17 +204,148 @@ integration-test attempt). Next concrete actions, in priority order:
 4. Build out the P1 features marked PARTIAL/DEFERRED in priority order
    once P0 is live-verified, per brief Stage 5's stated order.
 
-## 8. Explicit verdict
+## 8. Stage 4 — frontend (this session)
 
-**CONDITIONALLY READY — contract-side only.**
+**Scope actually delivered:** a complete React + TypeScript + Vite
+frontend at `web/`, built against `genlayer-js@1.1.8` (pinned exactly, its
+real exported API read from the installed package's own
+`node_modules/genlayer-js/dist/*.d.ts` and README, not from memory), wired
+to a configurable (empty-by-default) StudioNet contract address. No backend
+of any kind was added.
+
+**Files:** `web/src/chain/{client,config,contract,schema,transactions}.ts`,
+`web/src/design/{tokens,global}.css`, `web/src/components/*` (AppShell,
+SpectralNav, NetworkPill, WalletConnect, AgreementEditor, RubricMatrix,
+EvidenceGraph, VerdictCard, CriterionFinding, ChallengeTimeline,
+RecoveryPanel, SettlementLedgerPanel, RiskMeter, ContractEventFeed,
+TxProgress, EmptyState, ErrorBoundary, Toast (via `state/ToastContext`),
+Skeleton, CopyHash, AgentPassportCard, DelegationGraph, AdapterCatalog,
+ConfigGate, IdPicker, StatusBadge), `web/src/features/{dashboard,
+agreements, agents, missions, evidence, verdicts, appeals, recovery,
+settlement, developer, telemetry, settings}/*.tsx`, `web/src/state/*`
+(wallet, contract-address, toast, and a browser-local ID-bookmark registry
+— explicitly non-authoritative), `web/src/App.tsx`, `web/src/main.tsx`.
+
+**genlayer-js API actually used (verified, not guessed):**
+`createClient({chain, account?, provider?})` from `genlayer-js`, the
+built-in `studionet` chain export from `genlayer-js/chains` (confirmed
+`id: 61999`, RPC `https://studio.genlayer.com/api` by reading
+`dist/chunk-XCQTIUTU.js` directly), `client.readContract`,
+`client.writeContract`, `client.waitForTransactionReceipt`,
+`client.getContractSchema`, `client.connect("studionet")`, and the real
+`TransactionStatus`/`ExecutionResult` runtime enums from
+`genlayer-js/types`. The README's own documented pattern — a read client
+with no account, and a separate write client created with
+`{account, provider: window.ethereum}` only once a wallet is connected —
+is followed exactly in `web/src/chain/client.ts`.
+
+**Wallet integration:** EIP-1193 injected-provider only (`window.ethereum`),
+per genlayer-js 1.1.8's actual documented integration path. No wallet SDK
+beyond that was added. `connectWallet()` calls `eth_requestAccounts`, then
+`client.connect("studionet")` to switch/add the chain, surfacing every
+realistic failure (no provider, rejected signature, wrong chain) as a real
+error string, never a silent fallback.
+
+**Contract schema binding:** `web/src/chain/schema.ts` transcribes all 39
+public methods (12 view, 27 write) directly from `contracts/agentverdict.py`
+— verified by a dedicated test (`web/src/chain/schema.test.ts`) asserting
+the exact counts and `create_agreement`'s exact parameter order. A
+`verifyLiveSchema()` function additionally cross-checks this manifest
+against the REAL on-chain schema via `getContractSchema` once a real
+address exists (exposed on the Settings screen), so manifest drift would
+be caught, not silently trusted.
+
+**Honesty gates implemented:**
+- No contract address is hardcoded; `deployments/studionet.json` still
+  records `NOT_DEPLOYED` and nothing in `web/` contradicts that.
+- Every screen that reads chain state is wrapped in `<ConfigGate>`, which
+  renders an explicit "No contract configured" empty state — verified by
+  `web/src/components/ConfigGate.test.tsx` — rather than fabricating data.
+- Every write goes through `chain/transactions.ts::runWrite`, which only
+  ever reports success after a real `waitForTransactionReceipt` result,
+  and explicitly distinguishes consensus status (`ACCEPTED`/`FINALIZED`)
+  from execution result (`FINISHED_WITH_RETURN`/`FINISHED_WITH_ERROR`) —
+  a transaction that reaches consensus with a failed execution is reported
+  as FAILED, never as a false success.
+- The Settlement Ledger screen visibly states "Authorization receipt only
+  — no real asset custody" (`web/src/components/SettlementLedgerPanel.tsx`),
+  matching what `record_settlement` actually does on-chain (no payable
+  methods exist in this contract at all).
+- Protocol Telemetry and the Command Deck's "bookmarked agreements" list
+  never seed fake activity; `ContractEventFeed` is explicitly labeled a
+  manual client-side poller, not a push subscription or webhook.
+- Simulation Chamber is labeled "Advisory · non-binding" and never calls
+  the chain or predicts an LLM decision.
+
+**Test/build results (exact, reproduced in this session):**
+- `cd web && npm ci` is the documented reproduction command;
+  `npm install` was actually run in this session (`npm ci` requires the
+  committed `package-lock.json`, which this session generated and committed).
+- `npm run typecheck` (`tsc --noEmit`) → **clean, zero errors.**
+- `npx vitest run` → **5 test files, 18 tests, all passing** (0 failed).
+  Tests cover: `StatusBadge`/`ExperimentalBadge` honesty labeling,
+  `EmptyState`'s "teach the first real action" contract, the
+  `CONTRACT_METHODS` manifest's exact shape (regression guard against the
+  contract's real signatures), `RubricMatrix` add/remove interactions, and
+  `ConfigGate`'s configured/unconfigured empty-state behavior.
+- `npm run build` (`tsc --noEmit && vite build`) → **succeeds.** Output:
+  `dist/index.html` (0.59 kB), `dist/assets/*.css` (10.77 kB),
+  `dist/assets/*.js` (780.27 kB combined, 190.03 kB gzip — Vite warns this
+  chunk exceeds 500 kB, mostly `viem`/`genlayer-js`; not code-split in this
+  session, a legitimate follow-up, not a failure).
+
+**Real-browser verification (Claude Browser pane, `npm run preview` on
+`127.0.0.1:4173`, confirmed via `.claude/launch.json`):**
+- Every one of the 14 screens (Landing, Command Deck, Agreement Forge,
+  Agent Atlas, Mission Control, Evidence Observatory, Verdict Theater,
+  Appeals Tribunal, Recovery Center, Settlement Ledger, Adapter Foundry,
+  Simulation Chamber, Protocol Telemetry, Settings) was navigated to and
+  rendered without a blank page or React error boundary trip.
+- No console errors were observed browsing with no contract configured and
+  no wallet connected (the two expected default states).
+- Entering a syntactically-valid but non-deployed test address
+  (`0x1234...7890`) in Settings and opening Protocol Telemetry produced a
+  **real RPC round-trip to `https://studio.genlayer.com/api`**, which
+  returned a genuine `Contract 0x1234...7890 not found` error — proving
+  the client is actually wired to live StudioNet infrastructure, not a
+  mock, and that the UI surfaces the real error instead of fabricating
+  data. This is the strongest available evidence of live wiring without a
+  real deployed address.
+- Mobile viewport (375×812) was verified: no horizontal overflow, the
+  two-column `app-shell` grid collapses to one column, nav items and
+  buttons remain tappable, text reflows correctly.
+- Disabled-state styling (e.g. "Create agreement" before a wallet is
+  connected) was visually confirmed dimmed via `.btn:disabled`.
+- **Not verified, and not claimed:** a real wallet signature flow, a real
+  write transaction, or any StudioNet integration against an actual
+  deployed contract — none of that is possible without a real deployment
+  and a real signing key, neither of which this agent has.
+
+**Known follow-up (not a blocker):** the production JS bundle is a single
+~780 kB chunk; `build.rollupOptions.output.manualChunks` or dynamic
+`import()` per route would reduce initial load, deferred as a legitimate
+Stage 5+ optimization rather than required for Stage 4's scope.
+
+## 9. Explicit verdict
+
+**CONDITIONALLY READY — contract-side proven, frontend built and
+self-tested, end-to-end chain integration still unverified live.**
 
 Not unconditionally READY: no real StudioNet (or even real-GenVM-via-Docker)
 deployment was performed or verified in this session, and integration
 tests against real consensus/LLM/web are honestly blocked and skipped, not
-faked. It is not BLOCKED outright either: the contract itself is complete
-for its first real path (Stages 0-3 of the brief), lint-clean, and proven
-correct against the real pinned SDK by 68 passing direct-mode tests
-covering every state transition, both flagship evaluation modules'
-leader/validator equivalence, the evidence/anti-injection firewall, and
-settlement safety — with every claim in this document backed by an actual
-command run in this session, not an assumption.
+faked. The Stage 4 frontend adds a second, equally honest layer to that
+same gap: it is typechecked, unit-tested, and production-built, and it was
+proven to make a REAL (if necessarily unsuccessful, since no contract is
+deployed) RPC call to live StudioNet — but no wallet-signed write, no real
+contract read, and no live schema verification against a real deployed
+address has been exercised, because none can be without a human performing
+the deployment this agent is deliberately barred from doing. It is not
+BLOCKED outright either: the contract itself is complete for its first
+real path (Stages 0-3 of the brief), lint-clean, and proven correct
+against the real pinned SDK by 68 passing direct-mode tests covering every
+state transition, both flagship evaluation modules' leader/validator
+equivalence, the evidence/anti-injection firewall, and settlement safety —
+and the frontend is complete for all 13 P0 screens plus Landing, with a
+P1 Simulation Chamber built as a bonus, with every claim in this document
+backed by an actual command run in this session, not an assumption.
