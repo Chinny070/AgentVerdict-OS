@@ -79,6 +79,53 @@ Confirmed by reading the installed package source directly (not assumed):
 
 - Not yet exercised (frontend stage not reached). The brief's instruction to "confirm official `createClient`, chain configuration, `readContract`, `writeContract` ... for this version" against `genlayer-js@1.1.8` specifically is deferred to the frontend stage and listed as a next step in `FINAL_HANDOFF.md`.
 
+## 7.1 Audit addendum (2026-10-13): time determinism re-investigated
+
+A later audit session re-investigated the `datetime.datetime.now(UTC)`
+claim above rigorously rather than accepting it at face value, per
+explicit instruction. Findings:
+
+- The `genlayer-docs` MCP tools were unavailable this session (every
+  call returned `HTTP 400: No transport found for sessionId`); the live
+  `sdk.genlayer.com` site was fetched directly via `WebFetch` instead
+  (`https://sdk.genlayer.com/main/_static/ai/api.txt` and
+  `.../impl-spec.txt`), which is the **current/main** GenVM docs branch,
+  not necessarily exactly this pin's version — treat accordingly.
+- Confirmed by reading the extracted pinned SDK directly
+  (`~/.cache/gltest-direct/extracted/v0.2.16/.../genlayer/gl/__init__.py`
+  and `vm.py`): this pin has **no** `gl.vm.get_timestamp()` and **no**
+  dedicated clock API at all besides `trace_time_micro()` (a profiling
+  timer, not a transaction clock). The current docs' `get_timestamp()`
+  ("in deterministic mode it is the transaction timestamp; in
+  non-deterministic mode it is the real wall-clock time") was added in a
+  later SDK generation than this pin targets. This means the contract's
+  use of raw `datetime.datetime.now(UTC)` is this pin's **only
+  available** option, not a choice made over a safer documented
+  alternative.
+- The current GenVM implementation spec (`impl-spec.txt`, main branch)
+  states WASI's time functions are "Modified to ensure reproducible
+  behavior across validators" under the "Modified Wasmtime Runtime", and
+  that real wall-clock time is exposed to a contract only at the
+  `unsafe-tracing` debug level, which "a host on a consensus network must
+  not" accept from untrusted callers. This is documentary evidence
+  consistent with (not proof of) deterministic-mode time reads being
+  safe for the real production runtime at this pin.
+- `gltest`'s direct-mode `VMContext.activate()` (`gltest/direct/vm.py`
+  line ~463) patches `datetime.datetime` at the **Python level** so that
+  `.now()` returns the `warp()`-set value — confirmed by reading the
+  source and by a new passing test
+  (`tests/direct/test_time_determinism.py`). This is a **test-harness**
+  simulation (direct mode runs contract code natively in CPython, not in
+  WASM) and is not itself evidence about the real WASM sandbox's
+  behavior, though it is consistent with the documentary evidence above.
+- **Net conclusion:** no hazard was newly discovered, and no fix was
+  made (none is possible within this SDK pin — there is no alternative
+  API to switch to). The determinism claim remains **supported by
+  documentary evidence and test-harness behavior, not by a live WASM-level
+  execution test**, which no environment in this session could provide
+  without a real `genlayer up`/Docker-backed GenVM or a StudioNet
+  deployment (out of scope / unavailable).
+
 ## 8. Explicit list of brief claims checked and found accurate
 
 - StudioNet chain ID 61999 — accurate.

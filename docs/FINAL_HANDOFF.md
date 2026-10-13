@@ -154,6 +154,77 @@ agent does not have.
 2. With a StudioNet signing key: follow `docs/DEPLOYMENT_RUNBOOK.md` exactly.
 3. With an LLM provider key (for either local GLSim-with-`--llm-provider` or Studio's own backend): re-enable `tests/integration/test_full_agent_lifecycle.py::test_real_consensus_evaluation_pass_decision` and the other skipped integration tests by removing their `pytest.mark.skip`.
 
+### 4.1 Audit correction (2026-10-13, independent re-investigation)
+
+A later security/compatibility audit session **re-ran the GLSim deploy
+attempt live** (same command, same contract, `glsim --port 4000
+--validators 3 --chain-id 61999 --no-browser`, confirmed live via
+`eth_chainId` → `0xf22f`) rather than accepting the diagnosis above at
+face value, per explicit user instruction to re-verify it independently.
+Findings:
+
+1. **The original diagnosis above (blaming `glsim/genvm_stubs.py`'s
+   hardcoded `__gl_allow_storage__` stubs) is factually wrong.**
+   `glsim/genvm_stubs.py` only stubs the unrelated
+   `genlayer_embeddings`/`VecDB` library; it contains no `Contract`
+   class, no `__init_subclass__`, and is never on the code path that
+   loads a user's `Contract` subclass. GLSim's contract loader
+   (`glsim/engine.py`) actually calls `gltest.direct.loader
+   .load_contract_class`/`deploy_contract` directly — **the same real
+   pinned-SDK loader direct-mode tests use** — so the SDK-mismatch
+   theory does not hold either.
+2. **The real bug is a flaky GLSim-only class-identity bug in
+   `glsim/engine.py`.** The first deploy to a freshly started GLSim
+   server succeeds (confirmed live, address returned). Every subsequent
+   deploy of the *same* contract source to that *same still-running*
+   server fails deterministically with the exact
+   `"class is not marked for usage within storage"` error, reproduced
+   4/4 times in a row. Root cause, confirmed by direct instrumentation
+   (calling `SimEngine.deploy()` twice in-process and inspecting the
+   cached class object): `SimEngine.deploy()` (`glsim/engine.py` lines
+   ~202-225) caches `contract_cls = type(instance)` after a successful
+   deploy, but `instance` at that point is the **calldata-roundtrip
+   proxy** `gltest/direct/loader.py::_make_contract_proxy` returns (not
+   the real contract instance). The proxy's dynamically-created wrapper
+   class has `__module__`/`__qualname__` copied from the real class (so
+   it *prints* identically, e.g. `<class
+   '_contract_...AgentVerdictOS'>`) but its actual `__mro__` is only
+   `(proxy_cls, object)` — no `gl.Contract` base, no
+   `__gl_allow_storage__`, no `__gl_contract__`. `engine.py`'s
+   MRO-walking loop (lines ~220-223) that is supposed to recover the
+   *real* class from the proxy's MRO instead matches the proxy class
+   itself on its very first iteration (it satisfies both of the loop's
+   own conditions: `hasattr(cls, '__annotations__')` and
+   `cls.__module__.startswith("_contract_")`), so the **wrong class
+   gets cached**. Every later deploy that hits this cache
+   (`glsim/engine.py` line ~204-206,
+   `if cached_cls is not None: instance = _allocate_contract(cached_cls, ...)`)
+   then runs `_storage_build()` directly on the storage-less proxy
+   class and fails. Empirically confirmed: after deploy #1,
+   `hasattr(engine._class_cache[path_key], '__gl_allow_storage__')` is
+   `False` and its `__mro__` is `(AgentVerdictOS-shaped proxy, object)`.
+3. **This is SIMULATOR-ONLY**, specifically a GLSim class-cache bug —
+   not a GenVM SDK bug, not a defect in this contract, and not expected
+   to occur on StudioNet. StudioNet runs the genuine hosted GenVM
+   (WASM-sandboxed, per-node independent process), which has no
+   equivalent of GLSim's local in-process "reuse cached Python class
+   across deploys" optimization for the Python-native `glsim` package
+   to get wrong; this architectural distinction (confirmed by GLSim
+   being a separate local-only pip package with its own
+   `glsim/engine.py`, never the backend of `studio.genlayer.com`) was
+   not independently exercised this session either (no StudioNet
+   deployment was attempted, per the hard operating boundary), so it
+   remains an architectural inference, not a live-tested one.
+4. **The contract was not changed** as a result of this finding — there
+   is nothing in `contracts/agentverdict.py` to fix; the bug is entirely
+   inside the `glsim` package's own engine. A filed upstream issue
+   against `glsim`/`genlayer-test` referencing
+   `glsim/engine.py` lines ~202-225 would be the correct fix location
+   for whoever maintains that package.
+
+See the audit session's full report for the live reproduction transcript
+and the standalone instrumentation script output.
+
 ## 5. P0/P1/P2 feature completion ledger
 
 See `docs/FEATURE_IMPLEMENTATION_LEDGER.md` for the full 40-row table.
