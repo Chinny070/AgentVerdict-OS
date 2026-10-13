@@ -70,6 +70,16 @@ web_modules/
 .env.*
 !.env.example
 
+# Python / GenLayer test tooling
+__pycache__/
+*.pyc
+.pytest_cache/
+.gltest_cache/
+artifacts/
+gltest.config.yaml
+.venv/
+venv/
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache

@@ -1,0 +1,22 @@
+{
+  "status": "NOT_DEPLOYED",
+  "reason": "This agent has no StudioNet signing key; deploying was treated as a hard operating boundary and was never attempted. See docs/DEPLOYMENT_RUNBOOK.md for the exact commands a human with a signing key should run, and docs/FINAL_HANDOFF.md for the full blocker record.",
+  "network": "studionet",
+  "chain_id": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "contract_address": null,
+  "deploy_tx_hash": null,
+  "source_file": "contracts/agentverdict.py",
+  "source_hash": null,
+  "schema": null,
+  "bootstrap_tx_hashes": {
+    "register_module_api_delivery": null,
+    "register_module_agent_task": null,
+    "register_policy_template": null
+  },
+  "last_verified_local_lint": {
+    "command": "genvm-lint check contracts/agentverdict.py --json",
+    "result": "ok:true, see docs/TEST_EVIDENCE.md",
+    "date": "2026-10-13"
+  }
+}
