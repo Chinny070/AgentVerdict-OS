@@ -272,3 +272,126 @@ independent run in a separate session. No code or test changes were needed
 as a result of this re-verification; this section exists only to convert
 the earlier, never-actually-run "final test pass" claim into a genuinely
 checked one.
+
+## 10. Stage 9 — Vercel production deployment verification (2026-10-14)
+
+The frontend (`web/`, unmodified by this pass except for this documentation
+and the addition of a stable Live Demo URL to `README.md`) was deployed to
+Vercel as static-site/SPA hosting — no backend, API route, serverless
+function, or database introduced. Build: `npm run build` (`tsc --noEmit &&
+vite build`) in Vercel's own build environment, Vite framework
+auto-detection, output directory `dist` (default). No blockchain transaction
+was signed or sent as part of this deployment or its verification — Vercel
+hosting involves no chain interaction, and this agent holds no StudioNet
+signing key, consistent with this project's absolute hard boundary.
+
+**Deployment facts:**
+- Vercel project: `chinny070s-projects/web` (project ID
+  `prj_fbSU6AI5aDFOfiC9FyPlldOHPzZ5`).
+- Production deployment: `dpl_36BndqyqcZn89maBkcbXovEHzeKe`, status `READY`,
+  target `production`.
+- Stable production URL (survives future `--prod` redeploys):
+  `https://web-omega-amber-37.vercel.app`.
+- Per-deployment URL (this specific build):
+  `https://web-7ql48eyd3-chinny070s-projects.vercel.app`.
+- Environment variable `VITE_CONTRACT_ADDRESS` explicitly set to
+  `0xCC67216ceD224A971739bAA706142A740B31853C` (V2) for the Production
+  environment, confirmed via `vercel env ls` before deploying. No other
+  `VITE_*` variable is read anywhere in `web/src` (confirmed by grep) — the
+  app's own built-in default (`web/src/chain/config.ts`) already matches V2,
+  so this env var is a deliberate explicit pin, not a silent reliance on a
+  fallback.
+- Router is `HashRouter` (`web/src/App.tsx`), confirmed by reading the
+  router config directly — all routes live under the `#/...` fragment,
+  which the server never sees, so **no SPA rewrite rule (`vercel.json`) was
+  required or added**; this is a structural property of hash routing, not
+  an oversight. Verified live (see below): a hard refresh on a nested route
+  renders correctly with no 404.
+- No secret, private key, or API key found anywhere in `web/` or any `.env*`
+  file (grepped explicitly for common secret patterns — the only matches
+  were unrelated words like "risk" and "mask" in component/CSS names). The
+  only public env var in use, `VITE_CONTRACT_ADDRESS`, is a public contract
+  address by design — genlayer-js talks directly to the public StudioNet
+  RPC with no API key of any kind.
+- `.vercel/` (containing the project link and a local OIDC token) and
+  `.env*` are both gitignored in `web/.gitignore` (written automatically by
+  the Vercel CLI on first link, matching Vercel's own documented
+  convention — confirmed by reading the file, not assumed). Nothing under
+  `.vercel/` was committed.
+
+**Live browser verification performed this pass** (via the built-in browser
+pane, real network calls, no simulation):
+- Landing, Command Deck, Agreement Forge, Agent Atlas, Mission Control,
+  Evidence Observatory, Verdict Theater, Appeals Tribunal, Recovery Center,
+  Settlement Ledger, Adapter Foundry, Simulation Chamber, Protocol
+  Telemetry, and Settings all navigated successfully on the live production
+  URL — no blank pages, no build-error screens, no 404s.
+- **SPA-refresh test:** navigated directly to `/#/telemetry` and performed a
+  real hard refresh (F5). The page reloaded correctly and re-rendered live
+  chain data — confirming the hash-routing approach needs no server-side
+  rewrite, and that the deployed static site serves `index.html` correctly
+  on a full reload regardless of the current hash.
+- **Real-RPC confirmation:** Protocol Telemetry on the live production URL
+  shows Agreements 7, Evidence 7, Delegations 1, Challenges 2, Settlements
+  1, Reputation Events 3, admin `0xaffE15…E8e70b`, settlement native
+  transfer `DISABLED` — matching this report's section 2 exactly. Confirmed
+  via `performance.getEntriesByType('resource')` that a real network
+  request fired to `https://studio.genlayer.com/api` (duration ~5.5s,
+  consistent with a real RPC round trip, not a mock). Evidence Observatory
+  looked up agreement `A-1` live and rendered its real E-1/E-2/E-3
+  provenance table with real submitters and freshness — matching section 2
+  again.
+- **Error handling:** entered a deliberately invalid value
+  (`not-a-valid-address`) into Agent Atlas's passport lookup field. The UI
+  surfaced a real, honest error ("Missing or invalid parameters... Details:
+  execution failed Version: viem@2.57.5") instead of crashing; the
+  corresponding `GenLayer RPC error (gen_call): execution failed` appeared
+  in the browser console as an expected, logged error, not an unhandled
+  exception.
+- **Honest write-gating confirmed on the live deployment:** Agreement
+  Forge's "Create agreement" button has a real `disabled` DOM attribute
+  (checked via direct JS, not visual inference) and the page states
+  "Connect a wallet to submit."
+- **Mobile viewport (375×812):** Landing, Protocol Telemetry, and Settings
+  show no horizontal overflow (`scrollWidth === clientWidth === 375`),
+  confirming the commit `1c85336` fix holds on the real deployed build for
+  those screens. **New finding, not previously documented:** Adapter
+  Foundry's contract method manifest table was **not** covered by that
+  fix and does overflow at 375px (`scrollWidth` 757 vs `clientWidth` 375).
+  Root cause, confirmed by inspecting computed styles: `body` has
+  `overflow-x: hidden` (the commit 1c85336 fix), but `<html>` does not, and
+  the table's wrapper `<div>` has no `overflow-x: auto`/scroll container of
+  its own — so the table (four columns, ~117px each, ~470px+ total) escapes
+  both containers and the whole page becomes horizontally scrollable at
+  mobile width. This is a real, reproducible, still-open mobile-layout bug
+  on one specific screen, not a regression introduced by this deployment —
+  it was not one of the "7 spot-checked screens" the commit 1c85336 pass
+  verified. Left unfixed in this pass since fixing frontend bugs was out of
+  scope for a pure hosting/deployment task; flagged here explicitly rather
+  than silently omitted.
+- **Console errors:** checked across Landing, Command Deck, Agent Atlas,
+  Evidence Observatory, Appeals Tribunal, Adapter Foundry, and Settings. The
+  only error observed across all of them was the single expected
+  `GenLayer RPC error (gen_call): execution failed` from the deliberate
+  invalid-lookup test above (console log persists across client-side
+  hash-route navigations within the same tab since there is no full
+  reload) — no other error, on any screen.
+- **Wallet integration — explicitly NOT fully testable in this session:**
+  the built-in browser pane has no injected wallet provider
+  (`window.ethereum` is undefined), and the Settings screen honestly
+  reports "Not detected" / "Not connected" rather than fabricating a
+  connection. No real wallet connection or signed transaction was attempted
+  or simulated, consistent with this project's absolute hard boundary (no
+  agent has ever held a signing key). This is a genuine, stated limitation
+  of headless-browser verification, not a gap in the deployment itself.
+- V1 (`0xb222305575ee8af1255d8aCd196280b405B54Baf`) confirmed unchanged and
+  intact: the Settings screen still shows the full "V1 — historical
+  deployment (read-only, superseded)" section verbatim, and README.md's V1
+  row in the "Live deployments" table is untouched by this pass.
+
+**Overall:** the production Vercel deployment faithfully reproduces the
+locally-verified frontend behavior from sections 1-9 above, reads real live
+V2 StudioNet data over a real RPC call, and introduces no backend, secret,
+or blockchain-signing capability of any kind. One new, real, narrow mobile
+layout bug was found (Adapter Foundry's method table) and is recorded here
+rather than silently left out.

@@ -9,6 +9,21 @@ Full build brief: `AGENTVERDICT_OS_CODING_AGENT_MASTER_BUILD_BRIEF.md`.
 Honest, precise current status: `docs/SUBMISSION_READINESS_REPORT.md`
 (PASS/PARTIAL/BLOCKED per area, not a single "production ready" claim).
 
+## Live Demo
+
+**[https://web-omega-amber-37.vercel.app](https://web-omega-amber-37.vercel.app)**
+— the real, live production frontend, hosted on Vercel as static-site/SPA
+hosting only (no backend, no API routes, no database — see "Architecture"
+below). Defaults to the live V2 contract
+(`0xCC67216ceD224A971739bAA706142A740B31853C`); Protocol Telemetry,
+Agent Atlas, Evidence Observatory, Verdict Theater, Appeals Tribunal, and
+Settlement Ledger all show real live V2 chain data immediately, no wallet or
+setup required. Connect a browser wallet (e.g. MetaMask) to attempt a write.
+Verified working (deployment ID `dpl_36BndqyqcZn89maBkcbXovEHzeKe`, Vercel
+project `chinny070s-projects/web`) on 2026-10-14 — see
+`docs/SUBMISSION_READINESS_REPORT.md` section 10 for the full verification
+record, including what could and could not be tested in that pass.
+
 **Architecture:** one GenLayer Python Intelligent Contract
 (`contracts/agentverdict.py`) plus a static frontend (`web/`). No backend
 server, no hosted database, no relayer — see `docs/PROTOCOL_ARCHITECTURE.md`.
