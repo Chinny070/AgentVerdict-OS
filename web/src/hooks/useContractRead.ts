@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { describeError } from "../chain/client";
 import { useContractAddress } from "../state/ContractAddressContext";
 
 export type ReadState<T> =
@@ -30,7 +31,7 @@ export function useContractRead<T>(
     setState({ status: "loading" });
     fetcher(address as `0x${string}`)
       .then((data) => setState({ status: "ready", data }))
-      .catch((err) => setState({ status: "error", error: err instanceof Error ? err.message : String(err) }));
+      .catch((err) => setState({ status: "error", error: describeError(err) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address, fetcher, ...deps]);
 

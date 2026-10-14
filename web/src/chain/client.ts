@@ -29,6 +29,36 @@ declare global {
   }
 }
 
+/**
+ * Extracts a human-readable message from any thrown value. Real `Error`
+ * instances are the easy case, but EIP-1193 provider errors (e.g. a
+ * rejected `wallet_switchEthereumChain`/`wallet_addEthereumChain` call from
+ * MetaMask) are commonly plain objects shaped like `{ code, message, data }`,
+ * not `Error` instances — `String(err)` on those degrades to the useless
+ * `"[object Object]"` and silently discards the actual reason. This checks
+ * for a `message` field first, then falls back to `JSON.stringify` (which at
+ * least surfaces the object's real contents) before the last-resort
+ * `String()` conversion.
+ */
+export function describeError(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === "object") {
+    const maybeMessage = (err as { message?: unknown }).message;
+    if (typeof maybeMessage === "string" && maybeMessage.length > 0) {
+      const maybeCode = (err as { code?: unknown }).code;
+      return typeof maybeCode === "number" || typeof maybeCode === "string"
+        ? `${maybeMessage} (code ${maybeCode})`
+        : maybeMessage;
+    }
+    try {
+      return JSON.stringify(err);
+    } catch {
+      // fall through to String() below — e.g. a circular or BigInt-bearing object
+    }
+  }
+  return String(err);
+}
+
 let cachedReadClient: ReturnType<typeof createClient> | null = null;
 
 /** A client for reads only — never carries a signer, never prompts a wallet. */
@@ -79,8 +109,7 @@ export async function connectWallet(): Promise<WalletConnection> {
   try {
     accounts = await provider.request({ method: "eth_requestAccounts" });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    throw new Error(`Wallet rejected the connection request: ${message}`);
+    throw new Error(`Wallet rejected the connection request: ${describeError(err)}`);
   }
   if (!Array.isArray(accounts) || accounts.length === 0 || typeof accounts[0] !== "string") {
     throw new Error("Wallet returned no accounts. Unlock the wallet and try again.");
@@ -91,9 +120,8 @@ export async function connectWallet(): Promise<WalletConnection> {
   try {
     await writeClient.connect("studionet");
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
     throw new Error(
-      `Wallet is connected but could not be switched to StudioNet (chain 61999): ${message}`
+      `Wallet is connected but could not be switched to StudioNet (chain 61999): ${describeError(err)}`
     );
   }
 

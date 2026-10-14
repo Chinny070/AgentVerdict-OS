@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
-import { connectWallet, hasInjectedProvider, type WalletConnection } from "../chain/client";
+import { connectWallet, describeError, hasInjectedProvider, type WalletConnection } from "../chain/client";
 
 interface WalletState {
   wallet: WalletConnection | null;
@@ -24,7 +24,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const result = await connectWallet();
       setWallet(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(describeError(err));
       setWallet(null);
     } finally {
       setConnecting(false);

@@ -19,7 +19,7 @@
 import { ExecutionResult, TransactionStatus } from "genlayer-js/types";
 import type { Hash } from "genlayer-js/types";
 import type { Address } from "viem";
-import { getReadClient, getWriteClient, type EthereumProviderLike } from "./client";
+import { describeError, getReadClient, getWriteClient, type EthereumProviderLike } from "./client";
 
 export type TxPhase =
   | "IDLE"
@@ -119,9 +119,7 @@ export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
     const update: TxUpdate = {
       phase: "FAILED",
       hash,
-      error: `Timed out or failed waiting for the transaction receipt: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
+      error: `Timed out or failed waiting for the transaction receipt: ${describeError(err)}`,
     };
     emit(update);
     return update;
@@ -129,7 +127,7 @@ export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
 }
 
 function describeWriteError(err: unknown): string {
-  const message = err instanceof Error ? err.message : String(err);
+  const message = describeError(err);
   if (/user rejected/i.test(message) || /denied/i.test(message)) {
     return "Wallet rejected the transaction signature request.";
   }

@@ -16,7 +16,7 @@
  */
 import type { ContractSchema } from "genlayer-js/types";
 import type { Address } from "viem";
-import { getReadClient } from "./client";
+import { describeError, getReadClient } from "./client";
 
 export type ParamKind = "str" | "address" | "u256" | "bool" | "json-str";
 
@@ -199,7 +199,7 @@ export async function verifyLiveSchema(address: Address): Promise<SchemaVerifica
       manifestMethodCount: manifestNames.size,
       missingFromLive: [...manifestNames],
       extraOnLive: [],
-      error: err instanceof Error ? err.message : String(err),
+      error: describeError(err),
     };
   }
 }
