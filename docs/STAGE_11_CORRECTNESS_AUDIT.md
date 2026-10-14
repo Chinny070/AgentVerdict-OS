@@ -1,16 +1,16 @@
 # Stage 11 correctness and release audit
 
-**Status (updated 2026-10-14):** Stage 11 source was deployed and initialized on StudioNet at `0xab972c3af9878b7CD4631CD21639B20E981B0702`. Two synthetic zero-value agreements are in `PROPOSED`; their counterparty must accept before evaluation and settlement lifecycle checks can continue. Deployment receipt and bootstrap evidence are in `docs/STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md` and `deployments/studionet.json`.
+**Status (updated 2026-10-15):** Stage 11 is deployed and initialized on StudioNet at `0xab972c3af9878b7CD4631CD21639B20E981B0702`. The original zero-value A-1/A-2 agreements remain `PROPOSED` because their fixed counterparty has not accepted. Replacement agreements A-3/A-4 completed live synthetic lifecycles with a dedicated counterparty; both are `SETTLED` at amount zero. Deployment and transaction evidence are recorded in `docs/STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md` and `deployments/studionet.json`.
 
 ## Scope and release boundary
 
-This pass addresses the ordered correctness findings supplied for Stage 11: agreement finality and settlement guards; bounded challenges; validator-equivalent verdict validation; retry and reputation accounting; frozen policy and delegation/evidence scope; and wallet write finality. The current source is a candidate for a new deployment. It is not the code running at either recorded address.
+This pass addresses the ordered correctness findings supplied for Stage 11: agreement finality and settlement guards; bounded challenges; validator-equivalent verdict validation; retry and reputation accounting; frozen policy and delegation/evidence scope; and wallet write finality. Stage 11 is deployed at its own address; V1 and V2 remain separate historical instances.
 
 | Deployment | Address | Status |
 |---|---|---|
 | V1 | `0xb222305575ee8af1255d8aCd196280b405B54Baf` | Historical deployment, unchanged |
 | V2 | `0xCC67216ceD224A971739bAA706142A740B31853C` | Historical verified deployment, unchanged; does not contain these Stage 11 changes |
-| Candidate | Not deployed | Requires separate deployment authorization and fresh deployment/lifecycle evidence |
+| Stage 11 | `0xab972c3af9878b7CD4631CD21639B20E981B0702` | Deployed, initialized, and verified through two zero-value settled lifecycles |
 
 The source hash recorded for V2 remains `sha256:e9d4c1314cce2d701fe5f105f28192a5200536d0c8e1f173f46e988e4b795ecb`. Do not replace it with the candidate source hash. Deployment records for V1/V2 remain historical evidence.
 
@@ -76,7 +76,18 @@ candidate because it never produced a usable contract address.
 
 The source header incompatibility was fixed and the contract deployed successfully. The exact Stage 11 source hash is `sha256:710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`. The transaction `0x8c1979122f3103f865bba60646d699217b2bb3ecd283ce232532bdb4aad4821b` finalized with majority agreement, five validator responses revealed, and successful leader execution. The new address is `0xab972c3af9878b7CD4631CD21639B20E981B0702`; V1 and V2 were not changed.
 
-Both modules and both policy templates were registered and verified by live reads. The admin created and proposed API Delivery agreement A-1 and AI-Agent Task agreement A-2. Both are zero-value and remain `PROPOSED` until the designated counterparty `0x1Af111b06E6f6A05Bd41572A016318f1356aF85c` accepts. Therefore deployment and initialization are verified; the Stage 11 end-to-end lifecycle, including security regressions, is not yet fully verified. The Vercel application still targets V2 and has not been checked against this Stage 11 address.
+Both modules and both policy templates were registered and verified by live reads. The admin created and proposed API Delivery agreement A-1 and AI-Agent Task agreement A-2. Both remain `PROPOSED` because their fixed counterparty is `0x1Af111b06E6f6A05Bd41572A016318f1356aF85c`. A dedicated test counterparty was then registered and used for new zero-value A-3/A-4 agreements; see the live lifecycle addendum below. The Vercel application still targets V2 and has not been checked against Stage 11.
+
+## Live Stage 11 lifecycle addendum (2026-10-14/15, complete for recorded paths)
+
+Dedicated counterparty: `0xAAbdb32c7e07803Fe9d5d4d70c06bbDEAfE3b402` (`agentverdict-stage11-counterparty`). It was created specifically for this user-authorized synthetic test and registered on Stage 11. No private key was printed, exported, or committed. Every test agreement has amount `0`; live `get_protocol_stats` confirms `settlement_native_transfer_enabled=false`.
+
+| Path | Agreement | Result observed live |
+|---|---|---|
+| API Delivery | A-3 | Accepted, activated, evidence submitted, validator evaluation PASS; counterparty challenged, admin upheld it, and a second evaluation again returned PASS. The verdict was finalized after its 900-second window. Receipt-only settlement `S-1` is `EXECUTED` at amount zero; passport read shows completed count 1 and reputation score 5. |
+| AI-Agent Task | A-4 | First evaluation returned FAIL/REWORK for a generic page; rework was requested and acknowledged; a public project verification report was submitted and the second evaluation returned PASS. Challenge `C-2` timed out with `TIMEOUT_REJECTED`; after the new 900-second challenge window ended, the counterparty finalized the verdict and recorded receipt-only settlement `S-2` at amount zero. Final state `SETTLED`. |
+
+These are real StudioNet leader executions and validator equivalence outputs. Transaction hashes, validator receipts, and recorded deadlines are in `deployments/studionet.json`. Final reads show A-3/A-4 `SETTLED`, two executed receipt-only settlements, two reputation events, counterparty completed count 2 and reputation score 10, and `settlement_native_transfer_enabled=false`. The old A-1/A-2 transactions remain unchanged.
 
 ## Test record
 

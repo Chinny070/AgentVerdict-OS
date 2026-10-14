@@ -1,12 +1,13 @@
 # AgentVerdict OS
 
-> **Stage 11 release notice (2026-10-14):** the latest source includes
-> correctness and wallet-finality hardening under audit. V1 and V2 remain
-> immutable historical deployments and do **not** contain these changes.
-> The candidate source has not been deployed; use V2 only with the specific
-> limitations documented in [the Stage 11 audit](docs/STAGE_11_CORRECTNESS_AUDIT.md).
-> Do not describe the candidate as live or production-ready until a separately
-> authorized new deployment and live verification are complete.
+> **Stage 11 deployment (2026-10-15):** the hardened source is deployed as a
+> separate StudioNet instance at `0xab972c3af9878b7CD4631CD21639B20E981B0702`.
+> A-3 has completed its challenged PASS lifecycle and zero-value receipt
+> settlement; A-4 has completed FAIL-to-rework recovery, permissionless
+> timeout recovery, finalization, and zero-value receipt settlement. V1 and V2 remain
+> unchanged historical deployments. The hosted frontend still targets V2;
+> see the [Stage 11 audit](docs/STAGE_11_CORRECTNESS_AUDIT.md) for current
+> evidence and remaining verification.
 
 > The universal accountability layer for autonomous work. Natural-language
 > agreements become evidence-backed, challengeable, settlement-authorizing
@@ -40,6 +41,7 @@ server, no hosted database, no relayer — see `docs/PROTOCOL_ARCHITECTURE.md`.
 | | Address | Status |
 |---|---|---|
 | **V2 (current)** | `0xCC67216ceD224A971739bAA706142A740B31853C` | Active, Stage-6-fixed (challenge-timeout recovery + storage-pickling fix). Every one of its 28 public write methods has been exercised at least once via real signed transactions. This is the frontend's default target. |
+| Stage 11 (new deployment) | `0xab972c3af9878b7CD4631CD21639B20E981B0702` | Separate 2026-10-14 deployment of Stage 11 security fixes. A-3 and A-4 completed synthetic zero-value lifecycles through settlement. No frontend cutover; native GEN transfer remains disabled. |
 | V1 (historical) | `0xb222305575ee8af1255d8aCd196280b405B54Baf` | Superseded, read-only. Two finalized agreements (`A-1`, `A-2`) kept as historical evidence. Does **not** have the Stage 6 fixes. Remains fully queryable — never hidden or deleted — via the Settings screen's "Fill in V1 address" option. |
 
 Both are on StudioNet, chain ID `61999`, RPC `https://studio.genlayer.com/api`.
@@ -61,10 +63,10 @@ every decision outcome, both challenge-resolution branches).
   challenges/appeals (including the Stage 6 permissionless
   timeout-recovery path), recovery/rework, and a settlement-authorization-
   receipt model with native GEN transfer disabled by default.
-- **92/92 passing direct-mode tests** for the current local candidate
+- **92/92 passing direct-mode tests** for the Stage 11 source
   (`tests/direct/`) against the real downloaded pinned GenVM SDK (v0.2.16).
-  V2's historical live verification applies to its deployed Stage 6 source,
-  not these Stage 11 candidate changes.
+  Live transaction evidence for Stage 11 is recorded separately from the
+  V1/V2 verification history.
 - A clean `genvm-lint check` pass (0 errors, 1 informational warning about
   a newer runner being available).
 - A full React + TypeScript + Vite frontend (`web/`), `genlayer-js@1.1.8`
@@ -75,7 +77,7 @@ every decision outcome, both challenge-resolution branches).
   production-built, defaulting to the live V2 contract, and unit-tested
   (32/32). The hosted browser check for the current release found no injected
   wallet and did not complete the telemetry read; see the audit report.
-- Two real, independent StudioNet deployments (table above) with an
+- Three independent StudioNet deployments (table above) with an
   exhaustive live-call-by-call verification history.
 
 ## What makes this technically distinctive

@@ -72,7 +72,7 @@
     }
   },
   "stage_11_candidate": {
-    "status": "DEPLOYED_INITIALIZATION_COMPLETE_LIFECYCLE_PENDING",
+    "status": "DEPLOYED_ZERO_VALUE_LIFECYCLES_VERIFIED",
     "source_file": "contracts/agentverdict.py",
     "source_hash": "sha256:710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b",
     "based_on_commit": "095bb4e9c789b4ce9e647dbaac377690be7074bb",
@@ -122,6 +122,12 @@
       "register_policy_template_default_v1": "0x9d558aee227976538caf08bf5156a9ccf50382f4716c20b3e4bbae0f53ef0223",
       "register_policy_template_smoke_test_v2": "0x0ff540d8a9ff75726eb25148425ed55bb664c0ca6eabf6b2dfe17c60b9ce1f7e"
     },
+    "test_counterparty": {
+      "address": "0xAAbdb32c7e07803Fe9d5d4d70c06bbDEAfE3b402",
+      "account_name": "agentverdict-stage11-counterparty",
+      "register_agent_tx": "0x36296003477a461dcafeead56fd8436dde3293088637157c7945517cdc040afc",
+      "note": "Dedicated user-authorized test account. No private key was exported, logged, or committed."
+    },
     "bootstrap_reads_verified": {
       "api_delivery_v1": true,
       "agent_task_v1": true,
@@ -138,9 +144,68 @@
         "create": "0x1818f77e3c8964f474023e032778df4b79a839d443fe18c83eff4d6e707070e2",
         "propose": "0x68b17e3ee255f5e8a3ca91ad855e96824aa4cea7832871760e7087a86b8163df",
         "state": "PROPOSED; counterparty acceptance required"
+      },
+      "A-3_api_delivery": {
+        "amount_atto": 0,
+        "create": "0x8810abbb8b372835bc111d426447c77b4fd772a715dcf1430715c94f1e1c7718",
+        "propose": "0xe8d1ed844419735b7e92aa8645f1fc0e3db0f62ef59b4497ae741b81d1301e1a",
+        "accept": "0x518e3b79d751af54dcef8ebfc73e6436532d4466f444494d96f7af8c5bf297a2",
+        "activate": "0x1713fcf975a0e81acad5c77b87e9955239ddf0b0d3fd5d1f2eae901c4a606b1b",
+        "open_evidence": "0x2c03278d8a29ebe6b1f8ad428ce621495718c1fc36c4a791178ec0c2b9fbe5f3",
+        "submit_evidence": "0xe0dc4373f2d441779728d53a47c77d7575c89d514ee20701ba27c7c99c59a9fe",
+        "evaluate_attempt_1": "0xf8a736e6e2d5c74056ae490953886450aa09d5a535cbe74868fc55586a37fcca",
+        "challenge_attempt_1": "0x718d20507a6e7341fe130bcdf93452588b1f6a013fe98a6ff941aad5ac1f1d5a",
+        "resolve_challenge_upheld": "0x8a9a57006d047a0133a756071c99e6fe62e7bc4f48439a5e3c8e0a0ea71c14e3",
+        "evaluate_attempt_2": "0x717467140ca1fcebf18ab75ac6142f34193d99458d445bdee45114917fc8ce01",
+        "finalize": "0xbc67a223d94c12d427a8dc8a5f01285b064f36028df2fe1cbf59f6269eb25f09",
+        "authorize_settlement": "0xec10d1d6369626b3ac623e4dfd66b0e4f19f3139d92a3e096c8bf82531ae97b8",
+        "record_settlement": "0x19122e09d0873a942b69de5509817b6fbf8d56cdfb9edeea38c7407c7426a5b3",
+        "final_state": "SETTLED",
+        "final_verdict": "PASS, LOW uncertainty, V-A-3-2",
+        "reputation": "counterparty score 5; completed_count 1",
+        "settlement": "S-1 EXECUTED, amount_atto 0; no GEN transfer"
+      },
+      "A-4_agent_task": {
+        "amount_atto": 0,
+        "create": "0x03a02498e264c009ca0cb34e4ca45b2a7076bc9f6dc46f40d379f0afc453df1e",
+        "propose": "0xa6b01d041574a8d84369211e67180dfa0db6356208d1910ea2fe764f0a2269e8",
+        "accept": "0xbf7541c6bfd4a864673b153898f8ec6cd331611135ee02c5ff12a83e526e7122",
+        "activate": "0x93a2270370166e2ae9055c95a52fb8ef212168797d61a1b68d51992fcc9d913d",
+        "open_evidence": "0x623048e6faaebc8978405bdab2ffc9f3eb2eca81750c8eb72bdf469d63695d2c",
+        "initial_evidence": null,
+        "initial_evidence_note": "Live get_evidence_metadata confirmed E-2 for https://example.org/ and task_coverage, but the submission transaction hash was not captured.",
+        "evaluate_attempt_1": "0x51dc940b96cbf4e4dad362db9810f43a2fd94958e9217a7e9fafe9205fe9a24e",
+        "request_rework": "0x72883265aaaade922733cb1aa3366f658f114c40e744931442ff197ce9f496d6",
+        "acknowledge_recovery": "0x370b9aa2b824f8a151cc7ee1968c6c3f1ad6431819f38d2f251cccc535f863b1",
+        "submit_report_evidence": "0x92eb2f72434a7e7fcbf1dae3f6c7554f73d589ae94e791effd806516cbf597c5",
+        "evaluate_attempt_2": "0x20098ce689aec45a9069ce94ef5bbffeaa9e065f604a0e27fc1baf6385b72937",
+        "challenge_attempt_2": "0x03fa8918e7673dde990fd4fd8ccfe822c04a58561fad3eafa62a1c427a1f32d8",
+        "resolve_challenge_by_timeout": "0x8d50e59baeaa88cc5695fe60b26ed19b6c36a6c5aeec3cb486000ce502a726d3",
+        "challenge_id": "C-2",
+        "timeout_state": "TIMEOUT_REJECTED",
+        "timeout_resolution": "Original PASS upheld automatically; no discretionary judgment; agreement reopened for a fresh challenge window",
+        "resolution_deadline": "2026-10-14T23:09:43.633725Z",
+        "reopened_challenge_deadline": "2026-10-14T23:25:06.598791Z",
+        "finalize": "0x9e8b2f0e52f1d0b12b0b6d92904a2cc583f2932b5a6501cfaaf4aec4c4e57ec7",
+        "authorize_settlement": "0x6eba06cb36025d2d0ab8db709936a79bbc9d64f5e369dfe63bfcd1f4e20f2c00",
+        "record_settlement": "0x2d5f438eae752aefe011198c7e3bc7481554bf0d39f2ae6643d494783ec18c75",
+        "final_state": "SETTLED",
+        "final_verdict": "PASS, LOW uncertainty, V-A-4-2",
+        "settlement": "S-2 EXECUTED, amount_atto 0; no GEN transfer"
       }
     },
-    "reason": "Stage 11 was deployed and initialized successfully. Earlier failed attempts are retained above as history; V1 and V2 remain unchanged. Two zero-value synthetic agreements are proposed, and evaluation through settlement is pending counterparty acceptance."
+    "final_live_reads": {
+      "A3_state": "SETTLED",
+      "A4_state": "SETTLED",
+      "counterparty_completed_count": 2,
+      "counterparty_disputed_count": 0,
+      "counterparty_reputation_score": 10,
+      "challenge_count": 2,
+      "settlement_count": 2,
+      "reputation_event_count": 2,
+      "settlement_native_transfer_enabled": false
+    },
+    "reason": "Stage 11 is deployed and initialized; earlier failed deployment attempts remain as history. A-3 completed the challenged PASS lifecycle through zero-value receipt settlement. A-4 completed FAIL-to-rework-to-PASS, permissionless timeout recovery, finalization, and zero-value settlement. Both final states are SETTLED. V1/V2 are unchanged; native GEN transfer is disabled."
   },
   "frontend_release": {
     "status": "READY",

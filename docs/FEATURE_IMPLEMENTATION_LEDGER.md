@@ -1,13 +1,12 @@
 # Feature Implementation Ledger (updated — Stage 4 frontend)
 
-> **Stage 11 source status (2026-10-14):** correctness hardening is present in
-> the current local candidate and covered by 92 direct-mode tests plus new
-> wallet-finality unit tests. These changes are not deployed at V1 or V2.
-> See [STAGE_11_CORRECTNESS_AUDIT.md](STAGE_11_CORRECTNESS_AUDIT.md) for the
-> candidate source hash, test results, and deployment/migration limits. The
-> historical feature claims below describe the stage and evidence named in
-> each row; they must not be interpreted as evidence the candidate has
-> already been deployed.
+> **Stage 11 live status (2026-10-15):** the hardened source is deployed at
+> `0xab972c3af9878b7CD4631CD21639B20E981B0702`. Two synthetic zero-value
+> lifecycles completed on StudioNet: A-3 challenged PASS through settlement;
+> A-4 FAIL/rework/PASS through timeout recovery and settlement. V1 and V2
+> remain unchanged, and the frontend still defaults to V2. See
+> [the Stage 11 audit](STAGE_11_CORRECTNESS_AUDIT.md) and
+> [the live deployment record](STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md).
 
 **Stage 4 update (this session):** the `web/` frontend (React + TypeScript +
 Vite, `genlayer-js@1.1.8` pinned) was built, wired to the contract's real
@@ -100,7 +99,7 @@ Natural-language task agreements (authored off-chain, frozen on-chain — IMPLEM
 
 - **40/40 features explicitly accounted for** — none silently dropped.
 - **15 IMPLEMENTED, 8 PARTIAL (each with a stated real subset and a stated gap), 16 DEFERRED, 1 DESIGN-SATISFIED**, after this session's Stage 4 update moved feature 1 (Counterfactual Verdict Simulator) from DEFERRED to PARTIAL (a real, clearly-labeled advisory frontend now exists; see `web/src/features/developer/SimulationChamber.tsx`).
-- The Stage 4 frontend itself (`web/`) is a cross-cutting deliverable, not a single numbered feature: it gives real UI to features 2, 4, 5, 6, 9, 13, 15, 16, 18, 19, 26, 30, 32, 35, 38, 39 (all P0) plus 1, 24, 25, 37 (P1, partial), all gated honestly behind "no contract configured" until a real StudioNet address exists.
+- The Stage 4 frontend itself (`web/`) is a cross-cutting deliverable, not a single numbered feature: it gives real UI to features 2, 4, 5, 6, 9, 13, 15, 16, 18, 19, 26, 30, 32, 35, 38, 39 (all P0) plus 1, 24, 25, 37 (P1, partial). The hosted application currently targets V2; Stage 11 live lifecycle evidence does not imply a frontend cutover or wallet-connected browser verification against Stage 11.
 - Every IMPLEMENTED and PARTIAL claim above is backed by a named, passing
   test in `tests/direct/`, re-run and confirmed in this session
   (`docs/TEST_EVIDENCE.md`) — not asserted from memory.
