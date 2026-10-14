@@ -12,6 +12,15 @@ body,
   min-height: 100%;
 }
 
+/* `body` alone is not a complete containment boundary: a wide enough
+   descendant (e.g. a table with no scroll container of its own, see
+   `.table-scroll` below) can still push `<html>`'s own scrollWidth past
+   the viewport, producing page-level horizontal scroll even though `body`
+   is clipped. Completing the pattern from the `body` fix below. */
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   background: radial-gradient(
@@ -474,6 +483,38 @@ td {
 
 tr:last-child td {
   border-bottom: none;
+}
+
+/* Dense data tables (the "iridescent forensic futurism" aesthetic
+   explicitly calls for dense-but-legible tables, not generic card lists)
+   use `table-layout: auto`, so a wide manifest table's intrinsic content
+   width is never allowed to shrink below its own min-content size -- the
+   same class of problem the grid `min-width: 0` fix above addresses for
+   grid/flex tracks, but tables need an actual scroll container since they
+   don't participate in that shrink behavior at all. Wrap any table that
+   can realistically exceed mobile viewport width in `.table-scroll` rather
+   than letting it escape containment (the Adapter Foundry method manifest
+   bug: scrollWidth 757 vs clientWidth 375 at mobile width). */
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  box-shadow: inset -24px 0 16px -18px rgba(0, 0, 0, 0.55), inset 24px 0 16px -18px rgba(0, 0, 0, 0.55);
+}
+
+.table-scroll table {
+  min-width: max-content;
+}
+
+.table-scroll-hint {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .table-scroll-hint {
+    display: block;
+    margin: var(--space-1) 0 var(--space-3);
+  }
 }
 
 /* ---------------------------------------------------------------- misc */

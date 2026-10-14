@@ -19,26 +19,29 @@ export default function AdapterFoundry() {
         Feature 22 (Universal Evaluation Adapter SDK) is DEFERRED — there is no third-party adapter
         registration flow. This table is read-only reference documentation of the real deployed surface.
       </p>
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Method</th>
-            <th scope="col">Kind</th>
-            <th scope="col">Params</th>
-            <th scope="col">Returns</th>
-          </tr>
-        </thead>
-        <tbody>
-          {CONTRACT_METHODS.map((m) => (
-            <tr key={m.name}>
-              <td className="mono">{m.name}</td>
-              <td>{m.mutability}</td>
-              <td className="mono">{m.params.map((p) => p.name).join(", ") || "—"}</td>
-              <td>{m.returns}</td>
+      <p className="field-help table-scroll-hint">Scroll horizontally to see all columns.</p>
+      <div className="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Method</th>
+              <th scope="col">Kind</th>
+              <th scope="col">Params</th>
+              <th scope="col">Returns</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {CONTRACT_METHODS.map((m) => (
+              <tr key={m.name}>
+                <td className="mono">{m.name}</td>
+                <td>{m.mutability}</td>
+                <td className="mono">{m.params.map((p) => p.name).join(", ") || "—"}</td>
+                <td>{m.returns}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

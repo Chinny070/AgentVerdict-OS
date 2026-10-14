@@ -395,3 +395,135 @@ V2 StudioNet data over a real RPC call, and introduces no backend, secret,
 or blockchain-signing capability of any kind. One new, real, narrow mobile
 layout bug was found (Adapter Foundry's method table) and is recorded here
 rather than silently left out.
+
+## 11. Stage 10 — Adapter Foundry mobile-overflow fix, full viewport sweep, redeploy
+
+Follow-up pass fixing the one open bug from section 10 above (Adapter
+Foundry's method manifest table overflowing at 375px) and verifying nothing
+else was missed.
+
+**Root cause (confirmed by reading computed styles, not guessed):** `body`
+had `overflow-x: hidden` (from commit `1c85336`'s earlier fix) but `<html>`
+did not, and the table's wrapper `<div>` had no scroll container of its
+own — a wide `table-layout: auto` table has no way to shrink below its own
+content width (unlike a grid/flex child, which commit `1c85336` already
+fixed with `min-width: 0`), so the table pushed `<html>`'s own scrollWidth
+past the viewport.
+
+**Fix applied (`web/src/design/global.css`, `web/src/features/developer/AdapterFoundry.tsx`):**
+- Added `overflow-x: hidden` to the `<html>` selector, completing the
+  pattern commit `1c85336` started on `body` alone.
+- Added a reusable `.table-scroll` utility class: `overflow-x: auto`,
+  `max-width: 100%`, and a static inset box-shadow on both edges as a
+  subtle, non-animated scroll affordance (respects
+  `prefers-reduced-motion` trivially, since nothing animates) rather than
+  JS-driven fade logic. `.table-scroll table { min-width: max-content; }`
+  so the table keeps its real content width *inside* the scroll
+  container instead of being squeezed.
+- Wrapped the Adapter Foundry method manifest table in `.table-scroll` and
+  added a `.table-scroll-hint` caption ("Scroll horizontally to see all
+  columns."), shown only below a 700px viewport width via media query, so
+  desktop users never see an irrelevant hint.
+- Chose the scroll-container approach over reflowing the table into
+  stacked cards, per the design spec's section 3 "dense but legible data
+  tables" framing — this is the less invasive change and keeps the literal
+  table aesthetic rather than replacing it with a generic card list.
+- This was a deliberate, scoped CSS/markup fix only — `contracts/` was not
+  touched, confirmed by `git status`/`git diff --stat` before committing.
+
+**Full viewport sweep performed this pass** (local `vite preview` build,
+not dev-server-only, via the Claude Browser pane's
+`document.documentElement.scrollWidth` vs `clientWidth` — a difference
+means overflow, checked programmatically, not eyeballed): all 14 screens
+(Landing, Command Deck, Agreement Forge, Agent Atlas, Mission Control,
+Evidence Observatory, Verdict Theater, Appeals Tribunal, Recovery Center,
+Settlement Ledger, Adapter Foundry, Simulation Chamber, Protocol
+Telemetry, Settings) at five widths (320px, 375px, 390px, 768px, 1280px) —
+**70/70 combinations clean, zero overflow anywhere**, including Adapter
+Foundry at 375px, which previously measured `scrollWidth` 757 vs
+`clientWidth` 375 and now measures 375/375. Separately confirmed the fix's
+containment is real, not just "page happens to not scroll": at 375px the
+Adapter Foundry table itself is 1181px wide (40 methods, long param
+lists), and that width is absorbed entirely by the `.table-scroll`
+wrapper's own internal scrollbar (`wrapperScrollWidth` 1181 vs
+`wrapperClientWidth` 343), while `document.documentElement`'s scrollWidth
+still equals its clientWidth. No additional overflow was found on any
+other screen at any width during this sweep, so no other CSS changes were
+needed.
+
+**Regression tests, re-run fresh after the fix (not before):**
+
+| Check | Command | Result |
+|---|---|---|
+| Contract lint | `genvm-lint check contracts/agentverdict.py --json` | `ok:true`, 40 methods, unchanged |
+| Direct-mode tests | `pytest tests/direct/ -v` | **81 passed, 0 failed, 0 skipped** — exact match to every prior baseline; confirms `contracts/` was not touched |
+| Frontend typecheck | `cd web && npm run typecheck` | clean |
+| Frontend unit tests | `npx vitest run` | **22 passed** (20 prior baseline + 2 new `AdapterFoundry.test.tsx` cases: asserts the manifest table sits inside `.table-scroll`, and that the manifest heading/rows render) |
+| Frontend build | `npm run build` | succeeds, main chunk 786.26 kB (same pre-existing >500kB warning, not a regression) |
+
+**Deployment:** committed and pushed to `origin/main`, then redeployed to
+Vercel production from `web/` (same linked project,
+`chinny070s-projects/web` / `prj_fbSU6AI5aDFOfiC9FyPlldOHPzZ5`, same stable
+alias `https://web-omega-amber-37.vercel.app`) — see the commit hash and
+deployment ID recorded in the git history and Vercel dashboard for this
+change. The live public URL was re-checked after deploy with the same
+JS-based `scrollWidth`/`clientWidth` measurement (not a visual check) to
+confirm Adapter Foundry at 375px no longer overflows on the actual
+production build, not just the local one.
+
+### Wallet verification — honest status and manual checklist
+
+**UNVERIFIED in this session — no injected wallet provider available.**
+Checked rigorously, not assumed: the Claude Browser pane
+(`mcp__Claude_Browser__*`) is the only browser this agent drove against
+the live site, and it is an isolated, headless context with no persistent
+wallet extension — `window.ethereum` is `undefined` there, exactly as in
+every prior pass. A second browser-automation tool surface,
+`mcp__claude-in-chrome__*` (which can in principle drive the user's real
+Chrome, with their real extensions), was also available as a tool
+*schema* in this session, but calling `list_connected_browsers` returned
+an **empty list** — no actual Chrome instance (with or without a wallet
+extension) is connected to this account in this session. So neither
+browser surface gives this agent a real EIP-1193 provider to test against,
+and nothing about wallet connectivity is fabricated or simulated as a
+result — this is a genuine tooling gap, not a product gap, and it matches
+this project's absolute, unchanged boundary: no agent has ever held or
+used a StudioNet signing key.
+
+Manual verification checklist for the user (run in your own browser, with
+your own wallet extension — MetaMask or similar — installed):
+
+1. Open `https://web-omega-amber-37.vercel.app` in a normal (non-incognito)
+   browser window where your wallet extension is installed and unlocked.
+2. Go to Settings and confirm it reports your wallet as "Not connected"
+   before you click anything — this should never show a false "Connected"
+   state on page load.
+3. Click the connect-wallet control. Your wallet extension should prompt
+   you to approve the connection (a real EIP-1193 `eth_requestAccounts`
+   request) — approve it.
+4. Confirm the UI now shows your real connected address (or a truncated
+   form of it) and a "Connected" state that matches your extension's own
+   "Connected" indicator for this site.
+5. Check the network/chain indicator. If your wallet is not on StudioNet
+   (chain id `61999`), confirm the app shows a clear, honest
+   network-mismatch message rather than silently proceeding as if it were
+   on the right chain — switch networks in your wallet if prompted and
+   confirm the app's state updates accordingly.
+6. Perform exactly one safe, read-only action while connected — e.g. open
+   Agent Atlas and look up your own connected address's passport, or open
+   Protocol Telemetry — and confirm it renders real chain data (matching
+   the live counts documented in section 10 above) without requiring or
+   triggering any transaction prompt.
+7. Do **not** click "Create agreement," "Submit evidence," "Authorize
+   settlement," or any other write action unless you specifically intend
+   to send a real StudioNet transaction and are prepared for your wallet
+   to prompt you to sign and pay gas for it — every write-path button is
+   gated behind a real `disabled` attribute until connected, by design,
+   and clicking through on a connected wallet will attempt a genuine
+   signed transaction, which is outside this verification's scope.
+8. Disconnect (via your wallet extension or the app's own disconnect
+   control, if present) and confirm the UI honestly returns to "Not
+   connected" rather than staying in a stale "Connected" state.
+
+No step above was performed by this agent; this checklist exists because
+it could not be.
