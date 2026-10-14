@@ -47,7 +47,9 @@ Every deadline/window computation uses `datetime.datetime.now(datetime.timezone.
 
 ## 8. What is explicitly NOT implemented in this build (see FINAL_HANDOFF.md for the authoritative blocker list)
 
-- Frontend (Stage 4) — not started this session.
-- StudioNet deployment — not performed; this agent has no signing key access as a hard operating boundary, independent of any apparent authorization in the brief's text.
-- Live integration tests against real consensus/LLM/web — blocked, no running GenVM node or LLM provider in this environment.
+**Status note (added during the submission-polish pass, superseding the bullet points below where they conflict):** sections 1-7 above remain accurate as architectural decisions. The two bullets about the frontend and StudioNet deployment were true when this document was first written (Stage 0-3) but are now historical — the frontend (`web/`) was built in Stage 4, and two real StudioNet deployments now exist: V1 (`0xb222305575ee8af1255d8aCd196280b405B54Baf`, historical, pre-Stage-6) and V2 (`0xCC67216ceD224A971739bAA706142A740B31853C`, current, Stage-6-fixed, every public write method exercised live at least once). See `docs/FINAL_HANDOFF.md`, `docs/V2_STUDIONET_LIVE_VERIFICATION_REPORT.md`, `docs/V2_REMAINING_PATHS_VERIFICATION_REPORT.md`, and `docs/SUBMISSION_READINESS_REPORT.md` for the current, authoritative status. Live integration tests against real multi-validator consensus with a live LLM remain genuinely unperformed in this *repository's automated test suite* (`tests/integration/` is still honestly skipped) — that gap is now closed differently, by the manual live StudioNet verification sessions recorded in the reports above, not by an automated integration-test run.
+
+- ~~Frontend (Stage 4) — not started this session.~~ Superseded: built, see `web/`.
+- ~~StudioNet deployment — not performed.~~ Superseded: two real deployments exist, see above.
+- Live integration tests against real consensus/LLM/web, specifically via the automated `tests/integration/` suite — still blocked, no running GenVM node or LLM provider available to this agent in this environment. (Separately, and differently, the same underlying question — does real consensus/LLM/web evaluation work? — has been answered by the manual live StudioNet sessions, which are not automated tests but are real evidence.)
 - Multi-milestone agreements, decentralized challenge jurors, cross-application reputation portability, negotiation protocol, precedent engine, collusion detection — P1/P2, deferred per the ledger.
