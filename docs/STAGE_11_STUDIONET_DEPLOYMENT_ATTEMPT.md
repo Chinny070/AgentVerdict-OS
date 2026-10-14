@@ -27,18 +27,37 @@ release/protocol mismatch.
 The CLI is `0.40.0-rc.3`. Official GenLayer migration guidance identifies
 the v0.40 CLI as a release-candidate toolchain and warns against mixing it
 with stable components; see the [Consensus v0.6 migration guide](https://docs.genlayer.com/developers/consensus-v06-migration).
-Retrieval of the stable CLI package timed out in this environment, so no
-retry was attempted with a compatible stable release.
+The cached stable CLI `0.39.2` was then run with `genlayer-js@1.1.8`. It
+submitted transaction
+`0x6c0f890c50715bfe92455599e244861b76cec920bd3520ea5adf058234c3e133`.
+The CLI printed address `0x65d5E2C1b94db61afd0c262270a5c6667d3402e2`, but
+the receipt shows `FINALIZED` consensus status with `MAJORITY_AGREE` while
+the leader execution itself is `ERROR` (`contract_error`, `invalid_contract`,
+gas used `0`). Read-only schema and `get_protocol_stats` calls at that
+address both returned `Contract not found`. The address is therefore not a
+usable deployment and no initialization or lifecycle writes were sent to it.
+This confirms that the CLI's top-level consensus status alone is not a valid
+deployment-success check.
+
+The candidate passed `genvm-lint` (40 methods), but this is not a successful
+GenVM load. A local `genlayer-js@1.1.8` `getContractSchemaForCode` request
+could not reach StudioNet (`fetch failed`). A sandbox escalation to submit
+the candidate source to StudioNet's read-only schema endpoint was rejected
+by the automatic approval reviewer because it transmits private contract
+source externally; no workaround was attempted. The specific `invalid_contract`
+root cause therefore remains unresolved. Source-level possibilities such as
+runner compatibility, storage schema validation, or code-size limits are
+hypotheses only, not findings.
 
 ## Next deployment step
 
-Deploy the candidate source through [GenLayer Studio](https://studio.genlayer.com)
-using the already connected MetaMask wallet on StudioNet. Confirm chain ID
-`61999`, submit the zero-argument constructor, and wait for a finalized
-receipt whose execution result is `FINISHED_WITH_RETURN` and consensus result
-is accepted. Record the resulting address and transaction hash before any
-initialization writes. This is a new deployment; it does not migrate V1/V2
-state or replace either historical address.
+Resolve the GenVM `invalid_contract` loader failure first using an approved
+validation path. Do not initialize or interact with the CLI-reported address.
+Only after a new deployment receipt shows successful leader execution
+(`FINISHED_WITH_RETURN`), accepted validator consensus, and successful schema
+and `get_protocol_stats` reads should initialization proceed. This is a new
+deployment; it does not migrate V1/V2 state or replace either historical
+address.
 
 After a successful deployment, initialize the two modules and policy
 templates from the repository's exact specifications, verify them with live

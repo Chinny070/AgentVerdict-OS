@@ -90,9 +90,19 @@
         "tool": "GenLayer CLI 0.40.0-rc.3",
         "date": "2026-10-14",
         "note": "Receipt was inspected with genlayer receipt --raw; no contract address or successful execution was returned. Do not treat this as a deployment. The CLI's schema query works against V2, but gen_call reads fail during method resolution and genlayer estimate-fees encounters unavailable sim_getFeeConfig on the stable StudioNet RPC."
+      },
+      {
+        "transaction_hash": "0x6c0f890c50715bfe92455599e244861b76cec920bd3520ea5adf058234c3e133",
+        "status": "FINALIZED_EXECUTION_ERROR",
+        "consensus_result": "MAJORITY_AGREE",
+        "contract_address_reported_by_cli": "0x65d5E2C1b94db61afd0c262270a5c6667d3402e2",
+        "contract_address_verified": false,
+        "tool": "GenLayer CLI 0.39.2 with genlayer-js@1.1.8",
+        "date": "2026-10-14",
+        "note": "The CLI printed a deployment address, but the transaction receipt's leader execution was ERROR with result code contract_error and payload invalid_contract (gas_used 0). Subsequent read-only schema and get_protocol_stats calls returned Contract not found. This is a failed deployment; do not initialize or use the reported address. V1 and V2 were not modified."
       }
     ],
-    "reason": "Stage 11 candidate source remains undeployed. The only deployment attempt concluded FINALIZED with NO_MAJORITY, zero votes, and no contract address using the installed v0.40.0-rc.3 CLI. Existing V1 and V2 deployments remain unchanged. Stable CLI retrieval was unavailable in this environment; see docs/STAGE_11_CORRECTNESS_AUDIT.md and docs/STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md."
+    "reason": "Stage 11 candidate source remains undeployed. One RC CLI attempt finalized NO_MAJORITY with zero votes; a stable CLI attempt finalized with majority consensus but leader execution ERROR (invalid_contract), and its reported address failed subsequent schema and state reads. Existing V1 and V2 deployments remain unchanged. Do not initialize the failed address. See docs/STAGE_11_CORRECTNESS_AUDIT.md and docs/STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md."
   },
   "frontend_release": {
     "status": "READY",

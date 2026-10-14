@@ -51,6 +51,27 @@ StudioNet signing path. Full evidence and the next step are in
 
 The current V2 deployment cannot receive source changes in place. A new deployment is required to obtain the fixes. Existing V1/V2 state and history cannot be migrated automatically; any migration or user-facing cutover must preserve those addresses as historical instances and explicitly identify the new address. No migration procedure is claimed here.
 
+## Deployment follow-up (2026-10-14)
+
+The candidate was submitted once with the stable CLI `0.39.2` and pinned
+`genlayer-js@1.1.8`. The transaction
+`0x6c0f890c50715bfe92455599e244861b76cec920bd3520ea5adf058234c3e133`
+reached majority consensus, but leader execution returned `ERROR` with
+`invalid_contract` and gas used `0`. Although the CLI printed
+`0x65d5E2C1b94db61afd0c262270a5c6667d3402e2`, subsequent schema and
+`get_protocol_stats` reads returned `Contract not found`. It is not a
+deployment. No initialization, lifecycle writes, or changes to V1/V2
+followed. The exact loader incompatibility remains unresolved; the passing
+static lint and direct-mode tests do not establish Studio compatibility.
+
+A read-only StudioNet code-schema check was attempted locally but failed at
+network access. Requesting network escalation to retransmit the candidate
+source to the schema endpoint was rejected by automatic approval review due
+to source disclosure risk; that review has not been bypassed. The next
+deployment attempt must wait until the loader issue is diagnosed through an
+approved path. No lifecycle transaction hashes can be reported for this
+candidate because it never produced a usable contract address.
+
 ## Test record
 
 Candidate source SHA-256: `89f9092bcd4f724d01919cfe1e5c584be37bf26abb7657aa47ddce1f8d65dbef`. This is a local source fingerprint only, not a deployed source hash. A `PytestCacheWarning` caused by the sandbox denying writes to `.pytest_cache` is an environment permission warning and does not indicate a contract test failure. The GenVM lint's newer-runner notice is informational and is not proof of compatibility with that newer runner.
