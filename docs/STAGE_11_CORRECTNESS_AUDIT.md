@@ -35,6 +35,20 @@ The tested frontend was published to Vercel production as deployment `dpl_4t1EYu
 
 Direct mode tests contract behavior under its simulator. `genvm-lint` checks contract compatibility statically. Neither demonstrates that the candidate source is deployed, that live validators have executed it, or that the hosted website has been verified with a connected wallet and signed transaction. These must be verified against a new candidate deployment before asserting live readiness.
 
+## Deployment attempt addendum (2026-10-14)
+
+A deployment was attempted with the installed GenLayer CLI `0.40.0-rc.3`
+using the configured admin signer. The transaction
+`0x275ca36353b0b96f635adb44afbbb3faf45aa15e1877bc4bb485ddec3ae8c5c7`
+ended `FINALIZED` with `NO_MAJORITY`, zero votes, no consensus data, and no
+contract address. No deployment success is claimed and no lifecycle writes
+were sent. Read-only schema lookup against V2 worked, but contract reads
+failed during method resolution and fee estimation used an RPC method that
+StudioNet does not expose. Retrieval of the stable CLI package timed out in
+this environment, so the candidate remains undeployed pending a compatible
+StudioNet signing path. Full evidence and the next step are in
+[`STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md`](STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md).
+
 The current V2 deployment cannot receive source changes in place. A new deployment is required to obtain the fixes. Existing V1/V2 state and history cannot be migrated automatically; any migration or user-facing cutover must preserve those addresses as historical instances and explicitly identify the new address. No migration procedure is claimed here.
 
 ## Test record

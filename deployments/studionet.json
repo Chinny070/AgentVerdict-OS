@@ -80,7 +80,19 @@
     "chain_id": 61999,
     "contract_address": null,
     "deployment_transaction": null,
-    "reason": "Stage 11 source changes are local candidate code. No deployment or live post-fix reads were performed. Existing V1 and V2 deployments remain unchanged; see docs/STAGE_11_CORRECTNESS_AUDIT.md."
+    "deployment_attempts": [
+      {
+        "transaction_hash": "0x275ca36353b0b96f635adb44afbbb3faf45aa15e1877bc4bb485ddec3ae8c5c7",
+        "status": "FINALIZED_NO_MAJORITY",
+        "leader_execution": "UNKNOWN",
+        "consensus_votes": 0,
+        "contract_address": null,
+        "tool": "GenLayer CLI 0.40.0-rc.3",
+        "date": "2026-10-14",
+        "note": "Receipt was inspected with genlayer receipt --raw; no contract address or successful execution was returned. Do not treat this as a deployment. The CLI's schema query works against V2, but gen_call reads fail during method resolution and genlayer estimate-fees encounters unavailable sim_getFeeConfig on the stable StudioNet RPC."
+      }
+    ],
+    "reason": "Stage 11 candidate source remains undeployed. The only deployment attempt concluded FINALIZED with NO_MAJORITY, zero votes, and no contract address using the installed v0.40.0-rc.3 CLI. Existing V1 and V2 deployments remain unchanged. Stable CLI retrieval was unavailable in this environment; see docs/STAGE_11_CORRECTNESS_AUDIT.md and docs/STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md."
   },
   "frontend_release": {
     "status": "READY",
