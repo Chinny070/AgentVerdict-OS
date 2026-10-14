@@ -70,3 +70,49 @@ unrelated local keystore should be used as a substitute.
 No lifecycle writes were sent to a new deployment because the deployment
 did not produce an address. The prior V2 transaction history remains valid
 for V2 only; it is not evidence for Stage 11 candidate behavior.
+
+## Successful deployment and bootstrap addendum (2026-10-14)
+
+The runner loader issue was traced to the source header. The contract file
+previously began with its title comment, so the runner treated the following
+`Depends` metadata as an ordinary comment and selected the default runner
+version. The supported header is a version line first, followed by the
+dependency configuration comment. After changing the header to start with
+`# v0.1.0`, the StudioNet code-schema validator returned the full contract
+schema and the runner-version warning disappeared. The source SHA-256 used
+for deployment is
+`710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`.
+
+Deployment succeeded on StudioNet, chain ID `61999`, with GenLayer CLI
+`0.39.2` and `genlayer-js@1.1.8`:
+
+- Address: `0xab972c3af9878b7CD4631CD21639B20E981B0702`
+- Transaction: `0x8c1979122f3103f865bba60646d699217b2bb3ecd283ce232532bdb4aad4821b`
+- Receipt: `FINALIZED`, `MAJORITY_AGREE`; leader execution `SUCCESS`; five
+  validator votes revealed (three agree, two idle); constructor returned
+  successfully.
+- Read-only schema: 40 methods (12 views, 28 writes).
+- `get_protocol_stats`: returned admin
+  `0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b`, zero initial agreements,
+  and `settlement_native_transfer_enabled=false`.
+
+Initialization was then confirmed by successful live reads. The API Delivery
+and AI-Agent Task modules are active at version `1.0.0`; `default-v1` is
+active with a 259,200 second challenge window; `smoke-test-v2` is active with
+a 900 second window. Their registration transaction hashes are recorded in
+`deployments/studionet.json`.
+
+Two zero-value synthetic agreements have been created and proposed:
+
+| Agreement | Module | Create transaction | Propose transaction | Current state |
+|---|---|---|---|---|
+| A-1 | API Delivery | `0x30fbb4f4697a0158ebd7b75e0f876bbe9eba06d31a24b3e760c16ea8ddf84234` | `0xd0c7103a039d6cf5e8cd0e4db73b2909205d38042ec0b05177a8e194ce3dcf34` | PROPOSED |
+| A-2 | AI-Agent Task | `0x1818f77e3c8964f474023e032778df4b79a839d443fe18c83eff4d6e707070e2` | `0x68b17e3ee255f5e8a3ca91ad855e96824aa4cea7832871760e7087a86b8163df` | PROPOSED |
+
+Each create and propose transaction received accepted StudioNet consensus,
+successful leader execution, and five revealed validator responses. The
+counterparty is `0x1Af111b06E6f6A05Bd41572A016318f1356aF85c`. The contract
+correctly rejects acceptance by the creator, so acceptance and the
+subsequent agreement lifecycle are pending that wallet's signatures. No
+unrelated local account was substituted. The V1 and V2 deployments and their
+history remain unchanged.

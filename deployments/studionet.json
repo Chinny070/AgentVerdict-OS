@@ -72,14 +72,14 @@
     }
   },
   "stage_11_candidate": {
-    "status": "NOT_DEPLOYED",
+    "status": "DEPLOYED_INITIALIZATION_COMPLETE_LIFECYCLE_PENDING",
     "source_file": "contracts/agentverdict.py",
-    "source_hash": "sha256:89f9092bcd4f724d01919cfe1e5c584be37bf26abb7657aa47ddce1f8d65dbef",
+    "source_hash": "sha256:710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b",
     "based_on_commit": "095bb4e9c789b4ce9e647dbaac377690be7074bb",
     "network": "studionet",
     "chain_id": 61999,
-    "contract_address": null,
-    "deployment_transaction": null,
+    "contract_address": "0xab972c3af9878b7CD4631CD21639B20E981B0702",
+    "deployment_transaction": "0x8c1979122f3103f865bba60646d699217b2bb3ecd283ce232532bdb4aad4821b",
     "deployment_attempts": [
       {
         "transaction_hash": "0x275ca36353b0b96f635adb44afbbb3faf45aa15e1877bc4bb485ddec3ae8c5c7",
@@ -102,7 +102,45 @@
         "note": "The CLI printed a deployment address, but the transaction receipt's leader execution was ERROR with result code contract_error and payload invalid_contract (gas_used 0). Subsequent read-only schema and get_protocol_stats calls returned Contract not found. This is a failed deployment; do not initialize or use the reported address. V1 and V2 were not modified."
       }
     ],
-    "reason": "Stage 11 candidate source remains undeployed. One RC CLI attempt finalized NO_MAJORITY with zero votes; a stable CLI attempt finalized with majority consensus but leader execution ERROR (invalid_contract), and its reported address failed subsequent schema and state reads. Existing V1 and V2 deployments remain unchanged. Do not initialize the failed address. See docs/STAGE_11_CORRECTNESS_AUDIT.md and docs/STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md."
+    "deployment_verified": {
+      "date": "2026-10-14",
+      "network": "studionet",
+      "chain_id": 61999,
+      "toolchain": "GenLayer CLI 0.39.2, genlayer-js@1.1.8",
+      "receipt_status": "FINALIZED",
+      "consensus_result": "MAJORITY_AGREE",
+      "validator_votes_revealed": 5,
+      "leader_execution": "SUCCESS",
+      "constructor_result": null,
+      "schema_read": "SUCCESS (40 methods: 12 views, 28 writes)",
+      "admin": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+      "source_header_fix": "Runner source begins with # v0.1.0 followed by the Depends configuration comment; the previous title-first comment caused invalid_contract during deployment."
+    },
+    "bootstrap_tx_hashes": {
+      "register_module_api_delivery": "0x4a24bc02deb004440c86b6ad891241aa2203bf8df5448c097ecae1499f2b1d61",
+      "register_module_agent_task": "0x9bcf76fa5aa2e3cc6f05ab9f8f59f4bd26b9d11a6b7c6998750f7d7c05de8b6f",
+      "register_policy_template_default_v1": "0x9d558aee227976538caf08bf5156a9ccf50382f4716c20b3e4bbae0f53ef0223",
+      "register_policy_template_smoke_test_v2": "0x0ff540d8a9ff75726eb25148425ed55bb664c0ca6eabf6b2dfe17c60b9ce1f7e"
+    },
+    "bootstrap_reads_verified": {
+      "api_delivery_v1": true,
+      "agent_task_v1": true,
+      "default_v1_active_challenge_seconds": 259200,
+      "smoke_test_v2_active_challenge_seconds": 900
+    },
+    "lifecycle_transactions": {
+      "A-1_api_delivery": {
+        "create": "0x30fbb4f4697a0158ebd7b75e0f876bbe9eba06d31a24b3e760c16ea8ddf84234",
+        "propose": "0xd0c7103a039d6cf5e8cd0e4db73b2909205d38042ec0b05177a8e194ce3dcf34",
+        "state": "PROPOSED; counterparty acceptance required"
+      },
+      "A-2_agent_task": {
+        "create": "0x1818f77e3c8964f474023e032778df4b79a839d443fe18c83eff4d6e707070e2",
+        "propose": "0x68b17e3ee255f5e8a3ca91ad855e96824aa4cea7832871760e7087a86b8163df",
+        "state": "PROPOSED; counterparty acceptance required"
+      }
+    },
+    "reason": "Stage 11 was deployed and initialized successfully. Earlier failed attempts are retained above as history; V1 and V2 remain unchanged. Two zero-value synthetic agreements are proposed, and evaluation through settlement is pending counterparty acceptance."
   },
   "frontend_release": {
     "status": "READY",

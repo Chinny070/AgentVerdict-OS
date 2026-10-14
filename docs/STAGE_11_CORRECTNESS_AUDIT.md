@@ -1,6 +1,6 @@
 # Stage 11 correctness and release audit
 
-**Status:** candidate source changes are implemented and local checks pass. No contract was deployed and no live chain state was changed during this work.
+**Status (updated 2026-10-14):** Stage 11 source was deployed and initialized on StudioNet at `0xab972c3af9878b7CD4631CD21639B20E981B0702`. Two synthetic zero-value agreements are in `PROPOSED`; their counterparty must accept before evaluation and settlement lifecycle checks can continue. Deployment receipt and bootstrap evidence are in `docs/STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md` and `deployments/studionet.json`.
 
 ## Scope and release boundary
 
@@ -31,7 +31,7 @@ Frontend verification passes: `npm run typecheck`, `npm run lint`, `npm test -- 
 
 `pytest -q tests/integration` collected **7 skipped** integration cases. They are intentionally disabled in this checkout because the required real GenVM/GLSim integration environment is unavailable. These results are not genuine leader/validator integration proof for the candidate.
 
-The tested frontend was published to Vercel production as deployment `dpl_4t1EYuhwXg2dYURCHPuwiNvM3MSG` (project `web`, alias `https://web-omega-amber-37.vercel.app`) from commit `131cfb2`. A read-only browser check confirmed the site loads, shows the V2 address/network label, and accurately states the Stage 11 candidate is not deployed. The telemetry route remained in a `Loading` state in this browser session; contract reads were therefore **not verified**. No injected wallet was available in the browser, so network switching, wallet connection, signed writes, wrong-network/rejection behavior in a real wallet, direct-route refreshes, and live mobile layouts remain **unverified**. No wallet prompt or live transaction was attempted.
+The tested frontend was published to Vercel production as deployment `dpl_4t1EYuhwXg2dYURCHPuwiNvM3MSG` (project `web`, alias `https://web-omega-amber-37.vercel.app`) from commit `131cfb2`. At that time, the browser check confirmed the site loaded and showed the V2 address; StudioNet reads and wallet-signed writes were unverified. Stage 11 is now a distinct deployment and the frontend still targets V2. Do not infer frontend integration with Stage 11 from the earlier Vercel check.
 
 Direct mode tests contract behavior under its simulator. `genvm-lint` checks contract compatibility statically. Neither demonstrates that the candidate source is deployed, that live validators have executed it, or that the hosted website has been verified with a connected wallet and signed transaction. These must be verified against a new candidate deployment before asserting live readiness.
 
@@ -71,6 +71,12 @@ to source disclosure risk; that review has not been bypassed. The next
 deployment attempt must wait until the loader issue is diagnosed through an
 approved path. No lifecycle transaction hashes can be reported for this
 candidate because it never produced a usable contract address.
+
+## Live deployment addendum (2026-10-14)
+
+The source header incompatibility was fixed and the contract deployed successfully. The exact Stage 11 source hash is `sha256:710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`. The transaction `0x8c1979122f3103f865bba60646d699217b2bb3ecd283ce232532bdb4aad4821b` finalized with majority agreement, five validator responses revealed, and successful leader execution. The new address is `0xab972c3af9878b7CD4631CD21639B20E981B0702`; V1 and V2 were not changed.
+
+Both modules and both policy templates were registered and verified by live reads. The admin created and proposed API Delivery agreement A-1 and AI-Agent Task agreement A-2. Both are zero-value and remain `PROPOSED` until the designated counterparty `0x1Af111b06E6f6A05Bd41572A016318f1356aF85c` accepts. Therefore deployment and initialization are verified; the Stage 11 end-to-end lifecycle, including security regressions, is not yet fully verified. The Vercel application still targets V2 and has not been checked against this Stage 11 address.
 
 ## Test record
 
