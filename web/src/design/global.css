@@ -26,6 +26,24 @@ body {
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Long unbroken tokens (doc paths, addresses, hashes) must never force a
+   grid/flex track wider than its container -- this is what caused a real
+   horizontal-overflow bug at mobile widths (375px viewport, ~511px content)
+   found during the submission polish pass's mobile audit. Grid items default
+   to min-width: auto, which equals their content's min-content size; a long
+   unbroken string like "docs/V2_STUDIONET_LIVE_VERIFICATION_REPORT.md" sets
+   that min-content width to its own full unbroken length regardless of
+   viewport. Fix: allow grid tracks to shrink, and let unbroken tokens wrap. */
+* {
+  overflow-wrap: break-word;
+}
+
+.hero > *,
+.grid > * {
+  min-width: 0;
 }
 
 h1,

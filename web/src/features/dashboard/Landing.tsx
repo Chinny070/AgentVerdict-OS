@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { GENLAYER_JS_VERSION, STUDIONET_CHAIN_ID } from "../../chain/config";
+import { GENLAYER_JS_VERSION, STUDIONET_CHAIN_ID, V2_CONTRACT_ADDRESS, shortenAddress } from "../../chain/config";
 
 export default function Landing() {
   return (
@@ -28,15 +28,33 @@ export default function Landing() {
         <div className="panel spectral-edge">
           <h3>What is actually real here</h3>
           <ul>
-            <li>A lint-clean, 68/68-test-passing GenLayer Intelligent Contract (see docs/TEST_EVIDENCE.md).</li>
+            <li>A lint-clean, 81/81-test-passing GenLayer Intelligent Contract (see docs/TEST_EVIDENCE.md).</li>
             <li>Two real flagship evaluation modules: API Delivery Verification, AI-Agent Task Verification.</li>
-            <li>genlayer-js@{GENLAYER_JS_VERSION} wired to real reads/writes once a contract address is configured.</li>
+            <li>
+              Live on StudioNet at <strong>V2</strong> (<code>{shortenAddress(V2_CONTRACT_ADDRESS)}</code>),
+              the Stage-6-fixed deployment this console targets by default — genlayer-js@{GENLAYER_JS_VERSION}{" "}
+              reads and writes real on-chain state, no mock or simulator.
+            </li>
+            <li>
+              Every public write method on V2 has been exercised at least once via real signed transactions
+              (see docs/V2_STUDIONET_LIVE_VERIFICATION_REPORT.md and
+              docs/V2_REMAINING_PATHS_VERIFICATION_REPORT.md).
+            </li>
           </ul>
           <h3>What is honestly not yet real</h3>
           <ul>
-            <li>No StudioNet deployment has happened — this agent has no signing key, by design.</li>
-            <li>Settlement is an authorization receipt only. No real asset custody exists in this build.</li>
-            <li>Until an address is configured on Settings, every chain-dependent screen shows an empty state.</li>
+            <li>
+              Settlement is an authorization receipt only — no real asset custody exists in this build
+              (native GEN transfer is disabled by default).
+            </li>
+            <li>
+              This browser session has no signing key, by design — every write action requires your own
+              connected wallet; nothing here signs or sends a transaction on your behalf.
+            </li>
+            <li>
+              V1 (the original, pre-Stage-6 deployment) remains queryable but historical — see Settings for
+              both addresses.
+            </li>
           </ul>
         </div>
       </section>
