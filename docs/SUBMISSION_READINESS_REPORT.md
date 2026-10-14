@@ -527,3 +527,69 @@ your own wallet extension — MetaMask or similar — installed):
 
 No step above was performed by this agent; this checklist exists because
 it could not be.
+
+## 12. Real finding from the user's own manual wallet test (2026-10-14) —
+confirmed root cause, fixed, and a genuine SDK constraint documented
+
+The user actually ran the manual checklist above with **Rabby Wallet**
+installed, and it surfaced two real, distinct bugs — not a single issue:
+
+1. **Error-message bug (fixed, commit `290e414`).** The failure rendered
+   as `"Wallet is connected but could not be switched to StudioNet (chain
+   61999): [object Object]"`. Root cause: six call sites across
+   `chain/client.ts`, `chain/schema.ts`, `chain/transactions.ts`,
+   `hooks/useContractRead.ts`, and `state/WalletContext.tsx` used
+   `err instanceof Error ? err.message : String(err)`, which degrades to
+   JavaScript's default object stringification for any non-`Error` throw.
+   EIP-1193 provider errors are commonly plain `{code, message}` objects,
+   not `Error` instances, so every one of these sites silently discarded
+   the real reason. Fixed with a shared `describeError()` helper
+   (`chain/client.ts`) that extracts `.message` (with the error code
+   appended) before falling back to `JSON.stringify`. Covered by 4 new
+   regression tests.
+
+2. **Real underlying SDK constraint (now explicitly handled, commit
+   `<pending — see git log for the exact hash>`).** With the error
+   message now readable, the actual failure read: `"method
+   [wallet_getSnaps] doesn't have corresponding handler (code -32601)"`.
+   Confirmed by reading `node_modules/genlayer-js/dist/index.js`'s own
+   `connect()` implementation directly (not guessed): `genlayer-js@1.1.8`'s
+   wallet-connect flow does the generic `wallet_addEthereumChain` /
+   `wallet_switchEthereumChain` dance and then **unconditionally** calls
+   `wallet_getSnaps` to check for, and auto-install if missing, a
+   GenLayer-specific MetaMask Snap plugin (`npm:genlayer-wallet-plugin`,
+   via `wallet_requestSnaps`). `wallet_getSnaps`/`wallet_requestSnaps` are
+   **MetaMask-proprietary RPC methods**, not part of the EIP-1193
+   standard. Rabby Wallet (and, by the same mechanism, other
+   MetaMask-mimicking extensions such as Coinbase Wallet or Brave's
+   built-in wallet) implements the standard EIP-1193 surface faithfully
+   but does not implement MetaMask's Snaps API, so this call fails with a
+   standard JSON-RPC `-32601 Method not found` error.
+
+   **This means `genlayer-js@1.1.8`'s documented wallet-connect path
+   genuinely requires the real MetaMask browser extension specifically**
+   — not "any EIP-1193-compatible wallet" as the product spec's "supported
+   injected-wallet integration" language might otherwise suggest. This is
+   a confirmed, previously-unverified constraint of the pinned SDK version,
+   discovered through real user testing, not assumed or guessed.
+
+   **Fix applied:** `connectWallet()` in `chain/client.ts` now proactively
+   probes `wallet_getSnaps` immediately after requesting accounts, *before*
+   calling into `genlayer-js`'s own `connect()`. If the probe fails with a
+   recognizable "method not found" shape, the user now sees one clear,
+   specific, actionable message — *"This wallet does not support MetaMask
+   Snaps, which genlayer-js requires for StudioNet... Install and use the
+   official MetaMask extension instead"* — instead of a cryptic RPC error
+   surfacing deep inside the SDK's own flow (potentially after the wallet's
+   active chain has already been changed, leaving it half-switched). An
+   unrecognized failure from the probe itself is still surfaced honestly
+   (`"Could not check wallet Snap support: ..."`) rather than
+   misdiagnosed as the Snaps issue specifically. Covered by 2 new
+   regression tests reproducing the exact Rabby failure shape and the
+   honest-fallback path.
+
+   **Not yet independently re-tested live with Rabby** after this fix —
+   the user's own manual re-test (with Rabby, or by switching to real
+   MetaMask) is the next real verification step, not yet performed by
+   this agent (which has no wallet in its browser context, per the
+   unchanged limitation in section 11 above).

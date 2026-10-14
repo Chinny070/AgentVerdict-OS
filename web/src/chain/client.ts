@@ -116,6 +116,38 @@ export async function connectWallet(): Promise<WalletConnection> {
   }
   const address = accounts[0] as Address;
 
+  // genlayer-js@1.1.8's own connect() (see node_modules/genlayer-js/dist/index.js,
+  // "src/wallet/connect.ts") does the generic wallet_addEthereumChain /
+  // wallet_switchEthereumChain dance and then UNCONDITIONALLY calls
+  // `wallet_getSnaps` to check for and auto-install a GenLayer-specific
+  // MetaMask Snap plugin (`npm:genlayer-wallet-plugin`). `wallet_getSnaps` is
+  // a MetaMask-proprietary RPC method, not part of the EIP-1193 standard —
+  // confirmed live that Rabby Wallet (and by the same mechanism, other
+  // MetaMask-mimicking extensions such as Coinbase Wallet or Brave Wallet)
+  // reports `-32601 Method not found` for it, even though it otherwise
+  // behaves as a normal injected provider. Probe for this BEFORE calling
+  // connect() so the user gets one clear, specific, actionable message
+  // instead of a generic RPC error surfacing deep inside the SDK's own flow
+  // (which, by that point, may have already changed the wallet's active
+  // chain, leaving it stuck half-switched).
+  try {
+    await provider.request({ method: "wallet_getSnaps" });
+  } catch (err) {
+    const description = describeError(err);
+    if (/method not found|-32601|no corresponding handler|doesn't have.*handler/i.test(description)) {
+      throw new Error(
+        "This wallet does not support MetaMask Snaps, which genlayer-js requires for StudioNet " +
+          "(it auto-installs a GenLayer signing Snap on first connect). Rabby, Coinbase Wallet, and " +
+          "other MetaMask-compatible extensions do not implement this. Install and use the official " +
+          "MetaMask extension instead, then reload this page."
+      );
+    }
+    // A different, unexpected failure from the capability probe itself —
+    // don't swallow it, but don't claim a specific diagnosis we didn't
+    // actually confirm either.
+    throw new Error(`Could not check wallet Snap support: ${description}`);
+  }
+
   const writeClient = getWriteClient(address, provider);
   try {
     await writeClient.connect("studionet");
