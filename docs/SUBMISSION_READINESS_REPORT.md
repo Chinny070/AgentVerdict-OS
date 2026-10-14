@@ -473,7 +473,16 @@ production build, not just the local one.
 
 ### Wallet verification — honest status and manual checklist
 
-**UNVERIFIED in this session — no injected wallet provider available.**
+**UPDATE 2026-10-14, later same day — see section 12 below: wallet
+connection is now CONFIRMED WORKING, live, by the user with real
+MetaMask.** Everything below this line describes this agent's own
+(unsuccessful, by design — no agent here has ever held a signing key)
+attempt to verify wallet behavior from within its own browser tooling,
+and is kept as an accurate record of that limitation rather than rewritten
+— it was superseded by the user's own real test, not by anything this
+agent did.
+
+**UNVERIFIED in this agent's own session — no injected wallet provider available.**
 Checked rigorously, not assumed: the Claude Browser pane
 (`mcp__Claude_Browser__*`) is the only browser this agent drove against
 the live site, and it is an isolated, headless context with no persistent
@@ -588,8 +597,24 @@ installed, and it surfaced two real, distinct bugs — not a single issue:
    regression tests reproducing the exact Rabby failure shape and the
    honest-fallback path.
 
-   **Not yet independently re-tested live with Rabby** after this fix —
-   the user's own manual re-test (with Rabby, or by switching to real
-   MetaMask) is the next real verification step, not yet performed by
-   this agent (which has no wallet in its browser context, per the
-   unchanged limitation in section 11 above).
+   **Confirmed live by the user, 2026-10-14, same day as the fix.** The
+   user installed/switched to the real MetaMask extension and reported a
+   successful wallet connection on the live production site
+   (`https://web-omega-amber-37.vercel.app`, deployment `dpl_8uLkNrPP
+   5HMTuXjtsJxRbpTDLF9w`) — the first genuinely confirmed, real wallet
+   connection in this project's history, by the user themselves since no
+   agent in this project has ever held a signing key. This closes the
+   loop opened in section 11 above: wallet connection is no longer
+   UNVERIFIED, it is **CONFIRMED WORKING with real MetaMask**. The
+   `wallet_getSnaps` probe added in commit `4590303` was not strictly
+   exercised as a failure path in this specific successful connection
+   (real MetaMask supports Snaps, so the probe would have passed
+   silently) — its value is specifically for a user who, like this one
+   initially did, tries to connect with Rabby or a similar wallet first;
+   that failure path itself remains verified only by the 2 regression
+   tests in `web/src/chain/client.test.ts`, not by a second live
+   re-attempt with Rabby after the fix. Still untested live: an actual
+   signed write transaction through the deployed frontend (creating an
+   agreement, submitting evidence, etc.) — the connection succeeding is
+   necessary but not sufficient evidence for that; it remains the next
+   real verification step if the user chooses to pursue it.
