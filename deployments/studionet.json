@@ -81,5 +81,15 @@
     "contract_address": null,
     "deployment_transaction": null,
     "reason": "Stage 11 source changes are local candidate code. No deployment or live post-fix reads were performed. Existing V1 and V2 deployments remain unchanged; see docs/STAGE_11_CORRECTNESS_AUDIT.md."
+  },
+  "frontend_release": {
+    "status": "READY",
+    "project": "chinny070s-projects/web",
+    "deployment_id": "dpl_4t1EYuhwXg2dYURCHPuwiNvM3MSG",
+    "deployment_url": "https://web-o3vn82g9q-chinny070s-projects.vercel.app",
+    "production_alias": "https://web-omega-amber-37.vercel.app",
+    "source_commit": "131cfb2",
+    "contract_target": "0xCC67216ceD224A971739bAA706142A740B31853C",
+    "note": "Frontend deployment succeeded and the updated landing copy was confirmed in a read-only browser. Telemetry remained Loading and no injected wallet was available, so live contract reads and wallet-signed actions are unverified. The candidate contract source is not deployed."
   }
 }
