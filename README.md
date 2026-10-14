@@ -54,8 +54,84 @@ every decision outcome, both challenge-resolution branches).
 - Two real, independent StudioNet deployments (table above) with an
   exhaustive live-call-by-call verification history.
 
-## What is honestly not yet proven
+## What makes this technically distinctive
 
+Grounded in what is actually built and actually proven in this repo, not
+marketing language:
+
+- **Two-tier `run_nondet` leader/validator architecture.** Every
+  `request_evaluation` call defines independent `leader_fn`/`validator_fn`
+  closures and relies on GenVM's consensus to accept a result only once
+  leader and validator outputs satisfy an equivalence check (see
+  `docs/EQUIVALENCE_MATRIX.md`) — not a single node's unverified output.
+  Honestly stated limitation: the actual `eq_principle` wrapper dispatch
+  path could not be exercised in this workspace's direct-mode test
+  harness (no local GenVM runtime with an LLM backend was available), so
+  the live StudioNet runs are the only real evidence this mechanism works
+  end-to-end — including one recorded instance (V2 agreement `A-7`,
+  attempt 1) where **Rotation Count: 1** shows a real leader rotation
+  occurred before validators reached agreement, not just a rubber stamp.
+- **Permissionless timeout-recovery design.** `resolve_challenge_by_timeout`
+  is deliberately callable by *anyone*, not just a party or the admin,
+  because its outcome is fully deterministic (always upholds the original
+  verdict) — removing the discretion that would make restricting the
+  caller meaningful, while closing a genuine liveness gap an unresponsive
+  admin could otherwise exploit indefinitely. Live-verified with real 5/5
+  validator consensus on V2.
+- **Receipt-only settlement safety pattern.** No method in this contract
+  is payable; `authorize_settlement`/`record_settlement` only ever produce
+  an authorization record, never a real transfer, unless an admin
+  explicitly (and, by default, unsuccessfully — it raises an honest
+  "unverified stub" error) opts in. This sidesteps a confirmed live
+  StudioNet footgun (reverted payable calls not rolling back attached
+  value) entirely rather than trying to carefully sequence around it.
+- **Live cross-deployment (V1/V2) regression evidence.** V1 and V2 are two
+  independent real StudioNet deployments of the same contract family,
+  giving genuine before/after proof that the Stage 6 fixes changed real
+  on-chain behavior (V1's `resolve_challenge` has no deadline at all; V2's
+  `resolve_challenge_by_timeout` does, live-confirmed) — not just a diff
+  in source code that's assumed to behave as intended.
+
+## Known limitations
+
+Compiled honestly from `docs/SECURITY_THREAT_MODEL.md`,
+`docs/FINAL_HANDOFF.md`, and `docs/STAGE_6_MIGRATION_NOTE.md` — nothing
+below is new or hidden elsewhere; see those files for the full reasoning
+behind each.
+
+- **No challenge bond.** Challenging a verdict is free, since real GEN
+  custody is disabled by default — a real griefing vector if this were
+  deployed with high-value agreements. Adding a bond would require
+  re-enabling native custody, a deliberate out-of-scope decision for this
+  build.
+- **Admin centralization.** A single admin key controls module/policy
+  registration and (within the resolution deadline) challenge-merit
+  decisions. Stage 6 removed the *liveness* risk of an unresponsive admin
+  (`resolve_challenge_by_timeout`) but not the *discretion* a responsive
+  one holds.
+- **No defense against source substitution** between the leader's and a
+  validator's independent web fetch beyond the validator's own re-fetch —
+  a sophisticated adversary serving different content by timing/IP/headers
+  is not detected. No commitment/reveal scheme is implemented.
+- **Sybil-resistant reputation is not implemented.** Reputation only
+  accrues from real finalized agreements with a cooperating counterparty,
+  which raises the cost of farming but does not prevent two colluding
+  wallets from doing so.
+- **`genvm-lint`/Studio runtime version skew** is a known, unclosed gap — a
+  clean lint pass does not guarantee a given Studio runtime loads the
+  contract identically; this run shows one informational warning that a
+  newer runner exists.
+- **The GenVM time-source determinism claim** (`datetime.now(UTC)` being
+  consensus-safe on the real pinned runner) is held with high confidence
+  from SDK documentation and a passing determinism test, but was never
+  independently confirmed at the real-WASM level by this project, and no
+  single authoritative GenLayer doc was found stating it in so many words.
+- **"GenVM contracts are deployed-code-immutable"** (the reason V1 and V2
+  are separate addresses with no automatic state migration) is held with
+  high confidence from local skill documentation and the complete absence
+  of any contradicting mechanism found anywhere in this project, the
+  pinned SDK, or a live web search — but no single authoritative
+  GenLayer-specific page was found that confirms or denies it explicitly.
 - No real wallet-signed write has been exercised by any automated agent in
   this project's history — that boundary is absolute (see "Hard operating
   boundaries" below). Every write in the verification reports was executed
