@@ -23,14 +23,13 @@ Honest, precise current status: `docs/SUBMISSION_READINESS_REPORT.md`
 — the real, live production frontend, hosted on Vercel as static-site/SPA
 hosting only (no backend, no API routes, no database — see "Architecture"
 below). Defaults to the live V2 contract
-(`0xCC67216ceD224A971739bAA706142A740B31853C`); Protocol Telemetry,
-Agent Atlas, Evidence Observatory, Verdict Theater, Appeals Tribunal, and
-Settlement Ledger all show real live V2 chain data immediately, no wallet or
-setup required. Connect a browser wallet (e.g. MetaMask) to attempt a write.
-Verified working (deployment ID `dpl_36BndqyqcZn89maBkcbXovEHzeKe`, Vercel
-project `chinny070s-projects/web`) on 2026-10-14 — see
-`docs/SUBMISSION_READINESS_REPORT.md` section 10 for the full verification
-record, including what could and could not be tested in that pass.
+(`0xCC67216ceD224A971739bAA706142A740B31853C`). The latest frontend
+release is deployment `dpl_4t1EYuhwXg2dYURCHPuwiNvM3MSG` (commit `131cfb2`),
+project `chinny070s-projects/web`. A read-only browser check confirmed the
+site and updated deployment-status copy load; Protocol Telemetry remained in
+`Loading` in that session, so live contract reads and wallet-signed actions
+are not claimed as verified in this pass. See
+`docs/STAGE_11_CORRECTNESS_AUDIT.md` for current evidence and limits.
 
 **Architecture:** one GenLayer Python Intelligent Contract
 (`contracts/agentverdict.py`) plus a static frontend (`web/`). No backend
@@ -62,8 +61,10 @@ every decision outcome, both challenge-resolution branches).
   challenges/appeals (including the Stage 6 permissionless
   timeout-recovery path), recovery/rework, and a settlement-authorization-
   receipt model with native GEN transfer disabled by default.
-- **81/81 passing direct-mode tests** (`tests/direct/`) against the real
-  downloaded pinned GenVM SDK (v0.2.16) — not a hand-written stub.
+- **92/92 passing direct-mode tests** for the current local candidate
+  (`tests/direct/`) against the real downloaded pinned GenVM SDK (v0.2.16).
+  V2's historical live verification applies to its deployed Stage 6 source,
+  not these Stage 11 candidate changes.
 - A clean `genvm-lint check` pass (0 errors, 1 informational warning about
   a newer runner being available).
 - A full React + TypeScript + Vite frontend (`web/`), `genlayer-js@1.1.8`
@@ -71,9 +72,9 @@ every decision outcome, both challenge-resolution branches).
   Mission Control, Evidence Observatory, Verdict Theater, Appeals Tribunal,
   Recovery Center, Settlement Ledger, Adapter Foundry, Simulation Chamber,
   Protocol Telemetry, Settings), typechecked, unit-tested (20/20 passing),
-  production-built, defaulting to the live V2 contract, and browser-verified
-  against real V2 chain reads with zero console errors across every screen
-  and no mobile horizontal overflow.
+  production-built, defaulting to the live V2 contract, and unit-tested
+  (32/32). The hosted browser check for the current release found no injected
+  wallet and did not complete the telemetry read; see the audit report.
 - Two real, independent StudioNet deployments (table above) with an
   exhaustive live-call-by-call verification history.
 
@@ -183,7 +184,8 @@ area-by-area verdict in `docs/SUBMISSION_READINESS_REPORT.md`.
 3. The app defaults to the live V2 contract already — no address entry
    needed to browse read-only screens (Protocol Telemetry, Agent Atlas,
    Evidence Observatory, Verdict Theater, Appeals Tribunal, Settlement
-   Ledger all work immediately).
+   Ledger are designed for read-only inspection; verify live reads in your
+   own browser session before relying on their displayed data.
 4. Click "Connect wallet" (top right). The app calls `eth_requestAccounts`
    and then switches/adds the StudioNet chain via `genlayer-js`. Any
    realistic failure (no provider, rejected signature, wrong chain) is
@@ -238,7 +240,7 @@ npm run build
 npm run preview -- --host 127.0.0.1 --port 4173
 # Open http://127.0.0.1:4173 — Protocol Telemetry, Agent Atlas, Evidence
 # Observatory, Verdict Theater, Appeals Tribunal, and Settlement Ledger all
-# show real live V2 chain data immediately, no setup required.
+# target the deployed V2 contract; verify live RPC reads in your browser.
 ```
 
 No step above requires a funded account, a private key, or an LLM provider
