@@ -28,12 +28,15 @@ export default function Landing() {
         <div className="panel spectral-edge">
           <h3>What is actually real here</h3>
           <ul>
-            <li>A lint-clean, 81/81-test-passing GenLayer Intelligent Contract (see docs/TEST_EVIDENCE.md).</li>
+            <li>
+              The deployed V2 contract has a real StudioNet verification record. The current Stage 11 source
+              candidate passes 92 direct-mode contract tests; its correctness fixes are not yet deployed.
+            </li>
             <li>Two real flagship evaluation modules: API Delivery Verification, AI-Agent Task Verification.</li>
             <li>
               Live on StudioNet at <strong>V2</strong> (<code>{shortenAddress(V2_CONTRACT_ADDRESS)}</code>),
-              the Stage-6-fixed deployment this console targets by default — genlayer-js@{GENLAYER_JS_VERSION}{" "}
-              reads and writes real on-chain state, no mock or simulator.
+              the Stage-6 deployment this console targets by default — genlayer-js@{GENLAYER_JS_VERSION}{" "}
+              reads and writes real on-chain state. Stage 11 candidate fixes require a separate deployment.
             </li>
             <li>
               Every public write method on V2 has been exercised at least once via real signed transactions
@@ -54,6 +57,10 @@ export default function Landing() {
             <li>
               V1 (the original, pre-Stage-6 deployment) remains queryable but historical — see Settings for
               both addresses.
+            </li>
+            <li>
+              V1 and V2 do not contain the local Stage 11 hardening; the latest code is a candidate pending
+              separate deployment and live verification.
             </li>
           </ul>
         </div>

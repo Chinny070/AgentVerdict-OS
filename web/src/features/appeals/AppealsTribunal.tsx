@@ -185,8 +185,9 @@ export default function AppealsTribunal() {
                   Stage 6 fix for an unresolved challenge (docs/STAGE_6_MIGRATION_NOTE.md). Available to
                   any wallet once the looked-up challenge's admin resolution deadline has passed while it
                   is still OPEN. Deterministically upholds the original verdict — never the challenge —
-                  and reopens the challenge window, the same effect as an admin rejection. Not available
-                  on the currently deployed StudioNet contract.
+                  and reopens the challenge window, the same effect as an admin rejection. This method is
+                  available on the deployed Stage-6 V2 contract; the separate Stage 11 source changes are
+                  not deployed there.
                 </p>
                 {!canResolveByTimeout && (
                   <p className="field-help" style={{ color: "var(--tangerine)" }}>

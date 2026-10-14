@@ -44,8 +44,9 @@ export default function Settings() {
         <h2>Deployed contract address</h2>
         <p className="field-help">
           This build defaults to <strong>V2</strong> (<code>{shortenAddress(V2_CONTRACT_ADDRESS)}</code>), the
-          current, actively-used, Stage-6-fixed StudioNet deployment — a real deployed address, not a
-          placeholder (see <code>deployments/studionet.json</code>). Override it below to point at a different
+          verified Stage-6 StudioNet deployment — a real deployed address, not a
+          placeholder (see <code>deployments/studionet.json</code>). The Stage 11 source hardening is not
+          deployed on V1 or V2. Override it below to point at a different
           deployment (e.g. V1, historical, see below) or your own. Stored only in this browser's
           localStorage — a client preference, never canonical protocol state.
         </p>
