@@ -53,6 +53,7 @@ MAX_HASH_LEN = 128
 MAX_GROUNDS_LEN = 2000
 MAX_EVIDENCE_FETCH_CHARS = 4000
 MAX_EVIDENCE_SOURCES = 5
+MAX_RUBRIC_CRITERIA = 20
 
 API_DELIVERY_MODULE = "api-delivery"
 API_DELIVERY_VERSION = "1.0.0"
@@ -139,7 +140,41 @@ def _parse_json_text(text):
         raise gl.vm.UserError(ERROR_LLM + " unparsable JSON in LLM output")
 
 
-def _parse_llm_result(raw):
+def _rubric_criterion_ids(rubric_json):
+    try:
+        rubric = json.loads(rubric_json)
+    except Exception:
+        raise gl.vm.UserError(ERROR_EXPECTED + " rubric_json must be valid JSON")
+    raw_criteria = rubric.get("criteria") if isinstance(rubric, dict) else None
+    if not isinstance(raw_criteria, list) or len(raw_criteria) == 0 or len(raw_criteria) > MAX_RUBRIC_CRITERIA:
+        raise gl.vm.UserError(ERROR_EXPECTED + " rubric must declare 1-20 criteria")
+    ids = []
+    for item in raw_criteria:
+        cid = item.get("id") if isinstance(item, dict) else None
+        if not isinstance(cid, str) or not cid.strip() or len(cid) > 128 or cid in ids:
+            raise gl.vm.UserError(ERROR_EXPECTED + " rubric criterion ids must be unique non-empty strings")
+        ids.append(cid)
+    return ids
+
+
+def _declared_criterion_ids(schema_json):
+    try:
+        schema = json.loads(schema_json)
+    except Exception:
+        raise gl.vm.UserError(ERROR_EXPECTED + " registered module criteria schema is invalid")
+    rows = schema.get("criteria") if isinstance(schema, dict) else None
+    if not isinstance(rows, list):
+        raise gl.vm.UserError(ERROR_EXPECTED + " registered module schema has no criteria array")
+    result = []
+    for row in rows:
+        cid = row.get("id") if isinstance(row, dict) else row
+        if not isinstance(cid, str) or not cid or cid in result:
+            raise gl.vm.UserError(ERROR_EXPECTED + " registered module criterion ids are invalid")
+        result.append(cid)
+    return result
+
+
+def _parse_llm_result(raw, expected_ids):
     data = raw
     if isinstance(data, str):
         data = _parse_json_text(data)
@@ -158,21 +193,29 @@ def _parse_llm_result(raw):
 
     criteria_raw = data.get("criteria")
     if not isinstance(criteria_raw, list):
-        criteria_raw = []
+        raise gl.vm.UserError(ERROR_LLM + " criteria must be an array")
     criteria = []
     for item in criteria_raw:
         if not isinstance(item, dict):
-            continue
-        cid = str(item.get("id", ""))[:128]
+            raise gl.vm.UserError(ERROR_LLM + " criterion entry must be an object")
+        cid = item.get("id")
+        if not isinstance(cid, str) or not cid:
+            raise gl.vm.UserError(ERROR_LLM + " criterion id is missing")
         status = str(item.get("status", "INSUFFICIENT_EVIDENCE")).upper()
         if status not in ("PASS", "FAIL", "INSUFFICIENT_EVIDENCE"):
-            status = "INSUFFICIENT_EVIDENCE"
+            raise gl.vm.UserError(ERROR_LLM + " unsupported criterion status")
         reason = str(item.get("reason", ""))[:500]
         evidence_ids = item.get("evidence_ids", [])
         if not isinstance(evidence_ids, list):
-            evidence_ids = []
+            raise gl.vm.UserError(ERROR_LLM + " evidence_ids must be an array")
+        if status in ("PASS", "FAIL") and (not reason.strip() or not evidence_ids):
+            raise gl.vm.UserError(ERROR_LLM + " PASS/FAIL criteria require a reason and evidence reference")
         evidence_ids = [str(x)[:64] for x in evidence_ids][:10]
         criteria.append({"id": cid, "status": status, "reason": reason, "evidence_ids": evidence_ids})
+
+    actual_ids = [c["id"] for c in criteria]
+    if len(actual_ids) != len(set(actual_ids)) or set(actual_ids) != set(expected_ids):
+        raise gl.vm.UserError(ERROR_LLM + " criterion set does not exactly match the frozen rubric")
 
     uncertainty = str(data.get("uncertainty", "UNKNOWN")).upper()
     if uncertainty not in ("LOW", "MEDIUM", "HIGH", "UNKNOWN"):
@@ -189,20 +232,33 @@ def _apply_contradiction_downgrade(parsed, snapshot):
     Detection Engine; feature 6, Evidence Authenticity Firewall.
     """
     ok_ids = set(item["evidence_id"] for item in snapshot if item["ok"])
+    evidence_by_id = {item["evidence_id"]: item for item in snapshot}
     new_criteria = []
-    any_downgraded = False
     for c in parsed["criteria"]:
         ids = c.get("evidence_ids", [])
-        if c["status"] in ("PASS", "FAIL") and ids and not all(eid in ok_ids for eid in ids):
+        for eid in ids:
+            if eid not in evidence_by_id:
+                raise gl.vm.UserError(ERROR_LLM + " criterion cites evidence outside this agreement evaluation")
+            if evidence_by_id[eid]["criterion_id"] != c["id"]:
+                raise gl.vm.UserError(ERROR_LLM + " evidence reference does not match its criterion")
+        if c["status"] in ("PASS", "FAIL") and not all(eid in ok_ids for eid in ids):
             c = dict(c)
             c["status"] = "INSUFFICIENT_EVIDENCE"
             c["reason"] = (c.get("reason", "") + " [downgraded: cited evidence unreachable]")[:500]
-            any_downgraded = True
         new_criteria.append(c)
     result = dict(parsed)
     result["criteria"] = new_criteria
-    if any_downgraded and result["decision"] == "PASS":
+    statuses = [c["status"] for c in new_criteria]
+    if all(status == "PASS" for status in statuses):
+        result["decision"] = "PASS"
+    elif all(status == "FAIL" for status in statuses):
+        result["decision"] = "FAIL"
+    elif "PASS" in statuses:
         result["decision"] = "PARTIAL"
+    elif "INSUFFICIENT_EVIDENCE" in statuses:
+        result["decision"] = "INSUFFICIENT_EVIDENCE"
+    else:
+        result["decision"] = "FAIL"
     return result
 
 
@@ -215,6 +271,12 @@ def _structured_decision_agrees(leader_result, validator_result):
     leader_pairs = set((c.get("id"), c.get("status")) for c in leader_result.get("criteria", []))
     validator_pairs = set((c.get("id"), c.get("status")) for c in validator_result.get("criteria", []))
     if leader_pairs != validator_pairs:
+        return False
+    leader_evidence = set((c.get("id"), tuple(sorted(c.get("evidence_ids", [])))) for c in leader_result.get("criteria", []))
+    validator_evidence = set((c.get("id"), tuple(sorted(c.get("evidence_ids", [])))) for c in validator_result.get("criteria", []))
+    if leader_evidence != validator_evidence:
+        return False
+    if leader_result.get("uncertainty") != validator_result.get("uncertainty"):
         return False
     return True
 
@@ -297,6 +359,10 @@ class Agreement:
     attempt_no: u256
     last_decision: str
     last_remedy: str
+    # V3 appended fields: operative policy values are frozen on agreement
+    # creation so later template edits cannot change an existing lifecycle.
+    challenge_window_seconds: u256
+    allowed_evidence_csv: str
 
 
 @allow_storage
@@ -338,6 +404,7 @@ class EvidencePacket:
     criterion_id: str
     submitted_at: str
     visibility: str
+    evidence_type: str
 
 
 @allow_storage
@@ -406,6 +473,7 @@ class ReputationEvent:
     delta: i256
     reason: str
     created_at: str
+    attempt_no: u256
 
 
 class AgentVerdictOS(gl.Contract):
@@ -503,14 +571,20 @@ class AgentVerdictOS(gl.Contract):
                 revoked=False,
             )
 
-    def _is_accepted_delegate_of(self, sender, principal):
+    def _is_accepted_delegate_of(self, sender, principal, permission):
         now = self._now_dt()
         for did in self.delegation_ids:
             d = self.delegations[did]
             if d.parent == principal and d.child == sender and d.accepted and not d.revoked:
                 try:
                     if now < _parse_iso(d.expires_at):
-                        return True
+                        scope = json.loads(d.scope_json)
+                        permissions = scope.get("permissions") if isinstance(scope, dict) else None
+                        if permissions is None and isinstance(scope, dict):
+                            permissions = scope.get("scope")
+                        if isinstance(permissions, str):
+                            permissions = [permissions]
+                        return isinstance(permissions, list) and permission in permissions
                 except Exception:
                     continue
         return False
@@ -522,17 +596,19 @@ class AgentVerdictOS(gl.Contract):
         hashes.sort()
         return "|".join(hashes)
 
-    def _apply_reputation_event(self, subject, agreement_id, decision):
+    def _apply_reputation_event(self, subject, agreement_id, decision, attempt_no, reversal=False):
         delta_map = {"PASS": 5, "PARTIAL": 1, "FAIL": -5, "INSUFFICIENT_EVIDENCE": 0, "ERROR": 0}
         delta = delta_map.get(decision, 0)
+        if reversal:
+            delta = -delta
         self._ensure_passport(subject)
         key = _addr_key(subject)
         passport = self.passports[key]
         passport.reputation_score = passport.reputation_score + delta
         if decision in ("PASS", "PARTIAL"):
-            passport.completed_count = passport.completed_count + 1
+            passport.completed_count = passport.completed_count - 1 if reversal else passport.completed_count + 1
         if decision == "FAIL":
-            passport.disputed_count = passport.disputed_count + 1
+            passport.disputed_count = passport.disputed_count - 1 if reversal else passport.disputed_count + 1
         self.passports[key] = passport
 
         self.reputation_counter = self.reputation_counter + 1
@@ -542,8 +618,9 @@ class AgentVerdictOS(gl.Contract):
             subject=subject,
             agreement_id=agreement_id,
             delta=delta,
-            reason=decision,
+            reason=("SUPERSEDED:" if reversal else "") + decision,
             created_at=_iso(self._now_dt()),
+            attempt_no=attempt_no,
         )
         existing = self.reputation_by_subject[key] if key in self.reputation_by_subject else ""
         self.reputation_by_subject[key] = existing + ("," if existing else "") + event_id
@@ -791,14 +868,18 @@ class AgentVerdictOS(gl.Contract):
             raise gl.vm.UserError(ERROR_EXPECTED + " unsupported or unregistered module_id")
         if rubric_json is None or len(rubric_json) == 0:
             raise gl.vm.UserError(ERROR_EXPECTED + " rubric_json must not be empty")
+        criterion_ids = _rubric_criterion_ids(rubric_json)
+        module_version = self.modules_latest[module_id]
+        module = self.modules[module_id + "@" + module_version]
+        declared_ids = _declared_criterion_ids(module.criteria_schema_json)
+        if any(cid not in declared_ids for cid in criterion_ids):
+            raise gl.vm.UserError(ERROR_EXPECTED + " rubric contains a criterion unsupported by the module version")
 
         self._ensure_passport(creator)
         self._ensure_passport(counterparty_addr)
 
         self.agreement_counter = self.agreement_counter + 1
         agreement_id = "A-" + str(int(self.agreement_counter))
-        module_version = self.modules_latest[module_id]
-
         self.agreements[agreement_id] = Agreement(
             agreement_id=agreement_id,
             creator=creator,
@@ -816,6 +897,8 @@ class AgentVerdictOS(gl.Contract):
             attempt_no=0,
             last_decision="",
             last_remedy="",
+            challenge_window_seconds=policy.challenge_window_seconds,
+            allowed_evidence_csv=policy.allowed_evidence_csv,
         )
         self.agreement_ids.append(agreement_id)
         return agreement_id
@@ -892,8 +975,8 @@ class AgentVerdictOS(gl.Contract):
         authorized = (
             sender == ag.creator
             or sender == ag.counterparty
-            or self._is_accepted_delegate_of(sender, ag.creator)
-            or self._is_accepted_delegate_of(sender, ag.counterparty)
+            or self._is_accepted_delegate_of(sender, ag.creator, "submit_evidence")
+            or self._is_accepted_delegate_of(sender, ag.counterparty, "submit_evidence")
         )
         if not authorized:
             raise gl.vm.UserError(ERROR_EXPECTED + " caller is not authorized to submit evidence for this agreement")
@@ -901,6 +984,15 @@ class AgentVerdictOS(gl.Contract):
         key = _addr_key(sender)
         if key in self.passports and self.passports[key].revoked:
             raise gl.vm.UserError(ERROR_EXPECTED + " submitter's passport is revoked")
+
+        criterion_ids = _rubric_criterion_ids(ag.rubric_json)
+        if criterion_id not in criterion_ids:
+            raise gl.vm.UserError(ERROR_EXPECTED + " criterion_id is not declared in the frozen rubric")
+        module = self.modules[ag.module_id + "@" + ag.module_version]
+        if "url" not in [x.strip() for x in ag.allowed_evidence_csv.split(",")]:
+            raise gl.vm.UserError(ERROR_EXPECTED + " agreement policy does not allow URL evidence")
+        if "url" not in [x.strip() for x in module.evidence_types_csv.split(",")]:
+            raise gl.vm.UserError(ERROR_EXPECTED + " module version does not support URL evidence")
 
         _validate_url(url)
         if not isinstance(content_hash, str) or len(content_hash) == 0 or len(content_hash) > MAX_HASH_LEN:
@@ -926,6 +1018,7 @@ class AgentVerdictOS(gl.Contract):
             criterion_id=criterion_id[:128],
             submitted_at=_iso(self._now_dt()),
             visibility="PUBLIC",
+            evidence_type="url",
         )
         new_csv = existing_csv + ("," if existing_csv else "") + evidence_id
         self.evidence_by_agreement[agreement_id] = new_csv
@@ -947,6 +1040,7 @@ class AgentVerdictOS(gl.Contract):
                 "criterion_id": e.criterion_id,
                 "submitted_at": e.submitted_at,
                 "visibility": e.visibility,
+                "evidence_type": e.evidence_type,
             })
         return {"agreement_id": agreement_id, "evidence": rows}
 
@@ -978,6 +1072,7 @@ class AgentVerdictOS(gl.Contract):
         # storage-detached str values into ordinary dicts HERE, strictly
         # before leader_fn/validator_fn are defined below, so neither
         # closure ever captures anything but plain Python immutables.
+        expected_ids = _rubric_criterion_ids(rubric_json)
         bounded_rows = [
             {
                 "evidence_id": str(row.evidence_id),
@@ -1051,7 +1146,7 @@ class AgentVerdictOS(gl.Contract):
 
             prompt = build_prompt(snapshot)
             raw = gl.nondet.exec_prompt(prompt, response_format="json")
-            parsed = _parse_llm_result(raw)
+            parsed = _parse_llm_result(raw, expected_ids)
             return _apply_contradiction_downgrade(parsed, snapshot)
 
         def validator_fn(leaders_res):
@@ -1111,6 +1206,8 @@ class AgentVerdictOS(gl.Contract):
         if ag.state not in (ST_EVIDENCE_OPEN, ST_REEVALUATING):
             raise gl.vm.UserError(ERROR_EXPECTED + " agreement is not ready for evaluation")
         self._require_party(ag)
+        if ag.attempt_no >= MAX_ATTEMPTS:
+            raise gl.vm.UserError(ERROR_EXPECTED + " maximum evaluation attempts reached")
 
         csv = self.evidence_by_agreement[agreement_id] if agreement_id in self.evidence_by_agreement else ""
         ids = [x for x in csv.split(",") if x]
@@ -1151,8 +1248,7 @@ class AgentVerdictOS(gl.Contract):
             self.agreements[agreement_id] = ag
             return
 
-        policy = self.policy_templates[ag.policy_id]
-        deadline_dt = self._now_dt() + datetime.timedelta(seconds=int(policy.challenge_window_seconds))
+        deadline_dt = self._now_dt() + datetime.timedelta(seconds=int(ag.challenge_window_seconds))
         verdict_id = "V-" + agreement_id + "-" + str(int(next_attempt))
         verdict = Verdict(
             verdict_id=verdict_id,
@@ -1221,14 +1317,14 @@ class AgentVerdictOS(gl.Contract):
 
         existing_csv = self.challenges_by_agreement[agreement_id] if agreement_id in self.challenges_by_agreement else ""
         for cid in [x for x in existing_csv.split(",") if x]:
-            if self.challenges[cid].state == "OPEN":
-                raise gl.vm.UserError(ERROR_EXPECTED + " a challenge is already open for this agreement")
+            previous = self.challenges[cid]
+            if previous.verdict_attempt_no == ag.attempt_no:
+                raise gl.vm.UserError(ERROR_EXPECTED + " this verdict attempt has already been challenged")
 
         self.challenge_counter = self.challenge_counter + 1
         challenge_id = "C-" + str(int(self.challenge_counter))
-        policy = self.policy_templates[ag.policy_id]
         resolution_deadline = _iso(
-            self._now_dt() + datetime.timedelta(seconds=int(policy.challenge_window_seconds))
+            self._now_dt() + datetime.timedelta(seconds=int(ag.challenge_window_seconds))
         )
         self.challenges[challenge_id] = Challenge(
             challenge_id=challenge_id,
@@ -1248,7 +1344,7 @@ class AgentVerdictOS(gl.Contract):
         self.agreements[agreement_id] = ag
         return challenge_id
 
-    def _reopen_challenge_window(self, ag, verdict, policy):
+    def _reopen_challenge_window(self, ag, verdict):
         """Shared effect for every 'the challenge did not stand' outcome --
         admin REJECTED and timeout TIMEOUT_REJECTED alike route through
         this single implementation so the two paths can never diverge.
@@ -1256,7 +1352,7 @@ class AgentVerdictOS(gl.Contract):
         new verdict, no reputation event here -- those only ever happen
         in finalize_verdict's existing tail, unchanged by Stage 6).
         """
-        new_deadline = _iso(self._now_dt() + datetime.timedelta(seconds=int(policy.challenge_window_seconds)))
+        new_deadline = _iso(self._now_dt() + datetime.timedelta(seconds=int(ag.challenge_window_seconds)))
         verdict.challenge_deadline = new_deadline
         self.verdicts[ag.agreement_id] = verdict
         self.verdicts[ag.agreement_id + "#" + str(int(verdict.attempt_no))] = verdict
@@ -1274,6 +1370,8 @@ class AgentVerdictOS(gl.Contract):
         ag = self._get_agreement(ch.agreement_id)
         if ag.state != ST_CHALLENGED:
             raise gl.vm.UserError(ERROR_EXPECTED + " agreement is not in CHALLENGED state")
+        if self._now_dt() >= _parse_iso(ch.resolution_deadline):
+            raise gl.vm.UserError(ERROR_EXPECTED + " challenge resolution deadline passed; use timeout recovery")
 
         ch.state = "UPHELD" if upheld else "REJECTED"
         ch.resolution = resolution[:500]
@@ -1283,9 +1381,8 @@ class AgentVerdictOS(gl.Contract):
             ag.state = ST_REEVALUATING
             self.agreements[ch.agreement_id] = ag
         else:
-            policy = self.policy_templates[ag.policy_id]
             verdict = self.verdicts[ag.agreement_id]
-            self._reopen_challenge_window(ag, verdict, policy)
+            self._reopen_challenge_window(ag, verdict)
 
     @gl.public.write
     def resolve_challenge_by_timeout(self, challenge_id: str) -> None:
@@ -1358,9 +1455,8 @@ class AgentVerdictOS(gl.Contract):
         )[:500]
         self.challenges[challenge_id] = ch
 
-        policy = self.policy_templates[ag.policy_id]
         verdict = self.verdicts[ag.agreement_id]
-        self._reopen_challenge_window(ag, verdict, policy)
+        self._reopen_challenge_window(ag, verdict)
 
     @gl.public.view
     def get_challenge(self, challenge_id: str) -> dict:
@@ -1404,7 +1500,7 @@ class AgentVerdictOS(gl.Contract):
         ag.state = ST_FINALIZED
         self.agreements[agreement_id] = ag
 
-        self._apply_reputation_event(ag.counterparty, agreement_id, verdict.decision)
+        self._apply_reputation_event(ag.counterparty, agreement_id, verdict.decision, verdict.attempt_no)
 
     @gl.public.write
     def request_rework(self, agreement_id: str, reason: str) -> None:
@@ -1413,10 +1509,14 @@ class AgentVerdictOS(gl.Contract):
             raise gl.vm.UserError(ERROR_EXPECTED + " agreement is not eligible for rework")
         self._require_party(ag)
         verdict = self.verdicts[agreement_id]
-        if verdict.remedy != "REWORK":
-            raise gl.vm.UserError(ERROR_EXPECTED + " latest verdict does not carry a REWORK remedy")
+        if verdict.remedy not in ("REWORK", "RETRY"):
+            raise gl.vm.UserError(ERROR_EXPECTED + " latest verdict does not carry a recoverable remedy")
         if agreement_id in self.settlements and self.settlements[agreement_id].status in ("AUTHORIZED", "EXECUTED"):
             raise gl.vm.UserError(ERROR_EXPECTED + " cannot rework after settlement has been authorized")
+        if ag.state == ST_FINALIZED:
+            self._apply_reputation_event(
+                ag.counterparty, agreement_id, verdict.decision, verdict.attempt_no, reversal=True
+            )
         ag.state = ST_REMEDIATION_REQUESTED
         self.agreements[agreement_id] = ag
 
@@ -1446,8 +1546,8 @@ class AgentVerdictOS(gl.Contract):
     def cancel_by_rule(self, agreement_id: str) -> None:
         ag = self._get_agreement(agreement_id)
         self._require_party(ag)
-        if ag.state in TERMINAL_STATES:
-            raise gl.vm.UserError(ERROR_EXPECTED + " agreement is already in a terminal state")
+        if ag.state not in (ST_ACCEPTED, ST_ACTIVE, ST_EVIDENCE_OPEN):
+            raise gl.vm.UserError(ERROR_EXPECTED + " agreement state is not eligible for rule cancellation")
         if self._now_dt() < _parse_iso(ag.deadline):
             raise gl.vm.UserError(ERROR_EXPECTED + " deadline has not passed yet")
         ag.state = ST_CANCELLED_BY_RULE
@@ -1482,6 +1582,8 @@ class AgentVerdictOS(gl.Contract):
     @gl.public.write
     def record_settlement(self, agreement_id: str) -> None:
         ag = self._get_agreement(agreement_id)
+        if ag.state != ST_FINALIZED:
+            raise gl.vm.UserError(ERROR_EXPECTED + " agreement is not FINALIZED")
         sender = gl.message.sender_address
         if sender != ag.creator and sender != ag.counterparty and sender != self.admin:
             raise gl.vm.UserError(ERROR_EXPECTED + " not authorized to record settlement")
@@ -1490,6 +1592,17 @@ class AgentVerdictOS(gl.Contract):
         settlement = self.settlements[agreement_id]
         if settlement.status != "AUTHORIZED":
             raise gl.vm.UserError(ERROR_EXPECTED + " settlement is not in AUTHORIZED state (already executed?)")
+        verdict = self.verdicts[agreement_id]
+        if verdict.state != "FINAL" or verdict.decision not in ("PASS", "PARTIAL"):
+            raise gl.vm.UserError(ERROR_EXPECTED + " finalized verdict does not authorize this settlement")
+        expected_amount = ag.amount_atto if verdict.decision == "PASS" else ag.amount_atto // 2
+        if settlement.recipient != ag.counterparty or settlement.amount_atto != expected_amount:
+            raise gl.vm.UserError(ERROR_EXPECTED + " settlement instruction does not match finalized agreement")
+        if self.settlement_native_transfer_enabled:
+            raise gl.vm.UserError(
+                ERROR_EXPECTED
+                + " native transfer is not supported by this contract build; disable the flag before recording"
+            )
 
         # Idempotency-first ordering: flip to EXECUTED before any transfer
         # attempt, so a retried/duplicate call can never double-settle.
@@ -1500,23 +1613,6 @@ class AgentVerdictOS(gl.Contract):
         ag.state = ST_SETTLED
         self.agreements[agreement_id] = ag
 
-        if self.settlement_native_transfer_enabled:
-            # Native GEN transfer for the pinned v0.2.x-era runner was not
-            # independently verified live in this session (gl.chain.Account
-            # is confirmed only for the newer v0.3 SDK branch per
-            # docs/GENLAYER_CAPABILITY_MATRIX.md section 6). Rather than
-            # guess at an unverified API and risk a silent fake-success,
-            # this build raises a clear, honest error instead of
-            # attempting the call. Toggling the flag on therefore
-            # intentionally blocks record_settlement until a future
-            # session verifies and wires the real transfer call live.
-            raise gl.vm.UserError(
-                ERROR_EXPECTED
-                + " settlement_native_transfer_enabled is True but the native transfer call path is "
-                + "an unverified stub in this build; see docs/PROTOCOL_ARCHITECTURE.md section 5. "
-                + "The EXECUTED settlement receipt above is still valid and final; disable the flag "
-                + "to use authorization-receipt-only mode."
-            )
 
     @gl.public.write
     def set_settlement_native_transfer_enabled(self, enabled: bool) -> None:
@@ -1563,6 +1659,8 @@ class AgentVerdictOS(gl.Contract):
             "attempt_no": int(ag.attempt_no),
             "last_decision": ag.last_decision,
             "last_remedy": ag.last_remedy,
+            "challenge_window_seconds": int(ag.challenge_window_seconds),
+            "allowed_evidence_csv": ag.allowed_evidence_csv,
         }
 
     @gl.public.view

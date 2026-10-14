@@ -89,6 +89,8 @@ export interface WalletConnection {
   provider: EthereumProviderLike;
 }
 
+export const STUDIONET_EVM_CHAIN_ID = "0xf22f"; // 61999
+
 /**
  * Requests account access from the injected provider and switches it to the
  * studionet chain via genlayer-js's own `client.connect()` (which, per the
@@ -155,6 +157,11 @@ export async function connectWallet(): Promise<WalletConnection> {
     throw new Error(
       `Wallet is connected but could not be switched to StudioNet (chain 61999): ${describeError(err)}`
     );
+  }
+
+  const connectedChain = await provider.request({ method: "eth_chainId" });
+  if (typeof connectedChain !== "string" || connectedChain.toLowerCase() !== STUDIONET_EVM_CHAIN_ID) {
+    throw new Error(`Wallet is on chain ${String(connectedChain)} after connection; StudioNet requires chain ID 61999.`);
   }
 
   return { address, provider };

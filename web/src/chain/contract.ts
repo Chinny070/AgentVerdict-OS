@@ -38,6 +38,10 @@ export interface AgreementView {
   attempt_no: number;
   last_decision: string;
   last_remedy: string;
+  /** Challenge duration captured when the agreement was created. */
+  challenge_window_seconds: number;
+  /** Evidence types captured when the agreement was created. */
+  allowed_evidence_csv: string;
 }
 
 export interface CriterionFindingView {
@@ -74,6 +78,7 @@ export interface EvidenceRow {
   criterion_id: string;
   submitted_at: string;
   visibility: string;
+  evidence_type: string;
 }
 
 export interface EvidenceMetadataView {

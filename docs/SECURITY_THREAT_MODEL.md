@@ -1,5 +1,17 @@
 # Security Threat Model
 
+> **Current source addendum (Stage 11, 2026-10-14):** some risk descriptions
+> below are historical Stage 6 notes and no longer describe the local
+> candidate source. The up-to-date behavior and deployment boundary are in
+> [STAGE_11_CORRECTNESS_AUDIT.md](STAGE_11_CORRECTNESS_AUDIT.md). In
+> particular, the candidate now permits one challenge per verdict attempt,
+> freezes policy timing/evidence constraints, validates evidence references
+> and uncertainty in equivalence, reverses reputation when a finalized
+> verdict is superseded, enforces delegated evidence permission, restricts
+> cancellation and settlement states, and waits for finalized successful
+> transaction receipts in the frontend. **These candidate changes are not
+> present on the live V1 or V2 addresses.**
+
 Threats enumerated per brief section 10. For each: the concrete mitigation in `contracts/agentverdict.py`, and the negative test in `tests/direct/` that exercises it (file names refer to the Stage 1/2/3 test suite built in this session).
 
 | Threat | Mitigation | Test |

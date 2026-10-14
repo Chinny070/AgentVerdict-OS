@@ -59,7 +59,7 @@ def test_native_transfer_flag_admin_only(deployed, direct_vm, direct_alice):
         deployed.set_settlement_native_transfer_enabled(True)
 
 
-def test_native_transfer_enabled_blocks_record_settlement_as_unverified_stub(deployed, direct_vm, direct_alice, direct_bob, direct_owner):
+def test_native_transfer_enabled_rejects_before_settlement_state_changes(deployed, direct_vm, direct_alice, direct_bob, direct_owner):
     """Settlement Safety Vault, "safe disabled mode" branch: flipping the
     flag on must never produce a silent fake success. It must honestly
     block record_settlement until a verified transfer call is wired in a
@@ -74,8 +74,8 @@ def test_native_transfer_enabled_blocks_record_settlement_as_unverified_stub(dep
     with direct_vm.expect_revert():
         deployed.record_settlement(agreement_id)
 
-    # The idempotency-first write (status -> EXECUTED) still happened
-    # before the stub raised, so the settlement can never be re-authorized
-    # or re-executed from a retry -- but the honest error must be visible.
+    # The unsupported transfer mode is checked before any receipt/state
+    # mutation, so the authorized receipt remains retryable after disabling.
     settlement = deployed.get_settlement(agreement_id)
-    assert settlement["status"] == "EXECUTED"
+    assert settlement["status"] == "AUTHORIZED"
+    assert deployed.get_agreement(agreement_id)["state"] == "FINALIZED"

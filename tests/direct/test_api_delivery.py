@@ -2,7 +2,7 @@
 equivalence strategy is documented in docs/EQUIVALENCE_MATRIX.md section 2.
 """
 
-from conftest import create_active_agreement, mock_evidence_source, mock_llm_decision
+from conftest import create_active_agreement, make_rubric, mock_evidence_source, mock_llm_decision
 
 
 def test_pass_decision_full_evaluation(deployed, direct_vm, direct_alice, direct_bob):
@@ -42,17 +42,21 @@ def test_fail_decision_blocks_settlement_authorization(deployed, direct_vm, dire
 
 
 def test_partial_decision_allows_authorize_settlement(deployed, direct_vm, direct_alice, direct_bob):
-    agreement_id = create_active_agreement(deployed, direct_vm, direct_alice, direct_bob, amount_atto=1000)
+    rubric = make_rubric(("endpoint_coverage", "error_handling"))
+    agreement_id = create_active_agreement(deployed, direct_vm, direct_alice, direct_bob, amount_atto=1000, rubric_json=rubric)
     direct_vm.sender = direct_alice
     deployed.submit_evidence(agreement_id, "https://example.com/readme", "hash-1", "text/plain", "endpoint_coverage")
+    deployed.submit_evidence(agreement_id, "https://example.com/errors", "hash-2", "text/plain", "error_handling")
     mock_evidence_source(direct_vm, r"example\.com/readme", status=404)
+    mock_evidence_source(direct_vm, r"example\.com/errors", body="Error responses documented")
     mock_llm_decision(direct_vm, decision="PASS", criteria=[
         {"id": "endpoint_coverage", "status": "PASS", "reason": "claims ok", "evidence_ids": ["E-1"]},
+        {"id": "error_handling", "status": "PASS", "reason": "documented", "evidence_ids": ["E-2"]},
     ])
 
     deployed.request_evaluation(agreement_id)
     verdict = deployed.get_verdict(agreement_id)
-    assert verdict["decision"] == "PARTIAL"  # downgraded, see test_evidence.py
+    assert verdict["decision"] == "PARTIAL"  # derived from mixed PASS/INSUFFICIENT criteria
 
     direct_vm.warp("2999-06-01T00:00:00Z")
     deployed.finalize_verdict(agreement_id)

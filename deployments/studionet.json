@@ -70,5 +70,16 @@
       "date": "2026-10-14",
       "result": "Substantially more thorough than the V1 run -- see docs/V2_STUDIONET_LIVE_VERIFICATION_REPORT.md. Key results: (1) resolve_challenge_by_timeout (the Stage 6 challenge-deadlock fix) verified working live with real 5/5 validator consensus, correct TIMEOUT_REJECTED state tagging, and a reopened challenge window; (2) both live request_evaluation calls produced EMPTY stderr (no pickling warning), versus the warning seen on both V1 calls -- strong live evidence the Stage 6 storage-access fix works on real GenVM, though not an exhaustive proof across all possible inputs; (3) agent-task module exercised live for the first time, including a correct semantic (non-reachability-based) FAIL judgment; (4) rework/recovery exercised through two full cycles; (5) attempts-exhausted termination (MAX_ATTEMPTS=3) verified independently of remedy type; (6) delegation accept flow verified; (7) settlement authorization and receipt-only recording verified, with the native-transfer-disabled safety behavior confirmed intact; (8) reputation accounting cross-checked against the contract's own exact delta arithmetic and found correct."
     }
+  },
+  "stage_11_candidate": {
+    "status": "NOT_DEPLOYED",
+    "source_file": "contracts/agentverdict.py",
+    "source_hash": "sha256:89f9092bcd4f724d01919cfe1e5c584be37bf26abb7657aa47ddce1f8d65dbef",
+    "based_on_commit": "095bb4e9c789b4ce9e647dbaac377690be7074bb",
+    "network": "studionet",
+    "chain_id": 61999,
+    "contract_address": null,
+    "deployment_transaction": null,
+    "reason": "Stage 11 source changes are local candidate code. No deployment or live post-fix reads were performed. Existing V1 and V2 deployments remain unchanged; see docs/STAGE_11_CORRECTNESS_AUDIT.md."
   }
 }

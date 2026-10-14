@@ -29,13 +29,13 @@ def deployed(direct_vm, direct_deploy, direct_owner):
 
     contract.register_module(
         API_MODULE, API_VERSION,
-        json.dumps({"criteria": ["endpoint_coverage"]}),
-        "repo,api,test_output",
+        json.dumps({"criteria": ["endpoint_coverage", "error_handling"]}),
+        "url,repo,api,test_output",
     )
     contract.register_module(
         AGENT_MODULE, AGENT_VERSION,
         json.dumps({"criteria": ["task_coverage"]}),
-        "repo,report,url",
+        "url,repo,report",
     )
     contract.register_policy_template(
         POLICY_ID, "0xpolicyhash", CHALLENGE_WINDOW_SECONDS,
@@ -64,10 +64,10 @@ def create_draft_agreement(
 
 def create_active_agreement(
     contract, direct_vm, creator, counterparty,
-    module_id=API_MODULE, deadline=FAR_FUTURE_DEADLINE, amount_atto=1000,
+    module_id=API_MODULE, deadline=FAR_FUTURE_DEADLINE, amount_atto=1000, rubric_json=None,
 ):
     agreement_id = create_draft_agreement(
-        contract, direct_vm, creator, counterparty, module_id, deadline, amount_atto,
+        contract, direct_vm, creator, counterparty, module_id, deadline, amount_atto, rubric_json,
     )
     contract.propose_agreement(agreement_id)
     direct_vm.sender = counterparty

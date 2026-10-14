@@ -1,5 +1,14 @@
 # Final Handoff
 
+## Stage 11 correctness candidate
+
+The later audit and its deployment boundary are recorded in
+[`STAGE_11_CORRECTNESS_AUDIT.md`](STAGE_11_CORRECTNESS_AUDIT.md). Candidate
+source SHA-256: `89f9092bcd4f724d01919cfe1e5c584be37bf26abb7657aa47ddce1f8d65dbef`.
+V1 and V2 remain unchanged. The candidate has not been deployed or live-read;
+the historic V2 live verification reports do not establish these new source
+fixes. See the Stage 11 report for the complete regression run and blockers.
+
 **Date:** 2026-10-13
 **Agent:** Claude Sonnet 5, acting as implementing engineer for AgentVerdict OS
 **Repo:** https://github.com/Chinny070/AgentVerdict-OS (pushed to `main`)

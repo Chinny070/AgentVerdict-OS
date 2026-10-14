@@ -1,5 +1,14 @@
 # Submission Readiness Report
 
+> **Superseded update (Stage 11, 2026-10-14):** the status reported below
+> predates the current correctness review. The candidate hardens settlement,
+> bounded challenges, adjudication validation, retry accounting, policy and
+> delegation scope, and frontend transaction finality. It is not deployed.
+> V1/V2 remain immutable; therefore the live demo still runs V2 behavior and
+> is not evidence of the Stage 11 fixes. Consult
+> [STAGE_11_CORRECTNESS_AUDIT.md](STAGE_11_CORRECTNESS_AUDIT.md) for the
+> current verdict and test record.
+
 **Date:** 2026-10-14/15 (submission-polish pass, following the Stage 6 fix and
 the three live V2 verification reports)
 **Scope:** this is a final, honest assessment of what is actually proven

@@ -19,7 +19,7 @@
 import { ExecutionResult, TransactionStatus } from "genlayer-js/types";
 import type { Hash } from "genlayer-js/types";
 import type { Address } from "viem";
-import { describeError, getReadClient, getWriteClient, type EthereumProviderLike } from "./client";
+import { describeError, getReadClient, getWriteClient, STUDIONET_EVM_CHAIN_ID, type EthereumProviderLike } from "./client";
 
 export type TxPhase =
   | "IDLE"
@@ -57,8 +57,25 @@ export interface RunWriteArgs {
  * "did not succeed."
  */
 export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
-  const { account, provider, address, functionName, args: callArgs = [], waitForFinalized = false, onUpdate } = args;
+  const { account, provider, address, functionName, args: callArgs = [], onUpdate } = args;
   const emit = (u: TxUpdate) => onUpdate?.(u);
+
+  try {
+    const [chainId, accounts] = await Promise.all([
+      provider.request({ method: "eth_chainId" }),
+      provider.request({ method: "eth_accounts" }),
+    ]);
+    if (typeof chainId !== "string" || chainId.toLowerCase() !== STUDIONET_EVM_CHAIN_ID) {
+      throw new Error("Wallet is not on StudioNet (chain ID 61999). Switch networks and reconnect before writing.");
+    }
+    if (!Array.isArray(accounts) || typeof accounts[0] !== "string" || accounts[0].toLowerCase() !== account.toLowerCase()) {
+      throw new Error("The connected wallet account changed. Reconnect before writing.");
+    }
+  } catch (err) {
+    const update: TxUpdate = { phase: "FAILED", error: `Wallet preflight failed: ${describeError(err)}` };
+    emit(update);
+    return update;
+  }
 
   emit({ phase: "WALLET_CONFIRM" });
   const writeClient = getWriteClient(account, provider);
@@ -87,10 +104,9 @@ export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
 
   const readClient = getReadClient();
   try {
-    const targetStatus = waitForFinalized ? TransactionStatus.FINALIZED : TransactionStatus.ACCEPTED;
     const receipt = await readClient.waitForTransactionReceipt({
       hash: hash as Hash,
-      status: targetStatus,
+      status: TransactionStatus.FINALIZED,
       retries: 60,
       interval: 2000,
     });
@@ -98,21 +114,29 @@ export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
     const consensusStatus = (receipt.statusName ?? receipt.status) as TransactionStatus | undefined;
     const executionResult = receipt.txExecutionResultName as ExecutionResult | undefined;
 
-    if (executionResult === ExecutionResult.FINISHED_WITH_ERROR) {
+    if (executionResult !== ExecutionResult.FINISHED_WITH_RETURN) {
       const update: TxUpdate = {
         phase: "FAILED",
         hash,
         consensusStatus,
         executionResult,
-        error: "Transaction reached consensus but execution failed on-chain (FINISHED_WITH_ERROR).",
+        error: executionResult === ExecutionResult.FINISHED_WITH_ERROR
+          ? "Transaction finalized but execution failed on-chain (FINISHED_WITH_ERROR)."
+          : "Transaction finalized without a confirmed successful execution result.",
       };
       emit(update);
       return update;
     }
 
-    const phase: TxPhase =
-      consensusStatus === TransactionStatus.FINALIZED ? "FINALIZED" : "ACCEPTED";
-    const update: TxUpdate = { phase, hash, consensusStatus, executionResult };
+    if (consensusStatus !== TransactionStatus.FINALIZED) {
+      const update: TxUpdate = {
+        phase: "FAILED", hash, consensusStatus, executionResult,
+        error: "Receipt did not confirm FINALIZED consensus status.",
+      };
+      emit(update);
+      return update;
+    }
+    const update: TxUpdate = { phase: "FINALIZED", hash, consensusStatus, executionResult };
     emit(update);
     return update;
   } catch (err) {

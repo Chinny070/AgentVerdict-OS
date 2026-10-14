@@ -1,5 +1,13 @@
 # AgentVerdict OS
 
+> **Stage 11 release notice (2026-10-14):** the latest source includes
+> correctness and wallet-finality hardening under audit. V1 and V2 remain
+> immutable historical deployments and do **not** contain these changes.
+> The candidate source has not been deployed; use V2 only with the specific
+> limitations documented in [the Stage 11 audit](docs/STAGE_11_CORRECTNESS_AUDIT.md).
+> Do not describe the candidate as live or production-ready until a separately
+> authorized new deployment and live verification are complete.
+
 > The universal accountability layer for autonomous work. Natural-language
 > agreements become evidence-backed, challengeable, settlement-authorizing
 > decisions on GenLayer.

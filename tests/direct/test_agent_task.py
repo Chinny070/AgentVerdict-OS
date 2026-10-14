@@ -5,11 +5,11 @@ docs/EQUIVALENCE_MATRIX.md section 3.
 
 import json
 
-from conftest import AGENT_MODULE, create_active_agreement, mock_evidence_source, mock_llm_decision
+from conftest import AGENT_MODULE, create_active_agreement, make_rubric, mock_evidence_source, mock_llm_decision
 
 
 def test_agent_task_pass_decision(deployed, direct_vm, direct_alice, direct_bob):
-    agreement_id = create_active_agreement(deployed, direct_vm, direct_alice, direct_bob, module_id=AGENT_MODULE)
+    agreement_id = create_active_agreement(deployed, direct_vm, direct_alice, direct_bob, module_id=AGENT_MODULE, rubric_json=make_rubric(("task_coverage",)))
     direct_vm.sender = direct_alice
     deployed.submit_evidence(agreement_id, "https://example.com/report", "hash-1", "text/plain", "task_coverage")
     mock_evidence_source(direct_vm, r"example\.com/report", body="Task report: all deliverables completed on time.")
@@ -30,7 +30,7 @@ def test_agent_task_multi_delegate_inconclusive_causality(deployed, direct_vm, d
     specific delegate, the module must not fabricate blame -- it reports
     INSUFFICIENT_EVIDENCE with HIGH uncertainty instead.
     """
-    agreement_id = create_active_agreement(deployed, direct_vm, direct_alice, direct_bob, module_id=AGENT_MODULE)
+    agreement_id = create_active_agreement(deployed, direct_vm, direct_alice, direct_bob, module_id=AGENT_MODULE, rubric_json=make_rubric(("task_coverage",)))
     direct_vm.sender = direct_alice
     deployed.submit_evidence(agreement_id, "https://example.com/report", "hash-1", "text/plain", "task_coverage")
     mock_evidence_source(direct_vm, r"example\.com/report", body="Two delegates worked on this; unclear who caused the gap.")
@@ -46,7 +46,7 @@ def test_agent_task_multi_delegate_inconclusive_causality(deployed, direct_vm, d
 
 
 def test_agent_task_module_version_bound_to_agreement(deployed, direct_vm, direct_owner, direct_alice, direct_bob):
-    agreement_id = create_active_agreement(deployed, direct_vm, direct_alice, direct_bob, module_id=AGENT_MODULE)
+    agreement_id = create_active_agreement(deployed, direct_vm, direct_alice, direct_bob, module_id=AGENT_MODULE, rubric_json=make_rubric(("task_coverage",)))
 
     direct_vm.sender = direct_owner
     deployed.register_module(AGENT_MODULE, "2.0.0", json.dumps({"criteria": ["task_coverage"]}), "repo,report,url")

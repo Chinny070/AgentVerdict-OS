@@ -70,7 +70,7 @@ def test_evidence_packet_never_stores_raw_content(deployed, direct_vm, direct_al
     # Only metadata fields are ever persisted -- no raw body/content field exists.
     assert stored_keys == {
         "evidence_id", "submitter", "url", "content_hash", "mime_type",
-        "criterion_id", "submitted_at", "visibility",
+        "criterion_id", "submitted_at", "visibility", "evidence_type",
     }
 
 
@@ -136,7 +136,7 @@ def test_malicious_evidence_content_does_not_change_decision_path(deployed, dire
     # looks at the real recorded status code, never the page's own text)
     # must still fire despite the page's embedded claim.
     assert verdict["criteria"][0]["status"] == "INSUFFICIENT_EVIDENCE"
-    assert verdict["decision"] == "PARTIAL"
+    assert verdict["decision"] == "INSUFFICIENT_EVIDENCE"
 
 
 def test_oversized_evidence_is_truncated_not_rejected_outright(deployed, direct_vm, direct_alice, direct_bob):

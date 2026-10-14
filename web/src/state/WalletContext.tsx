@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
-import { connectWallet, describeError, hasInjectedProvider, type WalletConnection } from "../chain/client";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { connectWallet, describeError, hasInjectedProvider, STUDIONET_EVM_CHAIN_ID, type WalletConnection } from "../chain/client";
 
 interface WalletState {
   wallet: WalletConnection | null;
@@ -16,6 +16,31 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [wallet, setWallet] = useState<WalletConnection | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!wallet?.provider.on) return;
+    const provider = wallet.provider;
+    const onAccountsChanged = (...args: unknown[]) => {
+      const accounts = args[0];
+      if (!Array.isArray(accounts) || typeof accounts[0] !== "string" || accounts[0].toLowerCase() !== wallet.address.toLowerCase()) {
+        setWallet(null);
+        setError("Wallet account changed. Reconnect the account you want to use before sending a transaction.");
+      }
+    };
+    const onChainChanged = (...args: unknown[]) => {
+      const chainId = args[0];
+      if (typeof chainId !== "string" || chainId.toLowerCase() !== STUDIONET_EVM_CHAIN_ID) {
+        setWallet(null);
+        setError("Wallet network changed away from StudioNet (chain 61999). Reconnect after switching back.");
+      }
+    };
+    provider.on?.("accountsChanged", onAccountsChanged);
+    provider.on?.("chainChanged", onChainChanged);
+    return () => {
+      provider.removeListener?.("accountsChanged", onAccountsChanged);
+      provider.removeListener?.("chainChanged", onChainChanged);
+    };
+  }, [wallet]);
 
   const connect = useCallback(async () => {
     setConnecting(true);

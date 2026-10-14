@@ -1,5 +1,14 @@
 # Feature Implementation Ledger (updated — Stage 4 frontend)
 
+> **Stage 11 source status (2026-10-14):** correctness hardening is present in
+> the current local candidate and covered by 92 direct-mode tests plus new
+> wallet-finality unit tests. These changes are not deployed at V1 or V2.
+> See [STAGE_11_CORRECTNESS_AUDIT.md](STAGE_11_CORRECTNESS_AUDIT.md) for the
+> candidate source hash, test results, and deployment/migration limits. The
+> historical feature claims below describe the stage and evidence named in
+> each row; they must not be interpreted as evidence the candidate has
+> already been deployed.
+
 **Stage 4 update (this session):** the `web/` frontend (React + TypeScript +
 Vite, `genlayer-js@1.1.8` pinned) was built, wired to the contract's real
 schema, and verified: `npm run typecheck` clean, `npx vitest run` 18/18
