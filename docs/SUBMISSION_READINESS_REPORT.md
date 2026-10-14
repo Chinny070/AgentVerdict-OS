@@ -235,3 +235,40 @@ V2 contract itself needs to change." If the user wants the open design
 gaps (challenge bond, admin-discretion centralization) addressed, that is
 a new-feature decision for the user to make explicitly, not something this
 pass took it upon itself to implement.
+
+## 9. Independent re-verification (follow-up session, after a rate-limit cutoff)
+
+The pass that produced sections 1-8 above stated it would run a final full
+test pass before committing, then was cut off before that pass actually
+executed. A follow-up session re-ran every command fresh, from a clean
+`git status`, with no code changes made first (to test the claims as
+written, not a moving target):
+
+| Check | Command | Result | Matches sections 1-8? |
+|---|---|---|---|
+| Contract lint | `genvm-lint check contracts/agentverdict.py --json` | `ok:true`, 40 methods (12 view / 28 write), 0 ctor params, one `I200` info warning | Yes — exact match |
+| Direct-mode tests | `pytest tests/direct/ -v` | **81 passed, 0 failed, 0 skipped** | Yes — exact match to the stated 81/81 baseline |
+| Frontend typecheck | `cd web && npm run typecheck` | clean, no errors | Yes |
+| Frontend unit tests | `npx vitest run` | **20 passed** (5 files) | Yes — exact match |
+| Frontend build | `npm run build` | succeeds, main chunk 786.10 kB (pre-existing >500kB warning) | Yes — exact match down to the chunk size |
+
+Also independently re-checked in this follow-up session, not just re-quoted:
+`sha256sum contracts/agentverdict.py` on the current working tree returns
+`e9d4c1314cce2d701fe5f105f28192a5200536d0c8e1f173f46e988e4b795ecb`, matching
+`deployments/studionet.json`'s corrected `v2_deployment.source_hash` exactly
+— the section 2 correction is confirmed, not merely asserted. The
+`web/src/chain/config.ts` resolution order (localStorage override → env var
+→ built-in V2 default, with an explicit opt-out sentinel) was read in full
+and contains no fallback bug. The `global.css` mobile-overflow fix
+(`min-width: 0` on grid children, global `overflow-wrap: break-word`,
+`overflow-x: hidden` on `body`) is a genuine layout fix, not a cosmetic
+no-op. `docs/FEATURE_DEMONSTRATION_GUIDE.md` and `docs/PROTOCOL_ARCHITECTURE.md`
+(section 8's status note) were confirmed already adequate and were not
+duplicated. All 8 files referenced from `docs/screenshots/` were confirmed
+present on disk and correctly sized (29-60 KB each, not placeholders).
+
+**No drift found.** Every number in sections 1-8 holds up against a fresh,
+independent run in a separate session. No code or test changes were needed
+as a result of this re-verification; this section exists only to convert
+the earlier, never-actually-run "final test pass" claim into a genuinely
+checked one.
