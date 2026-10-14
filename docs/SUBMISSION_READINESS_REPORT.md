@@ -549,7 +549,7 @@ installed, and it surfaced two real, distinct bugs — not a single issue:
    regression tests.
 
 2. **Real underlying SDK constraint (now explicitly handled, commit
-   `<pending — see git log for the exact hash>`).** With the error
+   `4590303`).** With the error
    message now readable, the actual failure read: `"method
    [wallet_getSnaps] doesn't have corresponding handler (code -32601)"`.
    Confirmed by reading `node_modules/genlayer-js/dist/index.js`'s own
