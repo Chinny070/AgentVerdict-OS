@@ -2,14 +2,24 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import {
   getConfiguredContractAddress,
   isLikelyAddress,
+  isUsingDefaultContractAddress,
+  resetToDefaultContractAddress,
   setConfiguredContractAddress,
 } from "../chain/config";
 
 interface ContractAddressState {
   address: string | null;
   isConfigured: boolean;
+  /** True when `address` is this app's built-in default (V2), not an
+   *  explicit user override. */
+  isDefault: boolean;
   setAddress: (next: string) => { ok: boolean; error?: string };
+  /** Explicitly opts out of the default, showing the honest "no contract
+   *  configured" state again. */
   clearAddress: () => void;
+  /** Removes any override/opt-out and falls back to the built-in default
+   *  (V2). */
+  resetToDefault: () => void;
 }
 
 const ContractAddressContext = createContext<ContractAddressState | null>(null);
@@ -32,9 +42,21 @@ export function ContractAddressProvider({ children }: { children: ReactNode }) {
     setAddressState(null);
   }, []);
 
+  const resetToDefault = useCallback(() => {
+    resetToDefaultContractAddress();
+    setAddressState(getConfiguredContractAddress());
+  }, []);
+
   const value = useMemo<ContractAddressState>(
-    () => ({ address, isConfigured: Boolean(address), setAddress, clearAddress }),
-    [address, setAddress, clearAddress]
+    () => ({
+      address,
+      isConfigured: Boolean(address),
+      isDefault: Boolean(address) && isUsingDefaultContractAddress(),
+      setAddress,
+      clearAddress,
+      resetToDefault,
+    }),
+    [address, setAddress, clearAddress, resetToDefault]
   );
 
   return <ContractAddressContext.Provider value={value}>{children}</ContractAddressContext.Provider>;

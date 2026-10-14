@@ -55,7 +55,8 @@
     "deployed_by": "the user, via Studio web UI (this agent never signs transactions)",
     "deployed_at": "2026-10-14T09:20:36Z (Studio display time; see docs/V2_STUDIONET_LIVE_VERIFICATION_REPORT.md for the full timestamp reconciliation)",
     "source_commit": "721f5b9",
-    "source_hash": "sha256:7b286f034540e12b153bca0e343bde0073e304c202bc61e7e80e676fe138aa5e",
+    "source_hash": "sha256:e9d4c1314cce2d701fe5f105f28192a5200536d0c8e1f173f46e988e4b795ecb",
+    "source_hash_correction_note": "Corrected during the submission-polish pass (2026-10-14/15): this field previously duplicated V1's PRE-Stage-6 source_hash (sha256:7b286f03...) by copy-paste error. Independently re-verified: `git show 721f5b9:contracts/agentverdict.py | sha256sum` and the current working-tree `contracts/agentverdict.py` (unchanged since 721f5b9, confirmed via `git log --oneline -- contracts/agentverdict.py`) both hash to sha256:e9d4c1314cce2d701fe5f105f28192a5200536d0c8e1f173f46e988e4b795ecb, which is the value now recorded above. The OLD value (7b286f03...) is in fact V1's hash (`git show 28e00b6:contracts/agentverdict.py | sha256sum`), confirming this was a copy-paste leftover, not a real source discrepancy -- no evidence the wrong contract source was ever deployed to V2.",
     "has_stage_6_fix": true,
     "relationship_to_v1": "Independent, separately addressable deployment. V1 (0xb222305575ee8af1255d8aCd196280b405B54Baf) was NOT redeployed, overwritten, or modified. V1's existing history (agreements A-1, A-2, both FINALIZED) is unaffected and remains queryable at its own address.",
     "bootstrap_tx_hashes": {

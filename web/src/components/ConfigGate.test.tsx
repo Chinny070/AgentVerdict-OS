@@ -21,17 +21,24 @@ describe("ConfigGate", () => {
     window.localStorage.clear();
   });
 
-  it("shows an honest 'no contract configured' empty state and never renders protected content when unconfigured", () => {
+  it("renders protected content by default, using the app's built-in V2 default address, when nothing is configured", () => {
     renderGate();
-    expect(screen.getByText(/no contract configured/i)).toBeInTheDocument();
-    expect(screen.queryByText("Protected content")).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /go to settings/i })).toBeInTheDocument();
+    expect(screen.getByText("Protected content")).toBeInTheDocument();
+    expect(screen.queryByText(/no contract configured/i)).not.toBeInTheDocument();
   });
 
-  it("renders protected content once a valid address is already configured in localStorage", () => {
+  it("renders protected content once a valid address is explicitly configured in localStorage", () => {
     window.localStorage.setItem("agentverdict:contractAddress", "0x1234567890123456789012345678901234567890");
     renderGate();
     expect(screen.getByText("Protected content")).toBeInTheDocument();
     expect(screen.queryByText(/no contract configured/i)).not.toBeInTheDocument();
+  });
+
+  it("shows an honest 'no contract configured' empty state and never renders protected content after an explicit disconnect", () => {
+    window.localStorage.setItem("agentverdict:contractAddress", "__none__");
+    renderGate();
+    expect(screen.getByText(/no contract configured/i)).toBeInTheDocument();
+    expect(screen.queryByText("Protected content")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /go to settings/i })).toBeInTheDocument();
   });
 });

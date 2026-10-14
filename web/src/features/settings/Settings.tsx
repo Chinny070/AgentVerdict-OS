@@ -1,12 +1,19 @@
 import { useState } from "react";
-import { GENLAYER_JS_VERSION, STUDIONET_CHAIN_ID, STUDIONET_EXPLORER_URL, STUDIONET_RPC_URL } from "../../chain/config";
+import {
+  GENLAYER_JS_VERSION,
+  STUDIONET_CHAIN_ID,
+  STUDIONET_EXPLORER_URL,
+  STUDIONET_RPC_URL,
+  V1_CONTRACT_ADDRESS,
+  V2_CONTRACT_ADDRESS,
+} from "../../chain/config";
 import { useContractAddress } from "../../state/ContractAddressContext";
 import { useWallet } from "../../state/WalletContext";
 import { verifyLiveSchema, type SchemaVerificationResult } from "../../chain/schema";
 import { shortenAddress } from "../../chain/config";
 
 export default function Settings() {
-  const { address, setAddress, clearAddress } = useContractAddress();
+  const { address, isDefault, setAddress, clearAddress, resetToDefault } = useContractAddress();
   const { wallet, hasProvider } = useWallet();
   const [input, setInput] = useState(address ?? "");
   const [formError, setFormError] = useState<string | null>(null);
@@ -36,9 +43,11 @@ export default function Settings() {
       <div className="panel">
         <h2>Deployed contract address</h2>
         <p className="field-help">
-          No address is hardcoded in this build. Set the real StudioNet address here once a human with a
-          signing key has deployed contracts/agentverdict.py (see docs/DEPLOYMENT_RUNBOOK.md). Stored only in
-          this browser's localStorage — a client preference, never canonical protocol state.
+          This build defaults to <strong>V2</strong> (<code>{shortenAddress(V2_CONTRACT_ADDRESS)}</code>), the
+          current, actively-used, Stage-6-fixed StudioNet deployment — a real deployed address, not a
+          placeholder (see <code>deployments/studionet.json</code>). Override it below to point at a different
+          deployment (e.g. V1, historical, see below) or your own. Stored only in this browser's
+          localStorage — a client preference, never canonical protocol state.
         </p>
         <div className="field">
           <label htmlFor="addr">Contract address</label>
@@ -49,9 +58,19 @@ export default function Settings() {
             {formError}
           </p>
         )}
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button className="btn btn-primary btn-sm" onClick={handleSave}>
             Save address
+          </button>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              resetToDefault();
+              setInput(V2_CONTRACT_ADDRESS);
+              setVerification(null);
+            }}
+          >
+            Reset to default (V2)
           </button>
           <button
             className="btn btn-ghost btn-sm"
@@ -61,14 +80,37 @@ export default function Settings() {
               setVerification(null);
             }}
           >
-            Clear
+            Disconnect (show no contract)
           </button>
         </div>
-        {address && (
+        {address ? (
           <p className="field-help" style={{ marginTop: 8 }}>
             Currently configured: <strong>{shortenAddress(address)}</strong>
+            {isDefault && " (built-in default — V2)"}
+          </p>
+        ) : (
+          <p className="field-help" style={{ marginTop: 8 }}>
+            Currently configured: <strong>none</strong> (explicitly disconnected)
           </p>
         )}
+      </div>
+
+      <div className="panel" style={{ marginTop: 16 }}>
+        <h2>V1 — historical deployment (read-only, superseded)</h2>
+        <p className="field-help">
+          <code className="mono">{V1_CONTRACT_ADDRESS}</code> was the original Stage 0-4 deployment. It has two
+          finalized agreements (<strong>A-1</strong>, <strong>A-2</strong>) as historical evidence but does{" "}
+          <strong>not</strong> have the Stage 6 fixes (<code>resolve_challenge_by_timeout</code> or the
+          storage-pickling fix) — see <code>docs/STUDIONET_LIVE_VERIFICATION_REPORT.md</code>. It remains fully
+          queryable; it is simply no longer the default target for new interactions. Paste it into the address
+          field above and click "Save address" to browse it read-only.
+        </p>
+        <button
+          className="btn btn-ghost btn-sm"
+          onClick={() => setInput(V1_CONTRACT_ADDRESS)}
+        >
+          Fill in V1 address
+        </button>
       </div>
 
       <div className="panel" style={{ marginTop: 16 }}>
