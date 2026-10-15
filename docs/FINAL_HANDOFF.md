@@ -474,3 +474,19 @@ The attempt-3 upheld-challenge fix is implemented and covered by direct tests,
 but remains a source candidate. Stage 11 is immutable and unchanged; deploying
 the candidate requires explicit approval and creates a new contract address
 without automatic state migration. See `STAGE_11_CORRECTNESS_AUDIT.md`.
+
+## Stage 12 live verification update (2026-10-15)
+
+The above attempt-three deployment status is historical and superseded. Stage
+12 at `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40` is the deployed source
+matching the candidate hash. The attempt-three terminalization branch was
+exercised live with synthetic agreement A-9: three PASS verdicts were
+challenged and upheld, and Studio reads confirmed agreement `TERMINATED`,
+verdict `VOID`, and final challenge `UPHELD`. The last resolution receipt is
+[`0xf0bc4c93dd7d3b995609347625220459b1f2f725273532f523b6c7abd2f7324f`](https://explorer-studio.genlayer.com/tx/0xf0bc4c93dd7d3b995609347625220459b1f2f725273532f523b6c7abd2f7324f).
+The corrected production frontend receipt was independently confirmed with
+zero-value A-8 (`0x572efc7904f4042069e55be84011a0980c7740764700704c0c22962e91651080`):
+Explorer reports FINALIZED/Accepted/GenVM SUCCESS and the hosted UI showed
+`FINISHED_WITH_RETURN`, returning `A-8`. See section 15 of
+`SUBMISSION_READINESS_REPORT.md` and the Stage 12 entries in
+`deployments/studionet.json` for the complete recorded hashes and reads.

@@ -294,3 +294,21 @@ the corrected status display because Chrome desktop state capture timed out
 when switching to the hosted app. The A-7 transaction verifies wallet signing
 and a real hosted contract write; it does not verify that the old UI reported
 that transaction correctly.
+
+## Stage 12 follow-up: attempt-three challenge terminalization live-verified (2026-10-15)
+
+The previous attempt-three lifecycle gap is closed on Stage 12
+(`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`). Synthetic agreement A-9
+completed three PASS evaluations. The counterparty challenged each attempt and
+the admin upheld C-2, C-3, and C-4. The final `resolve_challenge(C-4, true, …)`
+receipt is [`0xf0bc4c93dd7d3b995609347625220459b1f2f725273532f523b6c7abd2f7324f`](https://explorer-studio.genlayer.com/tx/0xf0bc4c93dd7d3b995609347625220459b1f2f725273532f523b6c7abd2f7324f):
+FINALIZED, Accepted consensus, five initial validators, GenVM SUCCESS.
+
+Post-call Studio reads returned A-9 `TERMINATED` at attempt 3, latest verdict
+`V-A-9-3` with state `VOID`, and C-4 `UPHELD` with the terminal audit suffix
+`[TERMINAL: challenge upheld on the final allowed attempt; agreement terminated
+because no evaluation attempts remain]`. No settlement or reputation update
+was produced by this terminalization. Full captured hashes and read responses
+are recorded in `deployments/studionet.json` and section 15 of
+`docs/SUBMISSION_READINESS_REPORT.md`. Earlier statements that this branch was
+only source-tested are superseded by this live evidence.

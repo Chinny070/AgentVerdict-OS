@@ -1,13 +1,15 @@
 # Feature Implementation Ledger (updated — Stage 4 frontend)
 
 > **Current deployment addendum (2026-10-15):** Stage 12 is live at
-> `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. Studio reads and a synthetic
-> zero-value lifecycle through timeout recovery and settlement were observed.
-> Explorer receipt and deployment source hash were recovered; the embedded
-> `contract_code` hashes exactly to the repository candidate. The attempt-three
-> terminalization branch remains source/direct-test verified, not independently
-> exercised on-chain. Historical Stage 11/V2/V1 addresses and their evidence are
-> preserved in `deployments/studionet.json`.
+> `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. Explorer verifies its source
+> hash against the repository candidate. In addition to the zero-value A-2
+> timeout/settlement lifecycle, A-9 exercised the attempt-three upheld-challenge
+> terminal path live: three PASS evaluations were challenged and upheld, with
+> final reads `TERMINATED`, verdict `VOID`, and challenge `UPHELD`. A-8 also
+> confirms the corrected production frontend receipt display. Full hashes and
+> read evidence are in `deployments/studionet.json` and
+> `docs/SUBMISSION_READINESS_REPORT.md`. Historical Stage 11/V2/V1 evidence is
+> preserved.
 
 > **Stage 11 live status (2026-10-15):** the hardened source is deployed at
 > `0xab972c3af9878b7CD4631CD21639B20E981B0702`. Two synthetic zero-value

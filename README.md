@@ -38,15 +38,19 @@ Explorer confirms FINALIZED, Accepted consensus, GenVM SUCCESS, and return value
 simplified receipt exposes consensus status as `status_name` (with numeric
 `status`). The normalized parser is now deployed and has a regression test for
 the pinned SDK receipt shape. A second signed transaction through the updated
-release is still needed to verify that the UI displays success correctly.
-Attempt-three challenge terminalization has direct-mode regression coverage but
-has not been separately exercised live.
+release, A-8, is confirmed by Explorer as FINALIZED with GenVM SUCCESS; the
+hosted UI displayed FINALIZED, `FINISHED_WITH_RETURN`, and `A-8`. The live
+attempt-three terminalization path is now verified on Stage 12 with A-9: three
+PASS evaluations were challenged and upheld, and final reads returned
+`TERMINATED`, verdict `VOID`, and challenge `UPHELD`. Full hashes and read
+evidence are recorded in `deployments/studionet.json` and the readiness report.
 
 Agreement Forge serializes rubric JSON in the contract's required object
 shape and rejects a missing or invalid deadline before opening the wallet.
 Attempt-3 challenge terminalization is in the deployed Stage 12 source. The
 source shown in the finalized deployment transaction hashes exactly to the
-repository source; that branch is not separately exercised live.
+repository source. The attempt-three branch has since been exercised live on
+A-9; see the latest Stage 12 entry in the deployment record.
 
 **Architecture:** one GenLayer Python Intelligent Contract
 (`contracts/agentverdict.py`) plus a static frontend (`web/`). No backend

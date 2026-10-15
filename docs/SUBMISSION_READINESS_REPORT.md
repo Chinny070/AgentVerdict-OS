@@ -737,7 +737,46 @@ The hosted UI displayed the same transaction as FINALIZED with execution
 normalization on a real wallet-signed production write. It supersedes the
 post-fix write marked unverified in section 13.
 
-This confirms the create transaction and receipt display only. It does not
-exercise the separate attempt-three upheld-challenge terminalization path on
-StudioNet, which remains source-tested and included in the deployed Stage 12
-source identity but has no live lifecycle receipt in the current evidence.
+This confirms the create transaction and receipt display. The separate
+attempt-three path has since been exercised live; see section 15.
+
+## 15. Stage 12 live attempt-three terminalization (2026-10-15)
+
+The deployed Stage 12 contract was exercised through the previously unverified
+final-attempt challenge path using synthetic evidence and zero agreement value.
+Agreement A-9 used `smoke-test-v2`, `api-delivery`, and the single
+`endpoint_coverage` criterion. Attempts 1, 2, and 3 each returned PASS; each
+verdict was challenged by the counterparty and upheld by the admin. After the
+third uphold, read-only Studio calls returned:
+
+- `get_agreement(A-9)`: `TERMINATED`, `attempt_no: 3`, amount zero.
+- `get_verdict(A-9)`: verdict `V-A-9-3`, decision PASS, state `VOID`.
+- `get_challenge(C-4)`: state `UPHELD`, attempt 3, with the terminal audit
+  reason stating the agreement was terminated because no evaluation attempts
+  remain.
+
+Relevant Explorer receipts (all shown FINALIZED, Accepted consensus, five
+initial validators, and GenVM SUCCESS):
+
+| Action | Transaction |
+|---|---|
+| Create A-9 | [0x472939…f0ebcf](https://explorer-studio.genlayer.com/tx/0x472939c03a159ee1a980bb55c36ffbe3f8842c337ee2f5af6ae4310fc0f0ebcf) |
+| Counterparty accepts A-9 | [0xa613fe…3317ac](https://explorer-studio.genlayer.com/tx/0xa613fe04459de489ff58404faf2df360f6548e5355f7a17a07c7b561573317ac) |
+| Submit evidence E-2 | [0xeefe2c…b1bf9](https://explorer-studio.genlayer.com/tx/0xeefe2c0a613df27269d4f89f8dfe2ca38f9bc2690b4d540e2ba7d4140cab1bf9) |
+| Evaluation attempt 1 | [0xf84c59…57571](https://explorer-studio.genlayer.com/tx/0xf84c599e14bdcaa8e6dff7e6ae8da01871f33740ca902ece757d6b2439557571) |
+| Challenge C-2 | [0xd766eb…ca5c5](https://explorer-studio.genlayer.com/tx/0xd766eb41645d86b530ab5ce49f187a5043f373af3ff3eb790ea69e1457dca5c5) |
+| Uphold C-2 | [0xe6fd40…fcfad](https://explorer-studio.genlayer.com/tx/0xe6fd40d41786ad4462b6b6b031a1bcfdb133611416cb98aafd8b18e2991fcfad) |
+| Evaluation attempt 2 | [0xe46495…fb5df7](https://explorer-studio.genlayer.com/tx/0xe464959b7be18bc3307fe41ffccb1ffca5dcfb5a57c7c37321f4d4e3adfb5df7) |
+| Challenge C-3 | [0x3a391d…d9d7a4](https://explorer-studio.genlayer.com/tx/0x3a391dd76db66244b33a289180e543c8c7cc44d922628db106537cf2a4d9d7a4) |
+| Uphold C-3 | [0xd5c722…3187d](https://explorer-studio.genlayer.com/tx/0xd5c72284db2747b20956712ee1cf8223fbab2d60c53a0ea520fd32b45043187d) |
+| Evaluation attempt 3 | [0x5b0b77…17bbe](https://explorer-studio.genlayer.com/tx/0x5b0b77fbd0685439b3296aa458b8894d453c762ce3705a0555752f3937517bbe) |
+| Challenge C-4 | [0x0b64dc…9fca](https://explorer-studio.genlayer.com/tx/0x0b64dc86e7818016d288ce1e6f36e14cae1ea116d7b5829d69ce80bc31fe9fca) |
+| Uphold C-4; terminal transition | [0xf0bc4c…7324f](https://explorer-studio.genlayer.com/tx/0xf0bc4c93dd7d3b995609347625220459b1f2f725273532f523b6c7abd2f7324f) |
+
+The user supplied the Explorer receipts and the three accepted read results.
+Proposal, activation, and evidence-opening calls succeeded in the lifecycle,
+but their transaction hashes were not included in the captured evidence and
+are intentionally omitted here. No settlement was authorized or recorded;
+the fix closed the liveness edge atomically without creating settlement or
+reputation effects. This live result upgrades the attempt-three fix from
+direct-test-only to StudioNet-verified on the immutable Stage 12 deployment.
