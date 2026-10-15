@@ -305,15 +305,16 @@
   "stage_12_frontend_release": {
     "status": "READY",
     "project": "chinny070s-projects/web",
-    "deployment_id": "dpl_2MCWXALuMEimAF8zmKoQPn4ZuE8o",
-    "deployment_url": "https://web-gqjwiv8go-chinny070s-projects.vercel.app",
+    "deployment_id": "dpl_2qkWHqb7nKEmY6EmgHZEj8Ntdfcr",
+    "deployment_url": "https://web-bppjsysk1-chinny070s-projects.vercel.app",
     "production_alias": "https://web-omega-amber-37.vercel.app",
-    "source_commit": "7f399b6",
+    "source_commit": "d0be2b4",
     "contract_target": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
     "network": "studionet",
     "chain_id": 61999,
     "checks": {
-      "vercel_deployment_state": "READY",
+      "vercel_deployment_state": "READY; deployment dpl_2qkWHqb7nKEmY6EmgHZEj8Ntdfcr from d0be2b4; stable production alias points to it",
+      "public_http_check": "PASS; Vercel CLI read-only request returned AgentVerdict OS HTML and receipt-fix bundle /assets/index-CLtHWI2J.js",
       "live_schema": "SCHEMA MATCHES",
       "live_protocol_stats": "Read through the public frontend during final follow-up; 5 agreements, 1 evidence packet, 0 delegations, 1 challenge, 1 settlement, 1 reputation event; native settlement transfer disabled",
       "all_screens": "14 routes loaded with expected headings at 320, 375, 390, 768, and 1280 px",
@@ -358,23 +359,30 @@
         "source": "GenLayer JS 1.1.8 StudioNet execution result is nested in consensus_data.leader_receipt[]",
         "implementation": "Frontend ignores only the explicit validator quorum-cancellation marker, preserves failures for ordinary ERROR/conflicting rows and missing results, and extracts the successful leader return value",
         "tests": "Focused receipt suite 9/9; full frontend suite 44/44; TypeScript and production build passed",
-        "post_fix_wallet_write": "Local source fix implemented; hosted frontend retest pending Vercel deployment"
+        "post_fix_wallet_write": "Fix deployed to Vercel production as dpl_2qkWHqb7nKEmY6EmgHZEj8Ntdfcr; a signed wallet write through the corrected UI is still pending. The desktop screenshot showed the Windows lock screen during this verification, so no further browser UI interaction was attempted."
       }
     },
     "final_followup_verification": {
       "attempt_three_direct_regression": "PASS; 1 test verifies atomic TERMINATED state, VOID verdict, no settlement/reputation effects, and replay rejection",
-      "attempt_three_live_path": "Not exercised; no wallet signer exposed in the available browser session",
+      "attempt_three_live_path": "Not exercised in this follow-up",
       "local_genvm_integration": "BLOCKED; Docker client installed but Docker daemon pipe unavailable; seven integration tests remain skipped for diagnosed GLSim storage-registration mismatch and missing evaluator LLM credential",
       "live_stage12_read": "Production Telemetry page successfully read the current contract counters",
       "frontend_tests": "44 passed",
       "typescript": "PASS",
       "production_build": "PASS; existing large-chunk warning remains"
     },
-    "superseded_production_deployment": {
-      "deployment_id": "dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh",
-      "source_commit": "b2871fe",
-      "status": "READY; superseded by deployment dpl_2MCWXALuMEimAF8zmKoQPn4ZuE8o"
-    }
+    "superseded_production_deployments": [
+      {
+        "deployment_id": "dpl_2MCWXALuMEimAF8zmKoQPn4ZuE8o",
+        "source_commit": "7f399b6",
+        "status": "READY; superseded by deployment dpl_2qkWHqb7nKEmY6EmgHZEj8Ntdfcr"
+      },
+      {
+        "deployment_id": "dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh",
+        "source_commit": "b2871fe",
+        "status": "READY; superseded by deployment dpl_2qkWHqb7nKEmY6EmgHZEj8Ntdfcr"
+      }
+    ]
   },
   "stage_12_candidate": {
     "status": "DEPLOYED_LIVE_LIFECYCLE_VERIFIED",

@@ -37,9 +37,13 @@
 > only this explicit quorum-cancellation code, still fails closed on ordinary
 > errors/conflicts, and surfaces the return value so Agreement Forge can load
 > the new ID. Focused receipt tests pass (9/9); full frontend tests pass
-> (44/44), TypeScript and production build pass. These local changes are not yet
-> deployed, so corrected hosted-UI finality and automatic A-6 loading remain
-> unverified until the next Vercel release is live and exercised.
+> (44/44), TypeScript and production build pass. Commit `d0be2b4` is pushed,
+> and Vercel production deployment `dpl_2qkWHqb7nKEmY6EmgHZEj8Ntdfcr` is READY
+> at [the stable site](https://web-omega-amber-37.vercel.app). A read-only
+> request confirms the published HTML references the newly built bundle. A
+> signed write through the corrected hosted UI and automatic A-6 loading are
+> still unverified: the Chrome capture showed the Windows lock screen during
+> this check, so I stopped browser interaction. The contract was not redeployed.
 
 > **Verification record (2026-10-15):** contract suite 94 passed, 7 skipped;
 > the focused attempt-three upheld-challenge regression passed (1/1), confirming
