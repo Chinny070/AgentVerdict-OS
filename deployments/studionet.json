@@ -315,7 +315,7 @@
     "checks": {
       "vercel_deployment_state": "READY",
       "live_schema": "SCHEMA MATCHES",
-      "live_protocol_stats": "Read through the public frontend; 3 agreements, 1 evidence packet, 0 delegations, 1 challenge, 1 settlement, 1 reputation event; native settlement transfer disabled",
+      "live_protocol_stats": "Read through the public frontend during final follow-up; 5 agreements, 1 evidence packet, 0 delegations, 1 challenge, 1 settlement, 1 reputation event; native settlement transfer disabled",
       "all_screens": "14 routes loaded with expected headings at 320, 375, 390, 768, and 1280 px",
       "page_level_overflow": "None across all 70 route/viewport combinations",
       "nested_hash_refresh": "Appeals Tribunal remained loaded at #/appeals after browser refresh",
@@ -341,6 +341,15 @@
         "tests": "Three regression cases: nested success, nested error, missing execution result",
         "post_fix_wallet_write": "Not independently re-exercised; no second signed transaction submitted after the parser release"
       }
+    },
+    "final_followup_verification": {
+      "attempt_three_direct_regression": "PASS; 1 test verifies atomic TERMINATED state, VOID verdict, no settlement/reputation effects, and replay rejection",
+      "attempt_three_live_path": "Not exercised; no wallet signer exposed in the available browser session",
+      "local_genvm_integration": "BLOCKED; Docker client installed but Docker daemon pipe unavailable; seven integration tests remain skipped for diagnosed GLSim storage-registration mismatch and missing evaluator LLM credential",
+      "live_stage12_read": "Production Telemetry page successfully read the current contract counters",
+      "frontend_tests": "42 passed",
+      "typescript": "PASS",
+      "production_build": "PASS; existing large-chunk warning remains"
     },
     "superseded_production_deployment": {
       "deployment_id": "dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh",

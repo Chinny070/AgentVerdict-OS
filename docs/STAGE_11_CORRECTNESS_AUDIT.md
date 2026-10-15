@@ -251,4 +251,17 @@ values and fails closed when the result is absent. Three regression cases cover
 those outcomes; the frontend suite recorded 42 passing tests. The successful
 A-5 call predates this parser release, so post-fix wallet receipt rendering has
 not been re-exercised with another signed transaction. The source has no changes
-after the deployed commit; this final pass only reconciles records.
+after the deployed commit. The final readiness pass verified that only the
+wallet-less Codex in-app browser is available, so no post-fix signature could be
+submitted. The live production Telemetry page successfully read Stage 12 and
+reported 5 agreements, 1 evidence packet, 1 challenge, 1 settlement, and 1
+reputation event, with native GEN transfer disabled.
+
+The attempt-three regression was rerun in isolation and passed (1/1). It asserts
+atomic termination, voiding of the final provisional verdict, no settlement or
+reputation side effect, and rejection of replay. This is direct-mode evidence;
+it does not replace a live StudioNet attempt-three lifecycle. Docker is installed
+but its daemon pipe is unavailable in this environment, so local GenVM integration
+cannot be started. The seven integration tests remain explicitly skipped due to
+the diagnosed GLSim storage-registration mismatch and missing evaluator LLM
+credential. No GenLayer SDK internals were changed.

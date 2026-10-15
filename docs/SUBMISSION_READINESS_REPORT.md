@@ -24,14 +24,19 @@
 > finality has not been independently re-exercised. See the Stage 12 addendum
 > and deployment ledger.
 
-> **Verification record for commit `7f399b6`:** contract suite 94 passed, 7
-> skipped (local GenVM integration runtime unavailable); TypeScript check passed;
-> frontend suite 42 passed in the recorded implementation run; production Vercel
-> deployment is READY. A fresh local contract-suite rerun also reported 94
-> passed and 7 skipped. In this final documentation-only pass, the sandbox
-> blocked a fresh Vitest/Vite run while resolving the Vite config from a parent
-> directory, and the local production build hit the same environment restriction;
-> the deployed build remains READY and the source code has not changed since it.
+> **Verification record (2026-10-15):** contract suite 94 passed, 7 skipped;
+> the focused attempt-three upheld-challenge regression passed (1/1), confirming
+> terminal `TERMINATED` state, a `VOID` verdict, no settlement or reputation
+> effect, and replay rejection. TypeScript check passed; frontend suite 42
+> passed; production build passed with the existing large-chunk warning. The
+> live production Telemetry screen read Stage 12 counters (5 agreements, 1
+> evidence packet, 1 challenge, 1 settlement, 1 reputation event) and confirmed
+> native GEN transfer disabled. The seven GenVM integration tests remain
+> skipped: GLSim has the documented storage-registration mismatch, no local
+> GenVM/Docker daemon is running, and evaluator consensus tests also require an
+> LLM provider credential. No SDK internals were changed. The browser exposed
+> only the wallet-less in-app session, so a post-fix signed UI write and live
+> attempt-three path could not be run in this pass.
 
 > **Historical Stage 11 snapshot (2026-10-15):** Stage 11 hardening is deployed
 > at `0xab972c3af9878b7CD4631CD21639B20E981B0702`, and its two synthetic
