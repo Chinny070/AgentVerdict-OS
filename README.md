@@ -27,8 +27,8 @@ below). The production release targets the verified Stage 11 contract
 (`0xab972c3af9878b7CD4631CD21639B20E981B0702`). See
 `docs/STAGE_11_CORRECTNESS_AUDIT.md` for the live contract evidence and current
 wallet/browser verification status. Latest production deployment:
-`dpl_4JaXTWyAwYo9BEJcU5cfQyuEExJ7` (commit `c691dd2`), ready at
-[this deployment URL](https://web-5ya8rhurh-chinny070s-projects.vercel.app)
+`dpl_32GyQtJenY9RkEupgBTLYqNTpTqZ` (commit `03a6f16`), ready at
+[this deployment URL](https://web-drltkcgme-chinny070s-projects.vercel.app)
 and the stable alias above.
 
 **Architecture:** one GenLayer Python Intelligent Contract

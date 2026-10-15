@@ -209,23 +209,35 @@
   },
   "frontend_release_history": [
     {
-    "status": "READY",
-    "project": "chinny070s-projects/web",
-    "deployment_id": "dpl_4t1EYuhwXg2dYURCHPuwiNvM3MSG",
-    "deployment_url": "https://web-o3vn82g9q-chinny070s-projects.vercel.app",
-    "production_alias": "https://web-omega-amber-37.vercel.app",
-    "source_commit": "131cfb2",
-    "contract_target": "0xCC67216ceD224A971739bAA706142A740B31853C",
-    "note": "Frontend deployment succeeded and the updated landing copy was confirmed in a read-only browser. Telemetry remained Loading and no injected wallet was available, so live contract reads and wallet-signed actions are unverified. The candidate contract source is not deployed."
+      "status": "READY",
+      "project": "chinny070s-projects/web",
+      "deployment_id": "dpl_4t1EYuhwXg2dYURCHPuwiNvM3MSG",
+      "deployment_url": "https://web-o3vn82g9q-chinny070s-projects.vercel.app",
+      "production_alias": "https://web-omega-amber-37.vercel.app",
+      "source_commit": "131cfb2",
+      "contract_target": "0xCC67216ceD224A971739bAA706142A740B31853C",
+      "note": "Frontend deployment succeeded and the updated landing copy was confirmed in a read-only browser. Telemetry remained Loading and no injected wallet was available, so live contract reads and wallet-signed actions are unverified. The candidate contract source is not deployed."
+    },
+    {
+      "status": "READY",
+      "project": "chinny070s-projects/web",
+      "deployment_id": "dpl_4JaXTWyAwYo9BEJcU5cfQyuEExJ7",
+      "deployment_url": "https://web-5ya8rhurh-chinny070s-projects.vercel.app",
+      "production_alias": "https://web-omega-amber-37.vercel.app",
+      "source_commit": "c691dd2",
+      "contract_target": "0xab972c3af9878b7CD4631CD21639B20E981B0702",
+      "network": "studionet",
+      "chain_id": 61999,
+      "note": "Superseded by final Stage 11 frontend release; was schema-matched and live-read verified, with wallet-signed UI writes unavailable."
     }
   ],
   "frontend_release": {
     "status": "READY",
     "project": "chinny070s-projects/web",
-    "deployment_id": "dpl_4JaXTWyAwYo9BEJcU5cfQyuEExJ7",
-    "deployment_url": "https://web-5ya8rhurh-chinny070s-projects.vercel.app",
+    "deployment_id": "dpl_32GyQtJenY9RkEupgBTLYqNTpTqZ",
+    "deployment_url": "https://web-drltkcgme-chinny070s-projects.vercel.app",
     "production_alias": "https://web-omega-amber-37.vercel.app",
-    "source_commit": "c691dd2",
+    "source_commit": "03a6f16",
     "contract_target": "0xab972c3af9878b7CD4631CD21639B20E981B0702",
     "network": "studionet",
     "chain_id": 61999,
@@ -246,6 +258,8 @@
       "non_admin_timeout_transaction": "Not live-verified; available browser has no injected wallet"
     },
     "production_contract_address_override": "Removed; production now uses the Stage 11 built-in default",
-    "note": "Vercel production deployment completed and aliased to the stable URL. Stage 11 schema and live protocol stats were read successfully from the public website. No wallet was available in this browser session, so no signed UI transaction was attempted."
+    "note": "Vercel production deployment completed and aliased to the stable URL. Stage 11 schema and live protocol stats were read successfully from the public website. No wallet was available in this browser session, so no signed UI transaction was attempted.",
+    "responsive_sweep": "14 screens x 5 viewport widths (320, 375, 390, 768, 1280); zero page-level horizontal overflow",
+    "browser_console_errors": 0
   }
 }

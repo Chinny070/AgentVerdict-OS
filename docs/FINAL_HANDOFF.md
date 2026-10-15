@@ -8,8 +8,8 @@ latest release addendum there. Stage 11 source SHA-256 is
 `710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`; it is
 deployed at `0xab972c3af9878b7CD4631CD21639B20E981B0702`. It completed two
 synthetic, zero-value StudioNet lifecycles. The current Vercel production
-frontend defaults to Stage 11 (deployment `dpl_4JaXTWyAwYo9BEJcU5cfQyuEExJ7`,
-source commit `c691dd2`). A browser wallet was not available for signed frontend
+frontend defaults to Stage 11 (deployment `dpl_32GyQtJenY9RkEupgBTLYqNTpTqZ`,
+source commit `03a6f16`). A browser wallet was not available for signed frontend
 verification or a live non-admin timeout call.
 
 **Date:** 2026-10-13

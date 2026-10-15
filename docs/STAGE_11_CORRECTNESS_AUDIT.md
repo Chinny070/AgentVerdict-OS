@@ -124,9 +124,9 @@ Verification in this completion pass:
   replace observing a successful call from a separate address.
 
 The updated public site is Vercel deployment
-`dpl_4JaXTWyAwYo9BEJcU5cfQyuEExJ7` from source commit `c691dd2`, served at
+`dpl_32GyQtJenY9RkEupgBTLYqNTpTqZ` from source commit `03a6f16`, served at
 `https://web-omega-amber-37.vercel.app` (deployment URL
-`https://web-5ya8rhurh-chinny070s-projects.vercel.app`). Its Settings screen
+`https://web-drltkcgme-chinny070s-projects.vercel.app`). Its Settings screen
 shows Stage 11 as the default and a live schema check returns **SCHEMA
 MATCHES**. Protocol Telemetry reads agreements 4, evidence 3, delegations 0,
 challenges 2, settlements 2, reputation events 2, and native transfer
