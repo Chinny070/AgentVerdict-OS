@@ -1,13 +1,11 @@
 # AgentVerdict OS
 
-> **Stage 11 deployment (2026-10-15):** the hardened source is deployed as a
-> separate StudioNet instance at `0xab972c3af9878b7CD4631CD21639B20E981B0702`.
-> A-3 has completed its challenged PASS lifecycle and zero-value receipt
-> settlement; A-4 has completed FAIL-to-rework recovery, permissionless
-> timeout recovery, finalization, and zero-value receipt settlement. V1 and V2 remain
-> unchanged historical deployments. The production frontend now defaults to
-> Stage 11; the [Stage 11 audit](docs/STAGE_11_CORRECTNESS_AUDIT.md) records
-> live contract evidence and frontend verification status.
+> **Stage 12 live StudioNet instance:** `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`.
+> A synthetic, zero-value A-2 lifecycle completed challenge timeout recovery,
+> finalization, and receipt-only settlement. The deployment receipt and exact
+> deployed-source identity have not yet been recovered; do not treat the
+> candidate source hash as independently verified deployed bytecode. Stage 11,
+> V2, and V1 remain preserved historical deployments.
 
 > The universal accountability layer for autonomous work. Natural-language
 > agreements become evidence-backed, challengeable, settlement-authorizing
@@ -21,19 +19,17 @@ Honest, precise current status: `docs/SUBMISSION_READINESS_REPORT.md`
 ## Live Demo
 
 **[https://web-omega-amber-37.vercel.app](https://web-omega-amber-37.vercel.app)**
-— the real, live production frontend, hosted on Vercel as static-site/SPA
-hosting only (no backend, no API routes, no database — see "Architecture"
-below). The production release targets the verified Stage 11 contract
-(`0xab972c3af9878b7CD4631CD21639B20E981B0702`). See
-`docs/STAGE_11_CORRECTNESS_AUDIT.md` for the live contract evidence and current
-wallet/browser verification status. Latest production deployment: `DCZArRbeK923gwJFRnv3E9GyuDbD` (source commit `241df400ccf4f1e410d8f46884bdc9c08aca4c58`), ready at
-[this deployment URL](https://web-mfalwdcnp-chinny070s-projects.vercel.app)
-and the stable alias above. The live Agreement Forge rubric preview now matches the contract schema; the post-fix signed-write check remains pending in the user’s Chrome wallet.
+— the production frontend, hosted on Vercel as static-site/SPA hosting only
+(no backend, API routes, or database). The live StudioNet lifecycle target is
+Stage 12 (`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`). This repository is
+updating the hosted default; verify Settings on the live alias before signing
+writes. The prior Stage 11 production release is recorded in
+`deployments/studionet.json`.
 
-The Agreement Forge candidate serializes rubric JSON in the contract's
-required object shape and rejects a missing or invalid deadline before it
-opens MetaMask. The attempt-3 challenge terminalization change is source-tested
-but requires a new contract deployment; it is not on the live Stage 11 address.
+Agreement Forge serializes rubric JSON in the contract's required object
+shape and rejects a missing or invalid deadline before opening the wallet.
+Attempt-3 challenge terminalization is in the Stage 12 candidate source; exact
+source identity for the live address remains unverified.
 
 **Architecture:** one GenLayer Python Intelligent Contract
 (`contracts/agentverdict.py`) plus a static frontend (`web/`). No backend
@@ -43,7 +39,8 @@ server, no hosted database, no relayer — see `docs/PROTOCOL_ARCHITECTURE.md`.
 
 | | Address | Status |
 |---|---|---|
-| **Stage 11 (current)** | `0xab972c3af9878b7CD4631CD21639B20E981B0702` | Hardened deployment. A-3 and A-4 completed synthetic zero-value lifecycles through settlement. Frontend default target; native GEN transfer remains disabled. |
+| **Stage 12 (current chain target)** | `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40` | Live Studio lifecycle reached SETTLED after timeout recovery; zero-value receipt only. Deployment receipt/source identity not captured. |
+| Stage 11 (historical) | `0xab972c3af9878b7CD4631CD21639B20E981B0702` | Separately recorded deployment with A-3/A-4 zero-value lifecycles through settlement. |
 | V2 (historical) | `0xCC67216ceD224A971739bAA706142A740B31853C` | Stage-6-fixed deployment; all public write methods were exercised live. Kept available for historical comparison. |
 | V1 (historical) | `0xb222305575ee8af1255d8aCd196280b405B54Baf` | Superseded historical deployment. Two finalized agreements (`A-1`, `A-2`) kept as evidence. Does **not** have Stage 6 or Stage 11 fixes. Remains queryable via the Settings screen's "Fill in V1 address" option. |
 
@@ -66,7 +63,7 @@ every decision outcome, both challenge-resolution branches).
   challenges/appeals (including the Stage 6 permissionless
   timeout-recovery path), recovery/rework, and a settlement-authorization-
   receipt model with native GEN transfer disabled by default.
-- **92/92 passing direct-mode tests** for the Stage 11 source
+- **94/94 passing direct-mode tests** for the Stage 12 candidate source
   (`tests/direct/`) against the real downloaded pinned GenVM SDK (v0.2.16).
   Live transaction evidence for Stage 11 is recorded separately from the
   V1/V2 verification history.
@@ -77,9 +74,9 @@ every decision outcome, both challenge-resolution branches).
   Mission Control, Evidence Observatory, Verdict Theater, Appeals Tribunal,
   Recovery Center, Settlement Ledger, Adapter Foundry, Simulation Chamber,
   Protocol Telemetry, Settings), typechecked, unit-tested (35/35), production
-  built, and defaulting to the live Stage 11 contract. The available hosted
-  browser has no injected wallet, so signed UI actions remain unverified in
-  this session; see the audit report.
+  built, and configured to default to Stage 12. The user confirmed wallet
+  connection in Chrome, but a successful post-fix hosted frontend write remains
+  a separate verification item; see the audit report.
 - Three independent StudioNet deployments (table above) with an
   exhaustive live-call-by-call verification history.
 

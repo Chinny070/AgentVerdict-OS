@@ -189,7 +189,7 @@ recovery, and settlement) were independently read and showed FINALIZED,
 MAJORITY_AGREE, SUCCESS. The deployed source identity matched the recorded
 SHA-256 `710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`.
 
-## Stage 12 deployment attempt (2026-10-15)
+## Stage 12 deployment attempt (2026-10-15; CLI history)
 
 The attempt-exhaustion candidate (source SHA-256
 `897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe`) has
@@ -205,10 +205,34 @@ sim_getFeeConfig` from the StudioNet RPC. That incompatibility is verified,
 but its causal relationship to the no-majority outcomes is not established.
 The downloaded/cached `0.39.2` CLI could not be launched in this environment,
 and Chrome desktop control timed out while opening the authenticated Studio
-session. No more deployment attempts were made. Stage 11 remains the active
-contract at `0xab972c3af9878b7CD4631CD21639B20E981B0702`.
+session. At the time of that CLI audit, Stage 11 remained active. The later
+Studio UI lifecycle below supersedes that status; these two hashes remain
+failed CLI attempts and are not deployments.
 
-To complete deployment, use Studio's web deployment flow with the unlocked
-wallet or restore a verified StudioNet-compatible CLI. After submission,
-verify a finalized receipt with successful execution and record its contract
-address before initialization. These two failed hashes are not deployments.
+## Stage 12 StudioNet lifecycle addendum (2026-10-15)
+
+The user subsequently deployed and interacted with Stage 12 through GenLayer
+Studio. The live contract address is
+`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40` on StudioNet (chain 61999).
+The address was successfully called and read in Studio. Its deployment
+transaction hash and independently verified source identity were not captured
+in the evidence available for this addendum; the candidate source recorded
+before deployment has SHA-256
+`897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe`.
+Correspondence between that candidate and the deployed source remains
+unverified until the Studio deployment record is recovered.
+
+Live synthetic zero-value A-2 lifecycle completed: create, propose, accept,
+activate, evidence submission, PASS evaluation, challenge, permissionless
+timeout recovery, finalization, settlement authorization, and settlement
+receipt. Final `get_agreement(A-2)` returned `SETTLED`;
+`get_settlement(A-2)` returned `S-1`, `EXECUTED`, amount zero;
+`get_challenge(C-1)` returned `TIMEOUT_REJECTED` with a timeout audit
+explanation. Native GEN transfer stayed disabled. Full hashes for the final
+four actions were not retained; available Studio transaction prefixes are
+timeout `0x8be7…`, finalize `0x8bc6…`, authorize `0xe6cb…`, and record
+settlement `0x657e…`. These are prefixes, not complete transaction IDs.
+
+Stage 12 is live and lifecycle-tested, but deployment receipt and source
+identity evidence remain PARTIAL. Stage 11 remains available at
+`0xab972c3af9878b7CD4631CD21639B20E981B0702`; V1 and V2 remain unchanged.

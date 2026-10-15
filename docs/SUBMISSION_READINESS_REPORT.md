@@ -1,5 +1,15 @@
 # Submission Readiness Report
 
+> **Latest release addendum (2026-10-15):** the user deployed Stage 12 via GenLayer
+> Studio at `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. A synthetic, zero-value
+> A-2 lifecycle reached `SETTLED` after evaluation, challenge timeout recovery,
+> finalization, and receipt-only settlement. This supersedes the older Stage 12
+> “not deployed” statements below. The Studio deployment transaction and exact
+> source identity were not captured; the candidate source SHA is not independently
+> proven to be the deployed source. The frontend source now targets Stage 12, but
+> production Vercel redeployment and hosted-wallet write verification remain
+> pending. See the Stage 12 addendum in the audit and deployment ledger.
+
 > **Current update (Stage 11, 2026-10-15):** Stage 11 hardening is deployed
 > at `0xab972c3af9878b7CD4631CD21639B20E981B0702`, and its two synthetic
 > zero-value lifecycles completed through settlement. The production frontend

@@ -5,6 +5,7 @@ import {
   STUDIONET_EXPLORER_URL,
   STUDIONET_RPC_URL,
   STAGE_11_CONTRACT_ADDRESS,
+  STAGE_12_CONTRACT_ADDRESS,
   V1_CONTRACT_ADDRESS,
   V2_CONTRACT_ADDRESS,
 } from "../../chain/config";
@@ -44,8 +45,8 @@ export default function Settings() {
       <div className="panel">
         <h2>Deployed contract address</h2>
         <p className="field-help">
-          This build defaults to <strong>Stage 11</strong> (<code>{shortenAddress(STAGE_11_CONTRACT_ADDRESS)}</code>), the
-          StudioNet deployment with the finality, bounded-challenge, and policy/evidence hardening
+          This build defaults to <strong>Stage 12</strong> (<code>{shortenAddress(STAGE_12_CONTRACT_ADDRESS)}</code>), the
+          StudioNet deployment with attempt-exhaustion terminalization and the earlier correctness fixes
           (see <code>deployments/studionet.json</code>). Override it below to point at a different
           deployment (e.g. V1, historical, see below) or your own. Stored only in this browser's
           localStorage — a client preference, never canonical protocol state.
@@ -67,11 +68,11 @@ export default function Settings() {
             className="btn btn-ghost btn-sm"
             onClick={() => {
               resetToDefault();
-              setInput(STAGE_11_CONTRACT_ADDRESS);
+              setInput(STAGE_12_CONTRACT_ADDRESS);
               setVerification(null);
             }}
           >
-            Reset to default (Stage 11)
+            Reset to default (Stage 12)
           </button>
           <button
             className="btn btn-ghost btn-sm"
@@ -87,7 +88,7 @@ export default function Settings() {
         {address ? (
           <p className="field-help" style={{ marginTop: 8 }}>
             Currently configured: <strong>{shortenAddress(address)}</strong>
-            {isDefault && " (built-in default — Stage 11)"}
+            {isDefault && " (built-in default — Stage 12)"}
           </p>
         ) : (
           <p className="field-help" style={{ marginTop: 8 }}>
@@ -97,10 +98,21 @@ export default function Settings() {
       </div>
 
       <div className="panel" style={{ marginTop: 16 }}>
+        <h2>Stage 11 — previous hardened deployment</h2>
+        <p className="field-help">
+          <code className="mono">{STAGE_11_CONTRACT_ADDRESS}</code> remains available for comparison.
+          It predates the attempt-exhaustion terminal transition in Stage 12.
+        </p>
+        <button className="btn btn-ghost btn-sm" onClick={() => setInput(STAGE_11_CONTRACT_ADDRESS)}>
+          Fill in Stage 11 address
+        </button>
+      </div>
+
+      <div className="panel" style={{ marginTop: 16 }}>
         <h2>V2 — historical Stage 6 deployment</h2>
         <p className="field-help">
           <code className="mono">{V2_CONTRACT_ADDRESS}</code> remains available for historical comparison.
-          New interactions should use the Stage 11 default above.
+          New interactions should use the Stage 12 default above.
         </p>
         <button className="btn btn-ghost btn-sm" onClick={() => setInput(V2_CONTRACT_ADDRESS)}>
           Fill in V2 address

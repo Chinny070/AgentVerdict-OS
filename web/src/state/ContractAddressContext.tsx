@@ -10,7 +10,7 @@ import {
 interface ContractAddressState {
   address: string | null;
   isConfigured: boolean;
-  /** True when `address` is this app's built-in default (Stage 11), not an
+  /** True when `address` is this app's built-in default (Stage 12), not an
    *  explicit user override. */
   isDefault: boolean;
   setAddress: (next: string) => { ok: boolean; error?: string };
@@ -18,7 +18,7 @@ interface ContractAddressState {
    *  configured" state again. */
   clearAddress: () => void;
   /** Removes any override/opt-out and falls back to the built-in default
-   *  (Stage 11). */
+   *  (Stage 12). */
   resetToDefault: () => void;
 }
 

@@ -1,5 +1,17 @@
 # Final Handoff
 
+## Latest Stage 12 addendum (2026-10-15)
+
+Stage 12 is the current StudioNet target at
+`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. A synthetic zero-value A-2
+lifecycle completed challenge timeout recovery, finalization, and a receipt-only
+settlement; final reads returned agreement `SETTLED` and settlement `S-1`
+`EXECUTED` for amount zero. Native GEN transfers remained disabled. The Studio
+deployment transaction hash and exact deployed-source identity were not
+captured. Attempt-three terminalization therefore remains source/direct-test
+verified, not live-branch verified. See `deployments/studionet.json` and the
+Stage 12 addendum in `docs/STAGE_11_CORRECTNESS_AUDIT.md`.
+
 ## Current status — Stage 11 deployed
 
 This handoff's original body below is historical (Stage 0–8) and is superseded

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { GENLAYER_JS_VERSION, STAGE_11_CONTRACT_ADDRESS, STUDIONET_CHAIN_ID, shortenAddress } from "../../chain/config";
+import { GENLAYER_JS_VERSION, STAGE_12_CONTRACT_ADDRESS, STUDIONET_CHAIN_ID, shortenAddress } from "../../chain/config";
 
 export default function Landing() {
   return (
@@ -29,18 +29,19 @@ export default function Landing() {
           <h3>What is actually real here</h3>
           <ul>
             <li>
-              Stage 11 is deployed on StudioNet. Its finality, bounded-challenge, evidence validation, and
-              recovery behavior were exercised in two synthetic zero-value lifecycles.
+              Stage 12 is deployed on StudioNet. Finality, bounded challenges, evidence validation,
+              timeout recovery, and receipt-only settlement have live lifecycle evidence.
+              Attempt-exhaustion terminalization is covered by source-level regression tests.
             </li>
             <li>Two real flagship evaluation modules: API Delivery Verification, AI-Agent Task Verification.</li>
             <li>
-              Live on StudioNet at <strong>Stage 11</strong> (<code>{shortenAddress(STAGE_11_CONTRACT_ADDRESS)}</code>),
+              Live on StudioNet at <strong>Stage 12</strong> (<code>{shortenAddress(STAGE_12_CONTRACT_ADDRESS)}</code>),
               the hardened deployment this console targets by default — genlayer-js@{GENLAYER_JS_VERSION}{" "}
               reads and writes real on-chain state.
             </li>
             <li>
-              The Stage 11 lifecycles exercised evaluation, challenge resolution, rework, timeout recovery,
-              finalization, reputation, and receipt-only settlement (see the deployment records).
+              The Stage 12 lifecycle exercised evaluation, challenge timeout recovery, finality,
+              and receipt-only settlement (see the deployment records).
             </li>
           </ul>
           <h3>What is honestly not yet real</h3>
@@ -56,7 +57,7 @@ export default function Landing() {
               V1 and V2 remain queryable as historical deployments — see Settings for their addresses.
             </li>
             <li>
-              A browser without an injected wallet can read Stage 11 state, but it cannot submit signed
+              A browser without an injected wallet can read Stage 12 state, but it cannot submit signed
               writes. Settlement remains receipt-only and native GEN transfers are disabled.
             </li>
           </ul>

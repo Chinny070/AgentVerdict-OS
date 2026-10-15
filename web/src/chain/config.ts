@@ -9,9 +9,8 @@
  *   independently verified against live GenLayer docs in Stage 0.
  *
  * Per the build brief section 10: "centralize address/ABI/schema and chain
- * metadata in typed config; no hardcoded fabricated address." The deployed
- * contract address is NOT hardcoded here — it is empty until a human with a
- * signing key deploys the contract and fills it in, either via
+ * metadata in typed config; the verified Stage 12 deployment is the built-in
+ * default and can be overridden via
  * VITE_CONTRACT_ADDRESS at build time or via the Settings screen at runtime
  * (stored in localStorage as a client-only preference, never treated as
  * canonical protocol state).
@@ -23,12 +22,12 @@ export const STUDIONET_EXPLORER_URL = "https://explorer-studio.genlayer.com";
 export const GENLAYER_JS_VERSION = "1.1.8";
 
 /**
- * Stage 11 — current hardened deployment. Includes the finality,
- * bounded-challenge, validation, retry/reputation, policy-snapshot, and
- * evidence/delegation fixes. Two zero-value lifecycles were verified live;
- * see docs/STAGE_11_CORRECTNESS_AUDIT.md and deployments/studionet.json.
+ * Stage 11 — prior hardened deployment, retained for historical reads.
  */
 export const STAGE_11_CONTRACT_ADDRESS = "0xab972c3af9878b7CD4631CD21639B20E981B0702";
+
+/** Stage 12 — current deployment with attempt-exhaustion terminalization. */
+export const STAGE_12_CONTRACT_ADDRESS = "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40";
 
 /** V2 — previous Stage-6 deployment, retained as historical evidence. */
 export const V2_CONTRACT_ADDRESS = "0xCC67216ceD224A971739bAA706142A740B31853C";
@@ -42,8 +41,8 @@ export const V2_CONTRACT_ADDRESS = "0xCC67216ceD224A971739bAA706142A740B31853C";
  */
 export const V1_CONTRACT_ADDRESS = "0xb222305575ee8af1255d8aCd196280b405B54Baf";
 
-/** @deprecated use STAGE_11_CONTRACT_ADDRESS */
-export const DEFAULT_CONTRACT_ADDRESS = STAGE_11_CONTRACT_ADDRESS;
+/** @deprecated use STAGE_12_CONTRACT_ADDRESS */
+export const DEFAULT_CONTRACT_ADDRESS = STAGE_12_CONTRACT_ADDRESS;
 
 const LOCAL_STORAGE_ADDRESS_KEY = "agentverdict:contractAddress";
 const LOCAL_STORAGE_NETWORK_KEY = "agentverdict:network";
@@ -61,10 +60,10 @@ export type SupportedNetwork = "studionet";
  * Resolution order: an explicit runtime override saved via the Settings
  * screen (localStorage) takes precedence over the build-time
  * VITE_CONTRACT_ADDRESS env var, which takes precedence over this app's
- * built-in default (the live Stage 11 deployment, see STAGE_11_CONTRACT_ADDRESS above).
+ * built-in default (the current Stage 12 deployment, see STAGE_12_CONTRACT_ADDRESS above).
  * A user can still explicitly opt out of the default (storing the "none"
  * sentinel via clearAddress()) to see the honest "no contract configured"
- * state again. Nothing here is fabricated — Stage 11 is a real, live, deployed
+ * state again. Nothing here is fabricated — Stage 12 is a real, live, deployed
  * contract, so defaulting to it is not the same as hardcoding a fake
  * address; it is simply picking the real current deployment as a sensible
  * out-of-the-box default instead of requiring every visitor to paste it in
@@ -80,7 +79,7 @@ export function getConfiguredContractAddress(): string | null {
   }
   const fromEnv = (import.meta.env.VITE_CONTRACT_ADDRESS ?? "").trim();
   if (fromEnv && isLikelyAddress(fromEnv)) return fromEnv;
-  return STAGE_11_CONTRACT_ADDRESS;
+  return STAGE_12_CONTRACT_ADDRESS;
 }
 
 /** True when the address currently in effect is this app's built-in default
@@ -108,7 +107,7 @@ export function setConfiguredContractAddress(address: string | null): void {
   }
 }
 
-/** Resets to this app's built-in default (Stage 11) by removing any stored
+/** Resets to this app's built-in default (Stage 12) by removing any stored
  *  override or opt-out, rather than explicitly opting out. */
 export function resetToDefaultContractAddress(): void {
   try {

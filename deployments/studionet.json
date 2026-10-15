@@ -303,20 +303,39 @@
     "note": "Latest frontend source is deployed and the live rubric preview was checked at the production alias. The previously signed malformed create_agreement was conclusively rolled back and created no agreement. A successful post-fix signed frontend write still requires the user Chrome wallet session."
   },
   "stage_12_candidate": {
-    "status": "SOURCE_AND_TESTS_VERIFIED_NOT_DEPLOYED",
+    "status": "DEPLOYED_LIVE_LIFECYCLE_VERIFIED",
     "based_on_commit": "241df400ccf4f1e410d8f46884bdc9c08aca4c58",
     "source_file": "contracts/agentverdict.py",
     "source_hash": "sha256:897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe",
     "attempt_exhaustion_fix": "Upheld challenge on attempt 3 invalidates the provisional verdict and terminates the agreement atomically",
-    "deployment_status": "NOT_DEPLOYED",
-    "deployment_gate": "A separate user approval is required before replacing the live StudioNet instance",
+    "deployment_status": "DEPLOYED_AND_INTERACTED_WITH_VIA_STUDIO_UI",
+    "deployment_gate": "No further deployment is required for this candidate; preserve the live address and history",
+    "deployment": {
+      "network": "studionet",
+      "chain_id": 61999,
+      "contract_address": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
+      "deployment_transaction": "NOT_CAPTURED",
+      "source_identity": "Candidate SHA-256 was recorded before deployment; exact deployment transaction/source identity has not been independently recovered from Studio or an explorer receipt.",
+      "live_lifecycle": {
+        "agreement_id": "A-2",
+        "counterparty": "0x082a657bAA2ea66a3cfeD6dbeFeF18135d43a735",
+        "amount_atto": 0,
+        "flow": "create, propose, accept, activate, open evidence, submit evidence, evaluate PASS, challenge, permissionless timeout recovery, finalize, authorize settlement, record zero-value settlement receipt",
+        "final_state": "SETTLED",
+        "settlement_status": "EXECUTED",
+        "settlement_amount_atto": 0,
+        "native_transfer_enabled": false,
+        "transaction_hash_capture": "Studio showed finalized transactions; only abbreviated prefixes for timeout (0x8be7…), finalize (0x8bc6…), authorize settlement (0xe6cb…), and record settlement (0x657e…) were retained in the session notes. Full hashes are not asserted here."
+      },
+      "live_read_evidence": "get_agreement(A-2) returned SETTLED; get_settlement(A-2) returned S-1, status EXECUTED, amount_atto 0; get_challenge(C-1) returned TIMEOUT_REJECTED with the timeout audit message."
+    },
     "verification": {
       "direct_contract_tests": "94 passed",
       "genvm_lint": "ok:true; 40 methods (12 views, 28 writes)",
       "frontend_tests": "39 passed",
       "typescript": "passed",
       "production_build": "passed",
-      "deployment": "NOT DEPLOYED; explicit approval required before a new contract deployment"
+      "deployment": "StudioNet contract at 0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40 was interacted with successfully; deployment receipt/source identity remains uncaptured"
     },
     "deployment_attempts": [
       {
@@ -345,11 +364,12 @@
       }
     ],
     "deployment_blocker": {
+      "status": "HISTORICAL_CLI_ATTEMPTS_SUPERSEDED_BY_STUDIO_UI_DEPLOYMENT",
       "verified": "Both CLI deployment receipts finalized as NO_MAJORITY with zero votes and no contract address.",
       "environment": "The installed CLI is 0.40.0-rc.3. Its read-only fee estimate call fails because StudioNet RPC does not implement sim_getFeeConfig.",
       "causality": "The RPC method mismatch is verified; whether it directly caused the no-majority receipts is not proven.",
       "browser_fallback": "The authenticated Chrome Studio window timed out under the available desktop-control runtime after one documented retry. No wallet dialog was automated.",
-      "next_safe_path": "Use GenLayer Studio web UI or a verified StudioNet-compatible CLI release with the connected deployment wallet. Do not treat either hash as a deployed contract."
+      "next_safe_path": "The live Studio UI address is recorded in deployment.contract_address. The two hashes above remain failed CLI attempts and are not deployments."
     }
   },
   "stage11_post_deployment_audit": {

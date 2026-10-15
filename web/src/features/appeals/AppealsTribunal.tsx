@@ -181,11 +181,11 @@ export default function AppealsTribunal() {
               <div className="panel" style={{ marginTop: 12 }}>
                 <h3>Permissionless timeout recovery</h3>
                 <p className="field-help">
-                  Stage 11 recovery path for an unresolved challenge. Available to
+                  Stage 12 recovery path for an unresolved challenge. Available to
                   any wallet once the looked-up challenge's admin resolution deadline has passed while it
                   is still OPEN. Deterministically upholds the original verdict — never the challenge —
                   and reopens the challenge window, the same effect as an admin rejection. This method is
-                  available on the deployed Stage 11 contract. It requires the original verdict to stay
+                  available on the deployed Stage 12 contract. It requires the original verdict to stay
                   upheld while reopening the challenge window; no admin judgment is applied.
                 </p>
                 {!canResolveByTimeout && (

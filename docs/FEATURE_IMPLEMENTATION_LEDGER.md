@@ -1,5 +1,13 @@
 # Feature Implementation Ledger (updated — Stage 4 frontend)
 
+> **Current deployment addendum (2026-10-15):** Stage 12 is live at
+> `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. Studio reads and a synthetic
+> zero-value lifecycle through timeout recovery and settlement were observed.
+> Deployment receipt/source identity were not captured. The attempt-three
+> terminalization branch remains source/direct-test verified, not independently
+> exercised on-chain. Historical Stage 11/V2/V1 addresses and their evidence are
+> preserved in `deployments/studionet.json`.
+
 > **Stage 11 live status (2026-10-15):** the hardened source is deployed at
 > `0xab972c3af9878b7CD4631CD21639B20E981B0702`. Two synthetic zero-value
 > lifecycles completed on StudioNet: A-3 challenged PASS through settlement;
