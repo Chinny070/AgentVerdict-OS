@@ -690,8 +690,33 @@ installed, and it surfaced two real, distinct bugs — not a single issue:
    initially did, tries to connect with Rabby or a similar wallet first;
    that failure path itself remains verified only by the 2 regression
    tests in `web/src/chain/client.test.ts`, not by a second live
-   re-attempt with Rabby after the fix. Still untested live: an actual
-   signed write transaction through the deployed frontend (creating an
-   agreement, submitting evidence, etc.) — the connection succeeding is
-   necessary but not sufficient evidence for that; it remains the next
-   real verification step if the user chooses to pursue it.
+   re-attempt with Rabby after the fix. The signed write status is superseded
+   by the follow-up below.
+
+## 13. Stage 12 hosted write and receipt-status follow-up (2026-10-15)
+
+The earlier statement that no hosted signed write had been observed is no
+longer current. Through Chrome/MetaMask, a real zero-value `create_agreement`
+was submitted to Stage 12 from the admin wallet. Explorer confirms transaction
+[`0xb4784eba1222f816798b834b8b9d7077f845a8d0928f0017cbfe946449b8ebec`](https://explorer-studio.genlayer.com/tx/0xb4784eba1222f816798b834b8b9d7077f845a8d0928f0017cbfe946449b8ebec)
+FINALIZED with Accepted consensus, GenVM SUCCESS, and return value `A-7`.
+This proves the wallet-signed hosted write reached the live Stage 12 contract.
+
+The then-current production UI showed FAILED for this transaction. Inspection
+of the pinned SDK's simplified receipt shape identified the bug: it uses
+`status_name` and numeric `status`, while the application only recognized
+`statusName`/enum-string `status`. The parser now normalizes all these fields
+using the SDK enum mapping. A regression test uses the actual simplified shape,
+including the successful `A-7` return. Verification: all 45 frontend tests,
+TypeScript, local production build, Vercel production build, and public alias
+HTTP response passed. The new production deployment is
+`dpl_CekJRb6BwZzoQJgXVt9ccr5YXjmU` and READY at
+`https://web-omega-amber-37.vercel.app`.
+
+**Still open:** a second signed write through this new deployment has not been
+submitted, so the corrected on-page success state is not yet confirmed live.
+The Chrome desktop-state capture helper timed out after two attempts while
+switching from Explorer to the hosted app. The actual A-7 transaction remains
+successful according to Explorer; its prior UI FAILED label was a front-end
+receipt-decoding error, not an on-chain failure. No contract was redeployed in
+this follow-up.
