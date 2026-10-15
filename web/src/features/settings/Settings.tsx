@@ -4,6 +4,7 @@ import {
   STUDIONET_CHAIN_ID,
   STUDIONET_EXPLORER_URL,
   STUDIONET_RPC_URL,
+  STAGE_11_CONTRACT_ADDRESS,
   V1_CONTRACT_ADDRESS,
   V2_CONTRACT_ADDRESS,
 } from "../../chain/config";
@@ -43,10 +44,9 @@ export default function Settings() {
       <div className="panel">
         <h2>Deployed contract address</h2>
         <p className="field-help">
-          This build defaults to <strong>V2</strong> (<code>{shortenAddress(V2_CONTRACT_ADDRESS)}</code>), the
-          verified Stage-6 StudioNet deployment — a real deployed address, not a
-          placeholder (see <code>deployments/studionet.json</code>). The Stage 11 source hardening is not
-          deployed on V1 or V2. Override it below to point at a different
+          This build defaults to <strong>Stage 11</strong> (<code>{shortenAddress(STAGE_11_CONTRACT_ADDRESS)}</code>), the
+          StudioNet deployment with the finality, bounded-challenge, and policy/evidence hardening
+          (see <code>deployments/studionet.json</code>). Override it below to point at a different
           deployment (e.g. V1, historical, see below) or your own. Stored only in this browser's
           localStorage — a client preference, never canonical protocol state.
         </p>
@@ -67,11 +67,11 @@ export default function Settings() {
             className="btn btn-ghost btn-sm"
             onClick={() => {
               resetToDefault();
-              setInput(V2_CONTRACT_ADDRESS);
+              setInput(STAGE_11_CONTRACT_ADDRESS);
               setVerification(null);
             }}
           >
-            Reset to default (V2)
+            Reset to default (Stage 11)
           </button>
           <button
             className="btn btn-ghost btn-sm"
@@ -87,7 +87,7 @@ export default function Settings() {
         {address ? (
           <p className="field-help" style={{ marginTop: 8 }}>
             Currently configured: <strong>{shortenAddress(address)}</strong>
-            {isDefault && " (built-in default — V2)"}
+            {isDefault && " (built-in default — Stage 11)"}
           </p>
         ) : (
           <p className="field-help" style={{ marginTop: 8 }}>
@@ -97,14 +97,23 @@ export default function Settings() {
       </div>
 
       <div className="panel" style={{ marginTop: 16 }}>
-        <h2>V1 — historical deployment (read-only, superseded)</h2>
+        <h2>V2 — historical Stage 6 deployment</h2>
         <p className="field-help">
-          <code className="mono">{V1_CONTRACT_ADDRESS}</code> was the original Stage 0-4 deployment. It has two
-          finalized agreements (<strong>A-1</strong>, <strong>A-2</strong>) as historical evidence but does{" "}
-          <strong>not</strong> have the Stage 6 fixes (<code>resolve_challenge_by_timeout</code> or the
-          storage-pickling fix) — see <code>docs/STUDIONET_LIVE_VERIFICATION_REPORT.md</code>. It remains fully
-          queryable; it is simply no longer the default target for new interactions. Paste it into the address
-          field above and click "Save address" to browse it read-only.
+          <code className="mono">{V2_CONTRACT_ADDRESS}</code> remains available for historical comparison.
+          New interactions should use the Stage 11 default above.
+        </p>
+        <button className="btn btn-ghost btn-sm" onClick={() => setInput(V2_CONTRACT_ADDRESS)}>
+          Fill in V2 address
+        </button>
+      </div>
+
+      <div className="panel" style={{ marginTop: 16 }}>
+        <h2>V1 — historical deployment (superseded)</h2>
+        <p className="field-help">
+          <code className="mono">{V1_CONTRACT_ADDRESS}</code> is the original Stage 0-4 deployment and
+          retains two finalized agreements (<strong>A-1</strong>, <strong>A-2</strong>) as historical evidence.
+          It predates the Stage 6 and Stage 11 hardening. It remains queryable and is no longer the default
+          target for new interactions. Paste it into the address field above and click "Save address" to inspect it.
         </p>
         <button
           className="btn btn-ghost btn-sm"

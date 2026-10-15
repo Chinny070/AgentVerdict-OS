@@ -1,11 +1,15 @@
 # Submission Readiness Report
 
-> **Superseded update (Stage 11, 2026-10-14):** the status reported below
-> predates the current correctness review. The candidate hardens settlement,
+> **Current update (Stage 11, 2026-10-15):** Stage 11 hardening is deployed
+> at `0xab972c3af9878b7CD4631CD21639B20E981B0702`, and its two synthetic
+> zero-value lifecycles completed through settlement. The production frontend
+> is being moved from V2 to Stage 11. The older assessment below is historical;
+> its source-candidate, deployment, and frontend-target statements have been
+> superseded. Live wallet-signed frontend writes and the non-admin timeout
+> caller remain unverified. The candidate hardens settlement,
 > bounded challenges, adjudication validation, retry accounting, policy and
-> delegation scope, and frontend transaction finality. It is not deployed.
-> V1/V2 remain immutable; therefore the live demo still runs V2 behavior and
-> is not evidence of the Stage 11 fixes. Consult
+> delegation scope, and frontend transaction finality. It is deployed. V1/V2
+> remain historical immutable deployments. Consult
 > [STAGE_11_CORRECTNESS_AUDIT.md](STAGE_11_CORRECTNESS_AUDIT.md) for the
 > current verdict and test record.
 

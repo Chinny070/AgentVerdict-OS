@@ -36,9 +36,8 @@ export default function AppealsTribunal() {
   const [finalizeUpdate, setFinalizeUpdate] = useState<TxUpdate | null>(null);
   const [finalizing, setFinalizing] = useState(false);
 
-  // Stage 6: permissionless challenge-resolution timeout recovery. See
-  // docs/STAGE_6_MIGRATION_NOTE.md. Not available on the deployed
-  // StudioNet instance -- resolution_deadline reads back empty there.
+  // Permissionless challenge-resolution timeout recovery is available on
+  // Stage 11. Older V1 records may have no resolution_deadline.
   const [timeoutUpdate, setTimeoutUpdate] = useState<TxUpdate | null>(null);
   const [resolvingByTimeout, setResolvingByTimeout] = useState(false);
 
@@ -109,7 +108,7 @@ export default function AppealsTribunal() {
   const canChallenge = agreementState.status === "ready" && agreementState.data.state === "CHALLENGE_WINDOW" && !deadlinePassed;
   const canFinalize = agreementState.status === "ready" && agreementState.data.state === "CHALLENGE_WINDOW" && deadlinePassed;
 
-  // Stage 6: eligible once the looked-up challenge's resolution_deadline
+  // Eligible once the looked-up challenge's resolution_deadline
   // (admin-response SLA) has passed while it is still OPEN. Permissionless
   // by design -- no party/admin check, matching the contract.
   const hasResolutionDeadline = challengeState.status === "ready" && Boolean(challengeState.data.resolution_deadline);
@@ -182,12 +181,12 @@ export default function AppealsTribunal() {
               <div className="panel" style={{ marginTop: 12 }}>
                 <h3>Permissionless timeout recovery</h3>
                 <p className="field-help">
-                  Stage 6 fix for an unresolved challenge (docs/STAGE_6_MIGRATION_NOTE.md). Available to
+                  Stage 11 recovery path for an unresolved challenge. Available to
                   any wallet once the looked-up challenge's admin resolution deadline has passed while it
                   is still OPEN. Deterministically upholds the original verdict — never the challenge —
                   and reopens the challenge window, the same effect as an admin rejection. This method is
-                  available on the deployed Stage-6 V2 contract; the separate Stage 11 source changes are
-                  not deployed there.
+                  available on the deployed Stage 11 contract. It requires the original verdict to stay
+                  upheld while reopening the challenge window; no admin judgment is applied.
                 </p>
                 {!canResolveByTimeout && (
                   <p className="field-help" style={{ color: "var(--tangerine)" }}>

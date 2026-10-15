@@ -21,7 +21,7 @@ describe("ConfigGate", () => {
     window.localStorage.clear();
   });
 
-  it("renders protected content by default, using the app's built-in V2 default address, when nothing is configured", () => {
+  it("renders protected content by default, using the app's built-in Stage 11 address, when nothing is configured", () => {
     renderGate();
     expect(screen.getByText("Protected content")).toBeInTheDocument();
     expect(screen.queryByText(/no contract configured/i)).not.toBeInTheDocument();

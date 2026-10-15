@@ -11,9 +11,8 @@ export function ChallengeTimeline({ verdict, challenge }: ChallengeTimelineProps
   const now = Date.now();
   const deadlinePassed = verdict ? now > Date.parse(verdict.challenge_deadline) : false;
 
-  // Stage 6: resolution_deadline is empty on challenges read from the
-  // currently-deployed StudioNet instance (predates this field) -- guard
-  // against treating "" as a passed deadline.
+  // Older V1 challenges may predate the resolution_deadline field. Guard
+  // against treating an absent deadline as already passed.
   const hasResolutionDeadline = Boolean(challenge?.resolution_deadline);
   const resolutionDeadlinePassed =
     challenge && hasResolutionDeadline ? now > Date.parse(challenge.resolution_deadline) : false;
@@ -75,7 +74,7 @@ export function ChallengeTimeline({ verdict, challenge }: ChallengeTimelineProps
           {challenge.state === "OPEN" && !hasResolutionDeadline && (
             <p className="field-help" style={{ marginTop: 6 }}>
               No admin resolution deadline recorded on this challenge — it predates the
-              Stage 6 timeout-recovery fix (see docs/STAGE_6_MIGRATION_NOTE.md). Only the
+              This challenge predates the timeout-recovery field. Only the
               admin's own resolve_challenge can unstick this agreement if challenged.
             </p>
           )}

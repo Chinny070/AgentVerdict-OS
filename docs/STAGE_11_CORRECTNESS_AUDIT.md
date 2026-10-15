@@ -93,3 +93,35 @@ These are real StudioNet leader executions and validator equivalence outputs. Tr
 
 Candidate source SHA-256: `89f9092bcd4f724d01919cfe1e5c584be37bf26abb7657aa47ddce1f8d65dbef`. This is a local source fingerprint only, not a deployed source hash. A `PytestCacheWarning` caused by the sandbox denying writes to `.pytest_cache` is an environment permission warning and does not indicate a contract test failure. The GenVM lint's newer-runner notice is informational and is not proof of compatibility with that newer runner.
 
+## Stage 11 release completion addendum (2026-10-15)
+
+The frontend contract default and Settings diagnostics now target Stage 11
+(`0xab972c3af9878b7CD4631CD21639B20E981B0702`). The Vercel production
+`VITE_CONTRACT_ADDRESS` override that pinned V2 was removed, so production
+uses the Stage 11 built-in default. V1 and V2 remain available as historical
+selections. Appeals Tribunal copy now describes timeout recovery on Stage 11.
+
+Verification in this completion pass:
+
+- `pytest -q tests/direct`: **92 passed**.
+- `pytest -q tests/integration`: **7 skipped**; this environment has no local
+  GenVM/GLSim node or configured live LLM provider.
+- Frontend typecheck/lint (`tsc --noEmit`): **passed**.
+- Frontend Vitest suite: **35 passed**, including default Stage 11 selection,
+  historical V2 override, and reset behavior.
+- Production Vite build: **passed**. It reports the existing ~789 kB main
+  bundle size warning.
+- The available public browser tab exposes no injected wallet
+  (`window.ethereum` absent), and Chrome with MetaMask/Rabby is not available
+  to this session. Wallet-signed UI writes and a live non-admin timeout call
+  therefore remain **unverified here**. Existing live transaction history
+  proves timeout recovery with an admin-signed call; source and direct tests
+  establish that the method has no admin/party authorization gate, but do not
+  replace observing a successful call from a separate address.
+
+The Stage 11 source changes for correctness items 1–6 are deployed and covered
+by direct regression tests. The frontend default cutover is implemented and
+its Vercel V2 override removed. Do not describe the complete wallet/live
+integration portion as verified until a non-admin signed transaction and
+wallet-connected browser checks are observed.
+

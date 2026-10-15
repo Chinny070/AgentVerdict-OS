@@ -99,7 +99,7 @@ Natural-language task agreements (authored off-chain, frozen on-chain — IMPLEM
 
 - **40/40 features explicitly accounted for** — none silently dropped.
 - **15 IMPLEMENTED, 8 PARTIAL (each with a stated real subset and a stated gap), 16 DEFERRED, 1 DESIGN-SATISFIED**, after this session's Stage 4 update moved feature 1 (Counterfactual Verdict Simulator) from DEFERRED to PARTIAL (a real, clearly-labeled advisory frontend now exists; see `web/src/features/developer/SimulationChamber.tsx`).
-- The Stage 4 frontend itself (`web/`) is a cross-cutting deliverable, not a single numbered feature: it gives real UI to features 2, 4, 5, 6, 9, 13, 15, 16, 18, 19, 26, 30, 32, 35, 38, 39 (all P0) plus 1, 24, 25, 37 (P1, partial). The hosted application currently targets V2; Stage 11 live lifecycle evidence does not imply a frontend cutover or wallet-connected browser verification against Stage 11.
+- The Stage 4 frontend itself (`web/`) is a cross-cutting deliverable, not a single numbered feature: it gives real UI to features 2, 4, 5, 6, 9, 13, 15, 16, 18, 19, 26, 30, 32, 35, 38, 39 (all P0) plus 1, 24, 25, 37 (P1, partial). The production build now defaults to the Stage 11 contract. Wallet-connected signed UI writes remain unverified in this session because no injected wallet browser is available.
 - Every IMPLEMENTED and PARTIAL claim above is backed by a named, passing
   test in `tests/direct/`, re-run and confirmed in this session
   (`docs/TEST_EVIDENCE.md`) — not asserted from memory.

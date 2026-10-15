@@ -1,13 +1,15 @@
 # Final Handoff
 
-## Stage 11 correctness candidate
+## Current status — Stage 11 deployed
 
-The later audit and its deployment boundary are recorded in
-[`STAGE_11_CORRECTNESS_AUDIT.md`](STAGE_11_CORRECTNESS_AUDIT.md). Candidate
-source SHA-256: `89f9092bcd4f724d01919cfe1e5c584be37bf26abb7657aa47ddce1f8d65dbef`.
-V1 and V2 remain unchanged. The candidate has not been deployed or live-read;
-the historic V2 live verification reports do not establish these new source
-fixes. See the Stage 11 report for the complete regression run and blockers.
+This handoff's original body below is historical (Stage 0–8) and is superseded
+by [`STAGE_11_CORRECTNESS_AUDIT.md`](STAGE_11_CORRECTNESS_AUDIT.md) and the
+latest release addendum there. Stage 11 source SHA-256 is
+`710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`; it is
+deployed at `0xab972c3af9878b7CD4631CD21639B20E981B0702`. It completed two
+synthetic, zero-value StudioNet lifecycles. The current frontend release
+defaults to Stage 11. A browser wallet was not available for signed frontend
+verification or a live non-admin timeout call.
 
 **Date:** 2026-10-13
 **Agent:** Claude Sonnet 5, acting as implementing engineer for AgentVerdict OS

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { GENLAYER_JS_VERSION, STUDIONET_CHAIN_ID, V2_CONTRACT_ADDRESS, shortenAddress } from "../../chain/config";
+import { GENLAYER_JS_VERSION, STAGE_11_CONTRACT_ADDRESS, STUDIONET_CHAIN_ID, shortenAddress } from "../../chain/config";
 
 export default function Landing() {
   return (
@@ -29,19 +29,18 @@ export default function Landing() {
           <h3>What is actually real here</h3>
           <ul>
             <li>
-              The deployed V2 contract has a real StudioNet verification record. The current Stage 11 source
-              candidate passes 92 direct-mode contract tests; its correctness fixes are not yet deployed.
+              Stage 11 is deployed on StudioNet. Its finality, bounded-challenge, evidence validation, and
+              recovery behavior were exercised in two synthetic zero-value lifecycles.
             </li>
             <li>Two real flagship evaluation modules: API Delivery Verification, AI-Agent Task Verification.</li>
             <li>
-              Live on StudioNet at <strong>V2</strong> (<code>{shortenAddress(V2_CONTRACT_ADDRESS)}</code>),
-              the Stage-6 deployment this console targets by default — genlayer-js@{GENLAYER_JS_VERSION}{" "}
-              reads and writes real on-chain state. Stage 11 candidate fixes require a separate deployment.
+              Live on StudioNet at <strong>Stage 11</strong> (<code>{shortenAddress(STAGE_11_CONTRACT_ADDRESS)}</code>),
+              the hardened deployment this console targets by default — genlayer-js@{GENLAYER_JS_VERSION}{" "}
+              reads and writes real on-chain state.
             </li>
             <li>
-              Every public write method on V2 has been exercised at least once via real signed transactions
-              (see docs/V2_STUDIONET_LIVE_VERIFICATION_REPORT.md and
-              docs/V2_REMAINING_PATHS_VERIFICATION_REPORT.md).
+              The Stage 11 lifecycles exercised evaluation, challenge resolution, rework, timeout recovery,
+              finalization, reputation, and receipt-only settlement (see the deployment records).
             </li>
           </ul>
           <h3>What is honestly not yet real</h3>
@@ -51,16 +50,14 @@ export default function Landing() {
               (native GEN transfer is disabled by default).
             </li>
             <li>
-              This browser session has no signing key, by design — every write action requires your own
-              connected wallet; nothing here signs or sends a transaction on your behalf.
+              Writes require your own connected wallet; the app never holds or sends signing keys.
             </li>
             <li>
-              V1 (the original, pre-Stage-6 deployment) remains queryable but historical — see Settings for
-              both addresses.
+              V1 and V2 remain queryable as historical deployments — see Settings for their addresses.
             </li>
             <li>
-              V1 and V2 do not contain the local Stage 11 hardening; the latest code is a candidate pending
-              separate deployment and live verification.
+              The public frontend is being verified against Stage 11. Settlement remains receipt-only and
+              native GEN transfers are disabled.
             </li>
           </ul>
         </div>

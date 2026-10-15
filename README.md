@@ -5,9 +5,9 @@
 > A-3 has completed its challenged PASS lifecycle and zero-value receipt
 > settlement; A-4 has completed FAIL-to-rework recovery, permissionless
 > timeout recovery, finalization, and zero-value receipt settlement. V1 and V2 remain
-> unchanged historical deployments. The hosted frontend still targets V2;
-> see the [Stage 11 audit](docs/STAGE_11_CORRECTNESS_AUDIT.md) for current
-> evidence and remaining verification.
+> unchanged historical deployments. The production frontend now defaults to
+> Stage 11; the [Stage 11 audit](docs/STAGE_11_CORRECTNESS_AUDIT.md) records
+> live contract evidence and frontend verification status.
 
 > The universal accountability layer for autonomous work. Natural-language
 > agreements become evidence-backed, challengeable, settlement-authorizing
@@ -23,14 +23,10 @@ Honest, precise current status: `docs/SUBMISSION_READINESS_REPORT.md`
 **[https://web-omega-amber-37.vercel.app](https://web-omega-amber-37.vercel.app)**
 — the real, live production frontend, hosted on Vercel as static-site/SPA
 hosting only (no backend, no API routes, no database — see "Architecture"
-below). Defaults to the live V2 contract
-(`0xCC67216ceD224A971739bAA706142A740B31853C`). The latest frontend
-release is deployment `dpl_4t1EYuhwXg2dYURCHPuwiNvM3MSG` (commit `131cfb2`),
-project `chinny070s-projects/web`. A read-only browser check confirmed the
-site and updated deployment-status copy load; Protocol Telemetry remained in
-`Loading` in that session, so live contract reads and wallet-signed actions
-are not claimed as verified in this pass. See
-`docs/STAGE_11_CORRECTNESS_AUDIT.md` for current evidence and limits.
+below). The production release targets the verified Stage 11 contract
+(`0xab972c3af9878b7CD4631CD21639B20E981B0702`). See
+`docs/STAGE_11_CORRECTNESS_AUDIT.md` for the live contract evidence and current
+wallet/browser verification status.
 
 **Architecture:** one GenLayer Python Intelligent Contract
 (`contracts/agentverdict.py`) plus a static frontend (`web/`). No backend
@@ -40,8 +36,8 @@ server, no hosted database, no relayer — see `docs/PROTOCOL_ARCHITECTURE.md`.
 
 | | Address | Status |
 |---|---|---|
-| **V2 (current)** | `0xCC67216ceD224A971739bAA706142A740B31853C` | Active, Stage-6-fixed (challenge-timeout recovery + storage-pickling fix). Every one of its 28 public write methods has been exercised at least once via real signed transactions. This is the frontend's default target. |
-| Stage 11 (new deployment) | `0xab972c3af9878b7CD4631CD21639B20E981B0702` | Separate 2026-10-14 deployment of Stage 11 security fixes. A-3 and A-4 completed synthetic zero-value lifecycles through settlement. No frontend cutover; native GEN transfer remains disabled. |
+| **Stage 11 (current)** | `0xab972c3af9878b7CD4631CD21639B20E981B0702` | Hardened deployment. A-3 and A-4 completed synthetic zero-value lifecycles through settlement. Frontend default target; native GEN transfer remains disabled. |
+| V2 (historical) | `0xCC67216ceD224A971739bAA706142A740B31853C` | Stage-6-fixed deployment; all public write methods were exercised live. Kept available for historical comparison. |
 | V1 (historical) | `0xb222305575ee8af1255d8aCd196280b405B54Baf` | Superseded, read-only. Two finalized agreements (`A-1`, `A-2`) kept as historical evidence. Does **not** have the Stage 6 fixes. Remains fully queryable — never hidden or deleted — via the Settings screen's "Fill in V1 address" option. |
 
 Both are on StudioNet, chain ID `61999`, RPC `https://studio.genlayer.com/api`.
@@ -73,10 +69,10 @@ every decision outcome, both challenge-resolution branches).
   pinned, 14 screens (Landing, Command Deck, Agreement Forge, Agent Atlas,
   Mission Control, Evidence Observatory, Verdict Theater, Appeals Tribunal,
   Recovery Center, Settlement Ledger, Adapter Foundry, Simulation Chamber,
-  Protocol Telemetry, Settings), typechecked, unit-tested (20/20 passing),
-  production-built, defaulting to the live V2 contract, and unit-tested
-  (32/32). The hosted browser check for the current release found no injected
-  wallet and did not complete the telemetry read; see the audit report.
+  Protocol Telemetry, Settings), typechecked, unit-tested (35/35), production
+  built, and defaulting to the live Stage 11 contract. The available hosted
+  browser has no injected wallet, so signed UI actions remain unverified in
+  this session; see the audit report.
 - Three independent StudioNet deployments (table above) with an
   exhaustive live-call-by-call verification history.
 
@@ -183,7 +179,7 @@ area-by-area verdict in `docs/SUBMISSION_READINESS_REPORT.md`.
    StudioNet is gasless.
 2. Run the frontend locally (see "Reproduce the verified results yourself"
    below) and open it in a browser with that extension installed.
-3. The app defaults to the live V2 contract already — no address entry
+3. The app defaults to the live Stage 11 contract already — no address entry
    needed to browse read-only screens (Protocol Telemetry, Agent Atlas,
    Evidence Observatory, Verdict Theater, Appeals Tribunal, Settlement
    Ledger are designed for read-only inspection; verify live reads in your
