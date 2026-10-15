@@ -18,6 +18,14 @@
 > transactions were submitted during this follow-up. Evidence content hashes
 > are not verified against fetched bytes, merit challenges remain
 > administrator-resolved, and native GEN transfers remain disabled by design.
+> The frontend copy was corrected and deployed as Vercel production deployment
+> `dpl_Ef8qLE5vQNERhTuqBpYV7xUUoafB` (`READY`) from source commit `dba6730`;
+> the stable alias served the updated Landing and Settings text. Live Settings
+> confirmed Stage 12, StudioNet chain 61999, and `genlayer-js` 1.1.8. Live
+> Protocol Telemetry returned 9 agreements, 2 evidence packets, 0 delegations,
+> 4 challenges, 1 settlement, 1 reputation event, with native transfer disabled.
+> The read-only browser had no injected wallet provider; the separately recorded
+> signed A-8 hosted write remains the wallet-write evidence.
 
 > **Attempt-three evidence correction:** The A-9 terminal path is live-verified,
 > not merely covered by regression tests. Explorer records C-2, C-3, and C-4

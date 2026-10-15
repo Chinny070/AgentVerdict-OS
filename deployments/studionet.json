@@ -613,5 +613,34 @@
     "settlement_or_reputation_effect": "None created by terminalization; no settlement calls were made for A-9.",
     "receipt_status": "All supplied write receipts were FINALIZED with Accepted consensus, five initial validators, and GenVM SUCCESS.",
     "evidence_source": "Studio Explorer contract transaction list (read-only browser verification) and user-supplied transaction details/read responses"
+  },
+  "stage_12_submission_followup": {
+    "date": "2026-10-15",
+    "source_commit": "dba673029fa8dfacb47b71739157c2eccd4281b9",
+    "contract_address": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
+    "network": "studionet",
+    "chain_id": 61999,
+    "frontend_release": {
+      "project": "chinny070s-projects/web",
+      "deployment_id": "dpl_Ef8qLE5vQNERhTuqBpYV7xUUoafB",
+      "deployment_url": "https://web-9g8sd5a7u-chinny070s-projects.vercel.app",
+      "production_alias": "https://web-omega-amber-37.vercel.app",
+      "status": "READY",
+      "source_commit": "dba673029fa8dfacb47b71739157c2eccd4281b9"
+    },
+    "verification": {
+      "contract_target": "Stage 12 default confirmed in live Settings page",
+      "network_diagnostics": "StudioNet; chain ID 61999; RPC https://studio.genlayer.com/api; genlayer-js 1.1.8",
+      "live_protocol_stats": "Agreements 9; evidence 2; delegations 0; challenges 4; settlements 1; reputation events 1; native settlement DISABLED",
+      "wallet": "No injected provider in the Codex in-app browser; prior signed hosted create_agreement A-8 remains verified separately",
+      "landing_and_settings_copy": "Both show A-9's live attempt-three terminalization accurately",
+      "direct_contract_tests": "94 passed",
+      "integration_tests": "7 skipped because local GenVM/GLSim and evaluation LLM provider are unavailable",
+      "frontend_tests": "45 passed",
+      "typecheck": "passed",
+      "production_build": "passed; existing >500 kB main chunk warning",
+      "genvm_lint": "passed; 40 methods (12 views, 28 writes)"
+    },
+    "no_contract_transactions_submitted": true
   }
 }
