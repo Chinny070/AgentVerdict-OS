@@ -152,3 +152,39 @@ its Vercel V2 override removed. Do not describe the complete wallet/live
 integration portion as verified until a non-admin signed transaction and
 wallet-connected browser checks are observed.
 
+
+
+## Follow-up: rubric submission and attempt exhaustion (2026-10-15)
+
+**Frontend fix deployed:** Vercel deployment `DCZArRbeK923gwJFRnv3E9GyuDbD`,
+source commit `241df400ccf4f1e410d8f46884bdc9c08aca4c58`, is READY and serves
+the production alias. Its Agreement Forge preview was inspected live and now
+serializes rubric data as `{"criteria":[...]}`, matching the contract. Draft
+validation prevents malformed or missing deadlines before opening the wallet.
+
+**Failed signed request resolved:** transaction
+`0x9a57318c151930a6b967b3f2f885f87740160e05220b2b78704853060ddab1f1` reached
+FINALIZED / MAJORITY_AGREE, but leader GenVM execution returned ERROR and
+rolled back with `[EXPECTED] rubric must declare 1-20 criteria`. Therefore the
+wallet signature worked but the contract call did not; no agreement was
+created. A new successful post-fix wallet-signed call has not been observed
+because this agent's browser session has no injected wallet.
+
+**Attempt-3 liveness fix:** the source candidate terminates the agreement and
+voids the challenged provisional verdict atomically when an administrator
+upholds a challenge on the final permitted evaluation attempt. This avoids
+leaving the agreement in `REEVALUATING` when no fourth evaluation is allowed.
+The direct regression suite verifies the transition, audit record, replay
+rejection, and absence of settlement/reputation side effects. It is not part
+of the deployed Stage 11 source. Source SHA-256:
+`897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe`. A new
+contract deployment is required to activate this behavior; no redeployment
+was performed.
+
+**Verification run:** 94 direct contract tests passed; GenVM lint passed
+(40 methods, 12 views / 28 writes); frontend Vitest 39 passed; TypeScript
+check and Vite production build passed. The build retains its existing large
+chunk warning. Three representative Stage 11 receipts (deployment, timeout
+recovery, and settlement) were independently read and showed FINALIZED,
+MAJORITY_AGREE, SUCCESS. The deployed source identity matched the recorded
+SHA-256 `710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`.

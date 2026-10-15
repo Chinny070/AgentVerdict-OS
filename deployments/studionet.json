@@ -211,6 +211,47 @@
     {
       "status": "READY",
       "project": "chinny070s-projects/web",
+      "deployment_id": "dpl_32GyQtJenY9RkEupgBTLYqNTpTqZ",
+      "deployment_url": "https://web-drltkcgme-chinny070s-projects.vercel.app",
+      "production_alias": "https://web-omega-amber-37.vercel.app",
+      "source_commit": "03a6f16",
+      "contract_target": "0xab972c3af9878b7CD4631CD21639B20E981B0702",
+      "network": "studionet",
+      "chain_id": 61999,
+      "checks": {
+        "stage_11_default_shown_in_live_settings": true,
+        "live_contract_schema": "SCHEMA MATCHES",
+        "live_protocol_stats": {
+          "agreements": 4,
+          "evidence": 3,
+          "delegations": 0,
+          "challenges": 2,
+          "settlements": 2,
+          "reputation_events": 2,
+          "settlement_native_transfer_enabled": false
+        },
+        "navigation": "All 14 screens opened and expected heading verified",
+        "wallet_provider": "MetaMask connected on StudioNet chain 61999, confirmed by user-provided Chrome screenshot",
+        "non_admin_timeout_transaction": "Not live-verified; available browser has no injected wallet",
+        "wallet_signed_write": {
+          "transaction_hash": "0x9a57318c151930a6b967b3f2f885f87740160e05220b2b78704853060ddab1f1",
+          "consensus": "FINALIZED",
+          "result": "MAJORITY_AGREE",
+          "genvm_execution": "ERROR",
+          "outcome": "ROLLBACK",
+          "error": "[EXPECTED] rubric must declare 1-20 criteria",
+          "empty_deadline_in_calldata": true,
+          "agreement_created": false
+        }
+      },
+      "production_contract_address_override": "Removed; production now uses the Stage 11 built-in default",
+      "note": "MetaMask connection and signature confirmed by user screenshots. The signed create_agreement attempt finalized by consensus but rolled back because rubric_json was an array rather than the required criteria object and deadline was empty; no agreement was created. Corrected frontend source is pending Vercel deployment.",
+      "responsive_sweep": "14 screens x 5 viewport widths (320, 375, 390, 768, 1280); zero page-level horizontal overflow",
+      "browser_console_errors": 0
+    },
+    {
+      "status": "READY",
+      "project": "chinny070s-projects/web",
       "deployment_id": "dpl_4t1EYuhwXg2dYURCHPuwiNvM3MSG",
       "deployment_url": "https://web-o3vn82g9q-chinny070s-projects.vercel.app",
       "production_alias": "https://web-omega-amber-37.vercel.app",
@@ -234,52 +275,49 @@
   "frontend_release": {
     "status": "READY",
     "project": "chinny070s-projects/web",
-    "deployment_id": "dpl_32GyQtJenY9RkEupgBTLYqNTpTqZ",
-    "deployment_url": "https://web-drltkcgme-chinny070s-projects.vercel.app",
+    "deployment_id": "DCZArRbeK923gwJFRnv3E9GyuDbD",
+    "deployment_url": "https://web-mfalwdcnp-chinny070s-projects.vercel.app",
     "production_alias": "https://web-omega-amber-37.vercel.app",
-    "source_commit": "03a6f16",
+    "source_commit": "241df400ccf4f1e410d8f46884bdc9c08aca4c58",
     "contract_target": "0xab972c3af9878b7CD4631CD21639B20E981B0702",
     "network": "studionet",
     "chain_id": 61999,
     "checks": {
-      "stage_11_default_shown_in_live_settings": true,
-      "live_contract_schema": "SCHEMA MATCHES",
-      "live_protocol_stats": {
-        "agreements": 4,
-        "evidence": 3,
-        "delegations": 0,
-        "challenges": 2,
-        "settlements": 2,
-        "reputation_events": 2,
-        "settlement_native_transfer_enabled": false
-      },
-      "navigation": "All 14 screens opened and expected heading verified",
-      "wallet_provider": "MetaMask connected on StudioNet chain 61999, confirmed by user-provided Chrome screenshot",
-      "non_admin_timeout_transaction": "Not live-verified; available browser has no injected wallet",
-      "wallet_signed_write": {
+      "deployment_status": "READY (Vercel production)",
+      "live_rubric_preview": "Verified: {\"criteria\":[{\"id\":\"criterion-1\",\"description\":\"\"}]}",
+      "rubric_write_serialization": "Contract-required top-level criteria object",
+      "deadline_validation": "Missing, malformed, past, or invalid dates blocked before wallet submission",
+      "failed_wallet_transaction_receipt": {
         "transaction_hash": "0x9a57318c151930a6b967b3f2f885f87740160e05220b2b78704853060ddab1f1",
-        "consensus": "FINALIZED",
-        "result": "MAJORITY_AGREE",
-        "genvm_execution": "ERROR",
-        "outcome": "ROLLBACK",
+        "consensus": "FINALIZED / MAJORITY_AGREE",
+        "genvm_execution": "ERROR / ROLLBACK",
         "error": "[EXPECTED] rubric must declare 1-20 criteria",
-        "empty_deadline_in_calldata": true,
-        "agreement_created": false
-      }
+        "agreement_created": false,
+        "wallet_signature": "Confirmed by user-provided Chrome/MetaMask screenshot"
+      },
+      "post_fix_wallet_signed_create": "NOT VERIFIED: this agent browser has no injected wallet provider; user must submit one signed test through Chrome",
+      "browser_wallet_provider": "Earlier user screenshot confirmed MetaMask connected to StudioNet chain 61999; current in-app browser has no injected provider",
+      "contract_deployment": "Unchanged Stage 11 deployment; no contract write or redeployment performed",
+      "candidate_contract_fix": "Attempt-3 upheld-challenge terminalization is source-tested only and is not deployed"
     },
-    "production_contract_address_override": "Removed; production now uses the Stage 11 built-in default",
-    "note": "MetaMask connection and signature confirmed by user screenshots. The signed create_agreement attempt finalized by consensus but rolled back because rubric_json was an array rather than the required criteria object and deadline was empty; no agreement was created. Corrected frontend source is pending Vercel deployment.",
-    "responsive_sweep": "14 screens x 5 viewport widths (320, 375, 390, 768, 1280); zero page-level horizontal overflow",
-    "browser_console_errors": 0
+    "note": "Latest frontend source is deployed and the live rubric preview was checked at the production alias. The previously signed malformed create_agreement was conclusively rolled back and created no agreement. A successful post-fix signed frontend write still requires the user Chrome wallet session."
   },
   "stage_12_candidate": {
     "status": "SOURCE_AND_TESTS_VERIFIED_NOT_DEPLOYED",
-    "based_on_commit": "3858a8cd24dbeba656daf88346a60ee27f1ab827",
+    "based_on_commit": "241df400ccf4f1e410d8f46884bdc9c08aca4c58",
     "source_file": "contracts/agentverdict.py",
     "source_hash": "sha256:897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe",
     "attempt_exhaustion_fix": "Upheld challenge on attempt 3 invalidates the provisional verdict and terminates the agreement atomically",
     "deployment_status": "NOT_DEPLOYED",
-    "deployment_gate": "A separate user approval is required before replacing the live StudioNet instance"
+    "deployment_gate": "A separate user approval is required before replacing the live StudioNet instance",
+    "verification": {
+      "direct_contract_tests": "94 passed",
+      "genvm_lint": "ok:true; 40 methods (12 views, 28 writes)",
+      "frontend_tests": "39 passed",
+      "typescript": "passed",
+      "production_build": "passed",
+      "deployment": "NOT DEPLOYED; explicit approval required before a new contract deployment"
+    }
   },
   "stage11_post_deployment_audit": {
     "source_identity_commit": "fcb1199c489d",
@@ -304,6 +342,7 @@
         "consensus": "MAJORITY_AGREE",
         "execution": "SUCCESS"
       }
-    ]
+    ],
+    "result_note": "Deployment source identity and three representative finalized receipts verified read-only. Latest frontend deployment is documented separately above."
   }
 }

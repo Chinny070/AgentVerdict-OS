@@ -26,10 +26,9 @@ hosting only (no backend, no API routes, no database — see "Architecture"
 below). The production release targets the verified Stage 11 contract
 (`0xab972c3af9878b7CD4631CD21639B20E981B0702`). See
 `docs/STAGE_11_CORRECTNESS_AUDIT.md` for the live contract evidence and current
-wallet/browser verification status. Latest production deployment:
-`dpl_32GyQtJenY9RkEupgBTLYqNTpTqZ` (commit `03a6f16`), ready at
-[this deployment URL](https://web-drltkcgme-chinny070s-projects.vercel.app)
-and the stable alias above.
+wallet/browser verification status. Latest production deployment: `DCZArRbeK923gwJFRnv3E9GyuDbD` (source commit `241df400ccf4f1e410d8f46884bdc9c08aca4c58`), ready at
+[this deployment URL](https://web-mfalwdcnp-chinny070s-projects.vercel.app)
+and the stable alias above. The live Agreement Forge rubric preview now matches the contract schema; the post-fix signed-write check remains pending in the user’s Chrome wallet.
 
 The Agreement Forge candidate serializes rubric JSON in the contract's
 required object shape and rejects a missing or invalid deadline before it

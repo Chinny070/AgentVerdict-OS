@@ -7,10 +7,11 @@ by [`STAGE_11_CORRECTNESS_AUDIT.md`](STAGE_11_CORRECTNESS_AUDIT.md) and the
 latest release addendum there. Stage 11 source SHA-256 is
 `710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`; it is
 deployed at `0xab972c3af9878b7CD4631CD21639B20E981B0702`. It completed two
-synthetic, zero-value StudioNet lifecycles. The current Vercel production
-frontend defaults to Stage 11 (deployment `dpl_32GyQtJenY9RkEupgBTLYqNTpTqZ`,
-source commit `03a6f16`). A browser wallet was not available for signed frontend
-verification or a live non-admin timeout call.
+synthetic, zero-value StudioNet lifecycles. The current Vercel production frontend defaults to Stage 11 (deployment
+`DCZArRbeK923gwJFRnv3E9GyuDbD`, source commit
+`241df400ccf4f1e410d8f46884bdc9c08aca4c58`). The corrected rubric preview is
+verified live. A successful post-fix signed frontend transaction and a live
+non-admin timeout call remain unverified in this agent browser.
 
 **Date:** 2026-10-13
 **Agent:** Claude Sonnet 5, acting as implementing engineer for AgentVerdict OS
@@ -432,3 +433,19 @@ equivalence, the evidence/anti-injection firewall, and settlement safety —
 and the frontend is complete for all 13 P0 screens plus Landing, with a
 P1 Simulation Chamber built as a bonus, with every claim in this document
 backed by an actual command run in this session, not an assumption.
+
+
+## Latest correctness follow-up (2026-10-15)
+
+Commit `241df400ccf4f1e410d8f46884bdc9c08aca4c58` fixes the Agreement Forge
+rubric shape and validates deadlines before wallet submission. The previously
+signed transaction `0x9a57318c151930a6b967b3f2f885f87740160e05220b2b78704853060ddab1f1`
+was finalized by consensus but its GenVM execution rolled back with
+`[EXPECTED] rubric must declare 1-20 criteria`; no agreement was created. The
+new production site preview was checked and emits the required top-level
+`criteria` object. A new signed success still needs a Chrome/MetaMask test.
+
+The attempt-3 upheld-challenge fix is implemented and covered by direct tests,
+but remains a source candidate. Stage 11 is immutable and unchanged; deploying
+the candidate requires explicit approval and creates a new contract address
+without automatic state migration. See `STAGE_11_CORRECTNESS_AUDIT.md`.

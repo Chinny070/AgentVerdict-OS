@@ -3,11 +3,13 @@
 > **Current update (Stage 11, 2026-10-15):** Stage 11 hardening is deployed
 > at `0xab972c3af9878b7CD4631CD21639B20E981B0702`, and its two synthetic
 > zero-value lifecycles completed through settlement. The production frontend
-> now defaults to Stage 11 (Vercel deployment `dpl_32GyQtJenY9RkEupgBTLYqNTpTqZ`,
-> source commit `03a6f16`). The older assessment below is historical;
+> now defaults to Stage 11 (Vercel deployment `DCZArRbeK923gwJFRnv3E9GyuDbD`,
+> source commit `241df400ccf4f1e410d8f46884bdc9c08aca4c58`). Its rubric payload
+> correction is live; a successful post-fix signed wallet write remains pending. The older assessment below is historical;
 > its source-candidate, deployment, and frontend-target statements have been
-> superseded. Live wallet-signed frontend writes and the non-admin timeout
-> caller remain unverified. The candidate hardens settlement,
+> superseded. A successful post-fix wallet-signed frontend write and a live non-admin timeout
+> caller remain unverified. The earlier signed malformed call rolled back without
+> creating an agreement. The candidate hardens settlement,
 > bounded challenges, adjudication validation, retry accounting, policy and
 > delegation scope, and frontend transaction finality. It is deployed. V1/V2
 > remain historical immutable deployments. Consult
