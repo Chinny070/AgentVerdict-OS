@@ -308,7 +308,7 @@
     "deployment_id": "dpl_CekJRb6BwZzoQJgXVt9ccr5YXjmU",
     "deployment_url": "https://web-di9y8sx51-chinny070s-projects.vercel.app",
     "production_alias": "https://web-omega-amber-37.vercel.app",
-    "source_commit": "local deployment; source changes subsequently committed",
+    "source_commit": "42c86f992d339f771d0ce5666c75afa0899f79f9",
     "contract_target": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
     "network": "studionet",
     "chain_id": 61999,
@@ -383,7 +383,8 @@
         "source_commit": "b2871fe",
         "status": "READY; superseded by deployment dpl_2qkWHqb7nKEmY6EmgHZEj8Ntdfcr"
       }
-    ]
+    ],
+    "deployment_source_note": "Vercel CLI deployed the exact web source later recorded in this commit from the local workspace; deployment was READY before the commit was pushed."
   },
   "stage_12_candidate": {
     "status": "DEPLOYED_LIVE_LIFECYCLE_VERIFIED",
