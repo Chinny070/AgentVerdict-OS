@@ -26,7 +26,10 @@ hosting only (no backend, no API routes, no database — see "Architecture"
 below). The production release targets the verified Stage 11 contract
 (`0xab972c3af9878b7CD4631CD21639B20E981B0702`). See
 `docs/STAGE_11_CORRECTNESS_AUDIT.md` for the live contract evidence and current
-wallet/browser verification status.
+wallet/browser verification status. Latest production deployment:
+`dpl_4JaXTWyAwYo9BEJcU5cfQyuEExJ7` (commit `c691dd2`), ready at
+[this deployment URL](https://web-5ya8rhurh-chinny070s-projects.vercel.app)
+and the stable alias above.
 
 **Architecture:** one GenLayer Python Intelligent Contract
 (`contracts/agentverdict.py`) plus a static frontend (`web/`). No backend
@@ -38,7 +41,7 @@ server, no hosted database, no relayer — see `docs/PROTOCOL_ARCHITECTURE.md`.
 |---|---|---|
 | **Stage 11 (current)** | `0xab972c3af9878b7CD4631CD21639B20E981B0702` | Hardened deployment. A-3 and A-4 completed synthetic zero-value lifecycles through settlement. Frontend default target; native GEN transfer remains disabled. |
 | V2 (historical) | `0xCC67216ceD224A971739bAA706142A740B31853C` | Stage-6-fixed deployment; all public write methods were exercised live. Kept available for historical comparison. |
-| V1 (historical) | `0xb222305575ee8af1255d8aCd196280b405B54Baf` | Superseded, read-only. Two finalized agreements (`A-1`, `A-2`) kept as historical evidence. Does **not** have the Stage 6 fixes. Remains fully queryable — never hidden or deleted — via the Settings screen's "Fill in V1 address" option. |
+| V1 (historical) | `0xb222305575ee8af1255d8aCd196280b405B54Baf` | Superseded historical deployment. Two finalized agreements (`A-1`, `A-2`) kept as evidence. Does **not** have Stage 6 or Stage 11 fixes. Remains queryable via the Settings screen's "Fill in V1 address" option. |
 
 Both are on StudioNet, chain ID `61999`, RPC `https://studio.genlayer.com/api`.
 See `deployments/studionet.json` for the full bootstrap/verification record

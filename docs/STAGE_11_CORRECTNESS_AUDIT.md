@@ -95,6 +95,10 @@ Candidate source SHA-256: `89f9092bcd4f724d01919cfe1e5c584be37bf26abb7657aa47ddc
 
 ## Stage 11 release completion addendum (2026-10-15)
 
+The earlier sections describing the 2026-10-14 frontend release and its V2
+target are historical records of the build before this cutover. The following
+production-release evidence supersedes those target statements.
+
 The frontend contract default and Settings diagnostics now target Stage 11
 (`0xab972c3af9878b7CD4631CD21639B20E981B0702`). The Vercel production
 `VITE_CONTRACT_ADDRESS` override that pinned V2 was removed, so production
@@ -118,6 +122,24 @@ Verification in this completion pass:
   proves timeout recovery with an admin-signed call; source and direct tests
   establish that the method has no admin/party authorization gate, but do not
   replace observing a successful call from a separate address.
+
+The updated public site is Vercel deployment
+`dpl_4JaXTWyAwYo9BEJcU5cfQyuEExJ7` from source commit `c691dd2`, served at
+`https://web-omega-amber-37.vercel.app` (deployment URL
+`https://web-5ya8rhurh-chinny070s-projects.vercel.app`). Its Settings screen
+shows Stage 11 as the default and a live schema check returns **SCHEMA
+MATCHES**. Protocol Telemetry reads agreements 4, evidence 3, delegations 0,
+challenges 2, settlements 2, reputation events 2, and native transfer
+`DISABLED`, matching live contract state. All 14 screens navigated to their
+expected heading. A direct load and reload of `/#/telemetry` returned the same
+real counters. Browser console error logs were empty.
+
+Responsive sweep: all 14 screens were inspected at widths 320, 375, 390, 768,
+and 1280 pixels (70 screen/viewport combinations). None had document-level
+horizontal overflow. The wallet check was blocked by browser capability, not
+an app failure: this session's in-app browser reports no `window.ethereum`,
+and no extension-enabled Chrome/Rabby/MetaMask browser is exposed to the
+automation session.
 
 The Stage 11 source changes for correctness items 1–6 are deployed and covered
 by direct regression tests. The frontend default cutover is implemented and

@@ -133,7 +133,7 @@ export const CONTRACT_METHODS: MethodSpec[] = [
     mutability: "write",
     params: [str("challenge_id")],
     returns: "None",
-    summary: "Stage 6. Anyone, only after resolution_deadline has passed with no admin action. Deterministically upholds the original verdict (never the challenge) and reopens the challenge window — the same effect as resolve_challenge(upheld=false), tagged TIMEOUT_REJECTED for an unambiguous audit trail. NOT available on the deployed StudioNet instance (0xb222305575ee8af1255d8aCd196280b405B54Baf) — see docs/STAGE_6_MIGRATION_NOTE.md.",
+    summary: "Stage 11. Anyone, only after resolution_deadline has passed with no admin action. Deterministically upholds the original verdict (never the challenge) and reopens the challenge window — tagged TIMEOUT_REJECTED for an unambiguous audit trail. Older V1/V2 deployments may not expose this method.",
   },
   { name: "get_challenge", mutability: "view", params: [str("challenge_id")], returns: "dict", summary: "Read a challenge, including resolution_deadline and state (OPEN/UPHELD/REJECTED/TIMEOUT_REJECTED)." },
 

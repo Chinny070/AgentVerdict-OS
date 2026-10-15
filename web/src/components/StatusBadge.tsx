@@ -29,7 +29,7 @@ const STATE_CLASS: Record<string, string> = {
   OPEN: "badge-challenged",
   UPHELD: "badge-escalated",
   REJECTED: "badge-confirmed",
-  // Stage 6: permissionless timeout recovery (resolve_challenge_by_timeout).
+  // Stage 11: permissionless timeout recovery (resolve_challenge_by_timeout).
   // Tagged distinctly from a normal admin REJECTED so it's unambiguous in
   // the UI that no discretionary admin judgment was applied -- see
   // docs/STAGE_6_MIGRATION_NOTE.md.

@@ -56,8 +56,8 @@ export default function Landing() {
               V1 and V2 remain queryable as historical deployments — see Settings for their addresses.
             </li>
             <li>
-              The public frontend is being verified against Stage 11. Settlement remains receipt-only and
-              native GEN transfers are disabled.
+              A browser without an injected wallet can read Stage 11 state, but it cannot submit signed
+              writes. Settlement remains receipt-only and native GEN transfers are disabled.
             </li>
           </ul>
         </div>
