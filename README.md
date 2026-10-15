@@ -21,19 +21,24 @@ Honest, precise current status: `docs/SUBMISSION_READINESS_REPORT.md`
 **[https://web-omega-amber-37.vercel.app](https://web-omega-amber-37.vercel.app)**
 — the production frontend, hosted on Vercel as static-site/SPA hosting only
 (no backend, API routes, or database). The live StudioNet lifecycle target is
-Stage 12 (`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`). The latest Vercel
-production deployment is `dpl_2MCWXALuMEimAF8zmKoQPn4ZuE8o`, READY at
-[this deployment URL](https://web-gqjwiv8go-chinny070s-projects.vercel.app)
-and the stable alias above, from commit `7f399b6`. Public Settings reports `SCHEMA MATCHES`, Protocol
+Stage 12 (`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`). Latest Vercel
+production deployment `dpl_CekJRb6BwZzoQJgXVt9ccr5YXjmU` is READY at
+[its deployment URL](https://web-di9y8sx51-chinny070s-projects.vercel.app)
+and the stable alias above. Public Settings reports `SCHEMA MATCHES`, Protocol
 Telemetry returns live StudioNet counters, all 14 screens were checked at
 320, 375, 390, 768, and 1280 px without page-level overflow, and a nested hash
 route survived refresh. Chrome/MetaMask submitted zero-value Stage 12
 `create_agreement` transaction `0xad9d78f663573f2fbd956bee582147a62426c4cd7c37a0bd74b4fca960b618c2`;
 Explorer confirms GenVM success, accepted consensus, and agreement `A-5`.
-The hosted app's receipt parser now reads the nested StudioNet leader receipt,
-and regression tests cover successful, failed, and missing execution results.
-The A-5 live transaction predates that parser release; a second signed write was
-not submitted after the update.
+The hosted app's receipt parser reads the nested StudioNet leader execution
+result. A later signed zero-value Agreement Forge write created A-7 at
+[transaction `0xb4784eba…49b8ebec`](https://explorer-studio.genlayer.com/tx/0xb4784eba1222f816798b834b8b9d7077f845a8d0928f0017cbfe946449b8ebec).
+Explorer confirms FINALIZED, Accepted consensus, GenVM SUCCESS, and return value
+`A-7`. The then-current frontend nevertheless displayed FAILED because the SDK's
+simplified receipt exposes consensus status as `status_name` (with numeric
+`status`). The normalized parser is now deployed and has a regression test for
+the pinned SDK receipt shape. A second signed transaction through the updated
+release is still needed to verify that the UI displays success correctly.
 Attempt-three challenge terminalization has direct-mode regression coverage but
 has not been separately exercised live.
 

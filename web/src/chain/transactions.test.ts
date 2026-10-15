@@ -60,6 +60,26 @@ describe("runWrite finality and wallet safety", () => {
     expect(result.executionResult).toBe(ExecutionResult.FINISHED_WITH_RETURN);
   });
 
+  it("accepts the pinned SDK simplified receipt shape used by StudioNet", async () => {
+    mocks.waitForTransactionReceipt.mockResolvedValue({
+      // simplifyTransactionReceipt() maps `statusName` to `status_name` and
+      // leaves the contract enum in `status` as its numeric value.
+      status: 7,
+      status_name: "FINALIZED",
+      consensus_data: {
+        leader_receipt: [{
+          execution_result: "SUCCESS",
+          result: { status: "return", payload: { readable: '"A-7"' } },
+        }],
+      },
+    });
+    const result = await runWrite({ account, provider: provider("0xf22f", [account]), address, functionName: "create_agreement" });
+    expect(result.phase).toBe("FINALIZED");
+    expect(result.consensusStatus).toBe(TransactionStatus.FINALIZED);
+    expect(result.executionResult).toBe(ExecutionResult.FINISHED_WITH_RETURN);
+    expect(result.returnValue).toBe("A-7");
+  });
+
   it("accepts the successful leader return when StudioNet records a validator quorum cancellation", async () => {
     mocks.waitForTransactionReceipt.mockResolvedValue({
       status: TransactionStatus.FINALIZED,

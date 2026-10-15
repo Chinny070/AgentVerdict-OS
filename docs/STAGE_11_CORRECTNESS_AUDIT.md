@@ -265,3 +265,32 @@ but its daemon pipe is unavailable in this environment, so local GenVM integrati
 cannot be started. The seven integration tests remain explicitly skipped due to
 the diagnosed GLSim storage-registration mismatch and missing evaluator LLM
 credential. No GenLayer SDK internals were changed.
+
+## Hosted receipt normalization follow-up (2026-10-15)
+
+Chrome/MetaMask submitted a zero-value `create_agreement` from the hosted
+Agreement Forge to Stage 12. Explorer independently shows transaction
+[`0xb4784eba1222f816798b834b8b9d7077f845a8d0928f0017cbfe946449b8ebec`](https://explorer-studio.genlayer.com/tx/0xb4784eba1222f816798b834b8b9d7077f845a8d0928f0017cbfe946449b8ebec)
+as FINALIZED, Accepted by five initial validators, GenVM SUCCESS, returning
+`A-7`. The transaction used amount zero and counterparty
+`0x1Af111b06E6f6A05Bd41572A016318f1356aF85c`.
+
+The production UI displayed FAILED for that same successful transaction. The
+specific cause is the default simplified receipt returned by pinned
+`genlayer-js@1.1.8`: it provides `status_name: "FINALIZED"` and a numeric
+`status`, while the prior parser checked `statusName` and otherwise treated
+`status` as an enum string. The prior parser therefore rejected finality even
+though the execution result and Explorer receipt were successful. The updated
+parser normalizes both documented naming forms and the numeric SDK enum using
+the SDK's exported `transactionsStatusNumberToName` mapping. A focused test
+models the simplified receipt and verifies the final phase and `A-7` return
+value.
+
+The local fix passed TypeScript, all 45 frontend tests, and the production
+build. It is now deployed to Vercel production as
+`dpl_CekJRb6BwZzoQJgXVt9ccr5YXjmU`; Vercel reports READY and the stable alias
+serves the new build assets. A second hosted signed write has not yet verified
+the corrected status display because Chrome desktop state capture timed out
+when switching to the hosted app. The A-7 transaction verifies wallet signing
+and a real hosted contract write; it does not verify that the old UI reported
+that transaction correctly.

@@ -19,7 +19,7 @@
  * competing execution outcome. A consensus status alone is never treated as
  * success.
  */
-import { ExecutionResult, TransactionStatus } from "genlayer-js/types";
+import { ExecutionResult, TransactionStatus, transactionsStatusNumberToName } from "genlayer-js/types";
 import type { Hash } from "genlayer-js/types";
 import type { Address } from "viem";
 import { describeError, getReadClient, getWriteClient, STUDIONET_EVM_CHAIN_ID, type EthereumProviderLike } from "./client";
@@ -114,7 +114,7 @@ export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
       interval: 2000,
     });
 
-    const consensusStatus = (receipt.statusName ?? receipt.status) as TransactionStatus | undefined;
+    const consensusStatus = getConsensusStatus(receipt);
     const executionResult = getExecutionResult(receipt);
 
     if (executionResult !== ExecutionResult.FINISHED_WITH_RETURN) {
@@ -153,6 +153,30 @@ export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
     emit(update);
     return update;
   }
+}
+
+/**
+ * genlayer-js@1.1.8's default (simplified) receipt keeps the numeric
+ * `status`, and maps the decoded enum name to `status_name`. Full transaction
+ * responses can instead expose `statusName`. Normalize all documented forms
+ * before enforcing finality; treating the numeric enum as a string falsely
+ * rejected real finalized StudioNet writes.
+ */
+function getConsensusStatus(receipt: {
+  status?: unknown;
+  statusName?: unknown;
+  status_name?: unknown;
+}): TransactionStatus | undefined {
+  for (const value of [receipt.statusName, receipt.status_name, receipt.status]) {
+    if (typeof value !== "string" && typeof value !== "number" && typeof value !== "bigint") continue;
+    const normalized = String(value).toUpperCase();
+    if (Object.values(TransactionStatus).includes(normalized as TransactionStatus)) {
+      return normalized as TransactionStatus;
+    }
+    const enumName = transactionsStatusNumberToName[normalized as keyof typeof transactionsStatusNumberToName];
+    if (enumName) return enumName;
+  }
+  return undefined;
 }
 
 /** Normalize the documented SDK enum and StudioNet leader-receipt shape. */
