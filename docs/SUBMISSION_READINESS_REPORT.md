@@ -720,3 +720,24 @@ switching from Explorer to the hosted app. The actual A-7 transaction remains
 successful according to Explorer; its prior UI FAILED label was a front-end
 receipt-decoding error, not an on-chain failure. No contract was redeployed in
 this follow-up.
+
+## 14. Post-fix hosted receipt confirmation (2026-10-15)
+
+A second zero-value `create_agreement` was submitted through the corrected
+production frontend using Chrome/MetaMask. GenLayer Studio Explorer confirms
+[`0x572efc7904f4042069e55be84011a0980c7740764700704c0c22962e91651080`](https://explorer-studio.genlayer.com/tx/0x572efc7904f4042069e55be84011a0980c7740764700704c0c22962e91651080)
+is **FINALIZED**, with **Accepted** consensus, five initial validators,
+GenVM **SUCCESS**, and return value `A-8`. The call targeted Stage 12
+`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40` from admin
+`0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b`, with amount zero,
+counterparty `0x1Af111b06E6f6A05Bd41572A016318f1356aF85c`, policy
+`smoke-test-v2`, module `api-delivery`, and criterion `endpoint_coverage`.
+The hosted UI displayed the same transaction as FINALIZED with execution
+`FINISHED_WITH_RETURN` and returned `A-8`. This confirms the corrected receipt
+normalization on a real wallet-signed production write. It supersedes the
+post-fix write marked unverified in section 13.
+
+This confirms the create transaction and receipt display only. It does not
+exercise the separate attempt-three upheld-challenge terminalization path on
+StudioNet, which remains source-tested and included in the deployed Stage 12
+source identity but has no live lifecycle receipt in the current evidence.

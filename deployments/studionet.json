@@ -538,12 +538,37 @@
       "change": "Normalize statusName, status_name, enum-name status, and numeric SDK status before enforcing finality; regression test models the pinned SDK simplified receipt with A-7 return value.",
       "local_verification": "TypeScript check passed; 45 frontend tests passed; production build passed.",
       "deployment_status": "DEPLOYED: Vercel production deployment dpl_CekJRb6BwZzoQJgXVt9ccr5YXjmU is READY and alias https://web-omega-amber-37.vercel.app points to it; production build succeeded.",
-      "post_fix_signed_ui_write": "UNVERIFIED: desktop UI capture timed out before a second write could be submitted and observed.",
+      "post_fix_signed_ui_write": "VERIFIED by the later Stage 12 transaction recorded in stage_12_post_fix_hosted_write (A-8); the earlier timeout note is superseded.",
       "deployment_url": "https://web-di9y8sx51-chinny070s-projects.vercel.app",
       "deployment_id": "dpl_CekJRb6BwZzoQJgXVt9ccr5YXjmU",
       "production_alias": "https://web-omega-amber-37.vercel.app",
       "production_http_check": "PASS: stable alias served AgentVerdict OS HTML referencing the build assets index-CyRj6wXS.js and index-BqVIHe1l.css."
     },
     "source": "User-provided transaction details were independently visible in Chrome GenLayer Studio Explorer during this verification."
+  },
+  "stage_12_post_fix_hosted_write": {
+    "date": "2026-10-15",
+    "contract_address": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
+    "network": "studionet",
+    "chain_id": 61999,
+    "frontend": "https://web-omega-amber-37.vercel.app",
+    "method": "create_agreement",
+    "transaction_hash": "0x572efc7904f4042069e55be84011a0980c7740764700704c0c22962e91651080",
+    "explorer_url": "https://explorer-studio.genlayer.com/tx/0x572efc7904f4042069e55be84011a0980c7740764700704c0c22962e91651080",
+    "sender": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+    "counterparty": "0x1Af111b06E6f6A05Bd41572A016318f1356aF85c",
+    "policy_id": "smoke-test-v2",
+    "module_id": "api-delivery",
+    "amount_atto": 0,
+    "deadline": "2026-10-20T16:00:00.000Z",
+    "criterion": "endpoint_coverage",
+    "agreement_id": "A-8",
+    "transaction_status": "FINALIZED",
+    "consensus": "Accepted; five initial validators",
+    "genvm_execution": "SUCCESS",
+    "return_value": "A-8",
+    "frontend_receipt_display": "FINALIZED; FINISHED_WITH_RETURN; A-8",
+    "evidence_source": "User-provided Studio Explorer transaction details and observed hosted UI receipt",
+    "scope_note": "Confirms successful signed create_agreement and fixed frontend receipt normalization. The attempt-three upheld-challenge termination remains unexercised live."
   }
 }
