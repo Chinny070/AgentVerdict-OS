@@ -211,16 +211,14 @@ failed CLI attempts and are not deployments.
 
 ## Stage 12 StudioNet lifecycle addendum (2026-10-15)
 
-The user subsequently deployed and interacted with Stage 12 through GenLayer
-Studio. The live contract address is
-`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40` on StudioNet (chain 61999).
-The address was successfully called and read in Studio. Its deployment
-transaction hash and independently verified source identity were not captured
-in the evidence available for this addendum; the candidate source recorded
-before deployment has SHA-256
-`897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe`.
-Correspondence between that candidate and the deployed source remains
-unverified until the Studio deployment record is recovered.
+The user deployed Stage 12 through GenLayer Studio. Explorer identifies the
+live contract as `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40` on StudioNet
+(chain 61999), created by finalized deployment transaction
+`0x25c9111c7c75f5b202d5c84bb07ed47cee85bc9419c217e988b33c94705464dd`.
+The receipt shows Accepted consensus, successful GenVM execution, and five
+initial validators. SHA-256 of the complete `contract_code` shown in the
+explorer is `897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe`,
+exactly matching the repository contract and pre-deployment candidate.
 
 Live synthetic zero-value A-2 lifecycle completed: create, propose, accept,
 activate, evidence submission, PASS evaluation, challenge, permissionless
@@ -228,11 +226,11 @@ timeout recovery, finalization, settlement authorization, and settlement
 receipt. Final `get_agreement(A-2)` returned `SETTLED`;
 `get_settlement(A-2)` returned `S-1`, `EXECUTED`, amount zero;
 `get_challenge(C-1)` returned `TIMEOUT_REJECTED` with a timeout audit
-explanation. Native GEN transfer stayed disabled. Full hashes for the final
-four actions were not retained; available Studio transaction prefixes are
-timeout `0x8be7…`, finalize `0x8bc6…`, authorize `0xe6cb…`, and record
-settlement `0x657e…`. These are prefixes, not complete transaction IDs.
+explanation. Native GEN transfer stayed disabled. Full transaction hashes and
+finalized/accepted receipts are recorded under `stage_12_candidate.deployment`
+in `deployments/studionet.json`.
 
-Stage 12 is live and lifecycle-tested, but deployment receipt and source
-identity evidence remain PARTIAL. Stage 11 remains available at
+Stage 12 is live, source-identity matched, initialized, and lifecycle-tested.
+The attempt-three upheld-challenge terminal transition is not separately
+live-exercised; it remains direct-test verified. Stage 11 remains available at
 `0xab972c3af9878b7CD4631CD21639B20E981B0702`; V1 and V2 remain unchanged.

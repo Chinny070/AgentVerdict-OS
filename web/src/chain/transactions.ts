@@ -10,11 +10,11 @@
  *
  * No screen may claim a write succeeded without an actual transaction
  * receipt. `runWrite` below only ever reports SUCCEEDED after
- * `waitForTransactionReceipt` returns a receipt whose
- * `txExecutionResultName === ExecutionResult.FINISHED_WITH_RETURN` — a
- * transaction can reach ACCEPTED/FINALIZED consensus status and still have
- * a failed execution, per genlayer-js's own README warning, which this
- * code follows exactly.
+ * `waitForTransactionReceipt` returns a receipt whose execution result is
+ * successful. StudioNet 1.1.8 may provide that result only in the simplified
+ * `consensus_data.leader_receipt[].execution_result` field ("SUCCESS" or
+ * "ERROR"), rather than the top-level `txExecutionResultName` used on other
+ * network transports. A consensus status alone is never treated as success.
  */
 import { ExecutionResult, TransactionStatus } from "genlayer-js/types";
 import type { Hash } from "genlayer-js/types";
@@ -112,7 +112,7 @@ export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
     });
 
     const consensusStatus = (receipt.statusName ?? receipt.status) as TransactionStatus | undefined;
-    const executionResult = receipt.txExecutionResultName as ExecutionResult | undefined;
+    const executionResult = getExecutionResult(receipt);
 
     if (executionResult !== ExecutionResult.FINISHED_WITH_RETURN) {
       const update: TxUpdate = {
@@ -148,6 +148,32 @@ export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
     emit(update);
     return update;
   }
+}
+
+/** Normalize the documented SDK enum and StudioNet leader-receipt shape. */
+function getExecutionResult(receipt: {
+  txExecutionResultName?: ExecutionResult;
+  consensus_data?: { leader_receipt?: unknown };
+}): ExecutionResult | undefined {
+  if (receipt.txExecutionResultName) return receipt.txExecutionResultName;
+
+  const leaderReceipts = receipt.consensus_data?.leader_receipt;
+  const rows = Array.isArray(leaderReceipts) ? leaderReceipts : leaderReceipts ? [leaderReceipts] : [];
+  const results = rows
+    .map((row) => (row && typeof row === "object" ? (row as { execution_result?: unknown }).execution_result : undefined))
+    .filter((result): result is string => typeof result === "string")
+    .map((result) => result.toUpperCase());
+
+  if (results.length === 0) return undefined;
+  // Refuse to infer success from inconsistent leader receipts.
+  if (results.some((result) => result !== results[0])) return undefined;
+  if (results[0] === "SUCCESS" || results[0] === ExecutionResult.FINISHED_WITH_RETURN) {
+    return ExecutionResult.FINISHED_WITH_RETURN;
+  }
+  if (results[0] === "ERROR" || results[0] === ExecutionResult.FINISHED_WITH_ERROR) {
+    return ExecutionResult.FINISHED_WITH_ERROR;
+  }
+  return undefined;
 }
 
 function describeWriteError(err: unknown): string {

@@ -3,12 +3,15 @@
 ## Latest Stage 12 addendum (2026-10-15)
 
 Stage 12 is the current StudioNet target at
-`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. A synthetic zero-value A-2
+`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`, deployed by finalized transaction
+`0x25c9111c7c75f5b202d5c84bb07ed47cee85bc9419c217e988b33c94705464dd`.
+The full `contract_code` displayed in that explorer transaction hashes exactly
+to repository candidate SHA-256 `897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe`.
+A synthetic zero-value A-2
 lifecycle completed challenge timeout recovery, finalization, and a receipt-only
 settlement; final reads returned agreement `SETTLED` and settlement `S-1`
-`EXECUTED` for amount zero. Native GEN transfers remained disabled. The Studio
-deployment transaction hash and exact deployed-source identity were not
-captured. Attempt-three terminalization therefore remains source/direct-test
+`EXECUTED` for amount zero. Native GEN transfers remained disabled.
+Attempt-three terminalization remains source/direct-test
 verified, not live-branch verified. See `deployments/studionet.json` and the
 Stage 12 addendum in `docs/STAGE_11_CORRECTNESS_AUDIT.md`.
 

@@ -50,10 +50,37 @@ describe("runWrite finality and wallet safety", () => {
     expect(mocks.waitForTransactionReceipt).toHaveBeenCalledWith(expect.objectContaining({ status: TransactionStatus.FINALIZED }));
   });
 
+  it("recognizes successful StudioNet execution from the GenLayer 1.1.8 leader receipt", async () => {
+    mocks.waitForTransactionReceipt.mockResolvedValue({
+      statusName: TransactionStatus.FINALIZED,
+      consensus_data: { leader_receipt: [{ execution_result: "SUCCESS", result: '"A-5"' }] },
+    });
+    const result = await runWrite({ account, provider: provider("0xf22f", [account]), address, functionName: "create_agreement" });
+    expect(result.phase).toBe("FINALIZED");
+    expect(result.executionResult).toBe(ExecutionResult.FINISHED_WITH_RETURN);
+  });
+
   it("rejects a finalized transaction whose contract execution failed", async () => {
     mocks.waitForTransactionReceipt.mockResolvedValue({ statusName: TransactionStatus.FINALIZED, txExecutionResultName: ExecutionResult.FINISHED_WITH_ERROR });
     const result = await runWrite({ account, provider: provider("0xf22f", [account]), address, functionName: "create_agreement" });
     expect(result.phase).toBe("FAILED");
     expect(result.error).toMatch(/execution failed on-chain/i);
+  });
+
+  it("rejects a finalized StudioNet transaction whose leader execution errored", async () => {
+    mocks.waitForTransactionReceipt.mockResolvedValue({
+      statusName: TransactionStatus.FINALIZED,
+      consensus_data: { leader_receipt: [{ execution_result: "ERROR", error: "invalid rubric" }] },
+    });
+    const result = await runWrite({ account, provider: provider("0xf22f", [account]), address, functionName: "create_agreement" });
+    expect(result.phase).toBe("FAILED");
+    expect(result.executionResult).toBe(ExecutionResult.FINISHED_WITH_ERROR);
+  });
+
+  it("does not claim success when the finalized receipt omits its execution result", async () => {
+    mocks.waitForTransactionReceipt.mockResolvedValue({ statusName: TransactionStatus.FINALIZED });
+    const result = await runWrite({ account, provider: provider("0xf22f", [account]), address, functionName: "create_agreement" });
+    expect(result.phase).toBe("FAILED");
+    expect(result.error).toMatch(/without a confirmed successful execution result/i);
   });
 });

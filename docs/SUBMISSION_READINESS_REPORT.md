@@ -4,11 +4,17 @@
 > Studio at `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. A synthetic, zero-value
 > A-2 lifecycle reached `SETTLED` after evaluation, challenge timeout recovery,
 > finalization, and receipt-only settlement. This supersedes the older Stage 12
-> “not deployed” statements below. The Studio deployment transaction and exact
-> source identity were not captured; the candidate source SHA is not independently
-> proven to be the deployed source. The frontend source now targets Stage 12, but
-> production Vercel redeployment and hosted-wallet write verification remain
-> pending. See the Stage 12 addendum in the audit and deployment ledger.
+> “not deployed” statements below. Explorer deployment transaction
+> `0x25c9111c7c75f5b202d5c84bb07ed47cee85bc9419c217e988b33c94705464dd` is
+> finalized/accepted; SHA-256 of embedded deployed `contract_code` exactly
+> matches candidate source `897ad39a…92ca1abe`. Frontend deployment `dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh`
+> is READY and targets Stage 12. The public Settings page reports `SCHEMA MATCHES`,
+> Protocol Telemetry returns live counters, all 14 screens passed five viewport
+> widths without page-level overflow, and an Appeals Tribunal hash route survived
+> refresh. A Chrome/MetaMask signed write created Stage 12 agreement `A-5` with
+> zero GEN; Explorer confirms the Stage 12 target, wrapped rubric JSON, GenVM
+> success, and accepted consensus. A separate Stage 11 attempt rolled back
+> without creating an agreement. See the Stage 12 addendum and deployment ledger.
 
 > **Current update (Stage 11, 2026-10-15):** Stage 11 hardening is deployed
 > at `0xab972c3af9878b7CD4631CD21639B20E981B0702`, and its two synthetic

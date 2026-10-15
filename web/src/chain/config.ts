@@ -26,7 +26,7 @@ export const GENLAYER_JS_VERSION = "1.1.8";
  */
 export const STAGE_11_CONTRACT_ADDRESS = "0xab972c3af9878b7CD4631CD21639B20E981B0702";
 
-/** Stage 12 — current deployment with attempt-exhaustion terminalization. */
+/** Stage 12 — current hardened deployment; deployed source hash matches this repository. */
 export const STAGE_12_CONTRACT_ADDRESS = "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40";
 
 /** V2 — previous Stage-6 deployment, retained as historical evidence. */

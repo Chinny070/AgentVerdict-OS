@@ -2,10 +2,10 @@
 
 > **Stage 12 live StudioNet instance:** `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`.
 > A synthetic, zero-value A-2 lifecycle completed challenge timeout recovery,
-> finalization, and receipt-only settlement. The deployment receipt and exact
-> deployed-source identity have not yet been recovered; do not treat the
-> candidate source hash as independently verified deployed bytecode. Stage 11,
-> V2, and V1 remain preserved historical deployments.
+> finalization, and receipt-only settlement. Finalized deployment transaction
+> `0x25c9111c7c75f5b202d5c84bb07ed47cee85bc9419c217e988b33c94705464dd`
+> contains source whose SHA-256 matches the repository contract exactly.
+> Stage 11, V2, and V1 remain preserved historical deployments.
 
 > The universal accountability layer for autonomous work. Natural-language
 > agreements become evidence-backed, challengeable, settlement-authorizing
@@ -22,14 +22,22 @@ Honest, precise current status: `docs/SUBMISSION_READINESS_REPORT.md`
 — the production frontend, hosted on Vercel as static-site/SPA hosting only
 (no backend, API routes, or database). The live StudioNet lifecycle target is
 Stage 12 (`0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`). This repository is
-updating the hosted default; verify Settings on the live alias before signing
-writes. The prior Stage 11 production release is recorded in
-`deployments/studionet.json`.
+deployed to Vercel production as `dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh`, READY at
+[this deployment URL](https://web-eehf52mul-chinny070s-projects.vercel.app)
+and the stable alias above. Public Settings reports `SCHEMA MATCHES`, Protocol
+Telemetry returns live StudioNet counters, all 14 screens were checked at
+320, 375, 390, 768, and 1280 px without page-level overflow, and a nested hash
+route survived refresh. Chrome/MetaMask submitted zero-value Stage 12
+`create_agreement` transaction `0xad9d78f663573f2fbd956bee582147a62426c4cd7c37a0bd74b4fca960b618c2`;
+Explorer confirms GenVM success, accepted consensus, and agreement `A-5`.
+Attempt-three challenge terminalization has direct-mode regression coverage but
+has not been separately exercised live.
 
 Agreement Forge serializes rubric JSON in the contract's required object
 shape and rejects a missing or invalid deadline before opening the wallet.
-Attempt-3 challenge terminalization is in the Stage 12 candidate source; exact
-source identity for the live address remains unverified.
+Attempt-3 challenge terminalization is in the deployed Stage 12 source. The
+source shown in the finalized deployment transaction hashes exactly to the
+repository source; that branch is not separately exercised live.
 
 **Architecture:** one GenLayer Python Intelligent Contract
 (`contracts/agentverdict.py`) plus a static frontend (`web/`). No backend
@@ -39,7 +47,7 @@ server, no hosted database, no relayer — see `docs/PROTOCOL_ARCHITECTURE.md`.
 
 | | Address | Status |
 |---|---|---|
-| **Stage 12 (current chain target)** | `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40` | Live Studio lifecycle reached SETTLED after timeout recovery; zero-value receipt only. Deployment receipt/source identity not captured. |
+| **Stage 12 (current chain target)** | `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40` | Deployment `0x25c911…705464dd`; deployed source hash matches repository candidate. Live A-2 reached SETTLED after timeout recovery; amount zero. |
 | Stage 11 (historical) | `0xab972c3af9878b7CD4631CD21639B20E981B0702` | Separately recorded deployment with A-3/A-4 zero-value lifecycles through settlement. |
 | V2 (historical) | `0xCC67216ceD224A971739bAA706142A740B31853C` | Stage-6-fixed deployment; all public write methods were exercised live. Kept available for historical comparison. |
 | V1 (historical) | `0xb222305575ee8af1255d8aCd196280b405B54Baf` | Superseded historical deployment. Two finalized agreements (`A-1`, `A-2`) kept as evidence. Does **not** have Stage 6 or Stage 11 fixes. Remains queryable via the Settings screen's "Fill in V1 address" option. |

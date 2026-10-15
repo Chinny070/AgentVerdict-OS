@@ -16,8 +16,8 @@ export default function ProtocolTelemetry() {
     <div>
       <h1>Protocol Telemetry</h1>
       <p className="field-help">
-        Actual on-chain counters only. This screen shows an honest empty state with no contract configured and
-        never seeds a fabricated transaction/activity feed.
+        Reads actual counters from the selected on-chain contract. It never seeds a fabricated
+        transaction or activity feed.
       </p>
 
       <ConfigGate>

@@ -3,7 +3,8 @@
 > **Current deployment addendum (2026-10-15):** Stage 12 is live at
 > `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. Studio reads and a synthetic
 > zero-value lifecycle through timeout recovery and settlement were observed.
-> Deployment receipt/source identity were not captured. The attempt-three
+> Explorer receipt and deployment source hash were recovered; the embedded
+> `contract_code` hashes exactly to the repository candidate. The attempt-three
 > terminalization branch remains source/direct-test verified, not independently
 > exercised on-chain. Historical Stage 11/V2/V1 addresses and their evidence are
 > preserved in `deployments/studionet.json`.

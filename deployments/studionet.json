@@ -302,6 +302,46 @@
     },
     "note": "Latest frontend source is deployed and the live rubric preview was checked at the production alias. The previously signed malformed create_agreement was conclusively rolled back and created no agreement. A successful post-fix signed frontend write still requires the user Chrome wallet session."
   },
+  "stage_12_frontend_release": {
+    "status": "READY",
+    "project": "chinny070s-projects/web",
+    "deployment_id": "dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh",
+    "deployment_url": "https://web-eehf52mul-chinny070s-projects.vercel.app",
+    "production_alias": "https://web-omega-amber-37.vercel.app",
+    "source_commit": "b2871fe",
+    "contract_target": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
+    "network": "studionet",
+    "chain_id": 61999,
+    "checks": {
+      "vercel_deployment_state": "READY",
+      "live_schema": "SCHEMA MATCHES",
+      "live_protocol_stats": "Read through the public frontend; 3 agreements, 1 evidence packet, 0 delegations, 1 challenge, 1 settlement, 1 reputation event; native settlement transfer disabled",
+      "all_screens": "14 routes loaded with expected headings at 320, 375, 390, 768, and 1280 px",
+      "page_level_overflow": "None across all 70 route/viewport combinations",
+      "nested_hash_refresh": "Appeals Tribunal remained loaded at #/appeals after browser refresh",
+      "browser_console_errors": 0,
+      "injected_wallet": "VERIFIED in Chrome/MetaMask; connected admin 0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b on chain 61999",
+      "hosted_signed_write": {
+        "status": "FINALIZED_SUCCESS",
+        "method": "create_agreement",
+        "transaction": "0xad9d78f663573f2fbd956bee582147a62426c4cd7c37a0bd74b4fca960b618c2",
+        "explorer_url": "https://explorer-studio.genlayer.com/tx/0xad9d78f663573f2fbd956bee582147a62426c4cd7c37a0bd74b4fca960b618c2",
+        "contract": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
+        "agreement_id": "A-5",
+        "counterparty": "0x1Af111b06E6f6A05Bd41572A016318f1356aF85c",
+        "amount_atto": 0,
+        "genvm_execution": "SUCCESS",
+        "consensus": "Accepted",
+        "rubric_shape": "{\"criteria\":[{\"id\":\"endpoint_coverage\",\"description\":\"Synthetic frontend smoke test: GET https://example.org returns HTTP 200\"}]}",
+        "note": "A separate earlier transaction to historical Stage 11 rolled back with invalid rubric data; the successful Stage 12 transaction verifies the wrapped-object payload."
+      }
+    },
+    "superseded_production_deployment": {
+      "deployment_id": "dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh",
+      "source_commit": "b2871fe",
+      "status": "READY; superseded by final source release"
+    }
+  },
   "stage_12_candidate": {
     "status": "DEPLOYED_LIVE_LIFECYCLE_VERIFIED",
     "based_on_commit": "241df400ccf4f1e410d8f46884bdc9c08aca4c58",
@@ -314,8 +354,19 @@
       "network": "studionet",
       "chain_id": 61999,
       "contract_address": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
-      "deployment_transaction": "NOT_CAPTURED",
-      "source_identity": "Candidate SHA-256 was recorded before deployment; exact deployment transaction/source identity has not been independently recovered from Studio or an explorer receipt.",
+      "deployment_transaction": "0x25c9111c7c75f5b202d5c84bb07ed47cee85bc9419c217e988b33c94705464dd",
+      "deployment_transaction_status": "FINALIZED",
+      "deployment_consensus": "Accepted; 5 initial validators",
+      "deployer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+      "deployed_at": "2026-10-15T10:48:51Z (Studio Explorer display time)",
+      "explorer_address_url": "https://explorer-studio.genlayer.com/address/0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
+      "explorer_deployment_tx_url": "https://explorer-studio.genlayer.com/tx/0x25c9111c7c75f5b202d5c84bb07ed47cee85bc9419c217e988b33c94705464dd",
+      "source_identity": "VERIFIED: SHA-256 of the full contract_code displayed in the finalized deployment transaction is 897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe, exactly matching the candidate source and local contracts/agentverdict.py (74,134 characters).",
+      "initialization_transactions": {
+        "register_module_api_delivery": "0x44437f915f28a35a28d239d0f790b4f7eddd601f29d66d85f40bc5e912d21cfe",
+        "register_module_agent_task": "0xdc56d5c3d8b14439a30c68123598996c7d82afc854c224f5c91a05618e42d4e4",
+        "register_policy_template_smoke_test_v2": "0xe8812f6f8dc2eb3d14f716f797f3f5f6f601e520037884c87384d9ee9d21a498"
+      },
       "live_lifecycle": {
         "agreement_id": "A-2",
         "counterparty": "0x082a657bAA2ea66a3cfeD6dbeFeF18135d43a735",
@@ -325,9 +376,24 @@
         "settlement_status": "EXECUTED",
         "settlement_amount_atto": 0,
         "native_transfer_enabled": false,
-        "transaction_hash_capture": "Studio showed finalized transactions; only abbreviated prefixes for timeout (0x8be7…), finalize (0x8bc6…), authorize settlement (0xe6cb…), and record settlement (0x657e…) were retained in the session notes. Full hashes are not asserted here."
+        "transactions": {
+          "create": "0xf6ba12d7710b119eea7d334402b608fa312e79a3e377322ab681d55218952bce",
+          "propose": "0xe16b533a048d9fc185dcf75c43ecb51a7a71589b6fdfebb77df0efcdfe4a865a",
+          "accept": "0xc270fa270e81df72e2d5d64f4a5815bc948bb452e3d0e4a202de18f0e478c84",
+          "activate": "0xe6b825fd2f001f923d43c1132eae3dbacacb7cc178a54c6de16547a7a0050f7e",
+          "open_evidence": "0x211fa7888590075e0c70911355d3eb21178b4e7fab536bc3ee7344419d048eec",
+          "submit_evidence": "0x5b2f74cc27eb3d9611df7a4abddb5bbce9d6a13da539478b3ca06096dea8497b",
+          "request_evaluation": "0x82c393e646123980fcb2c7ae327798e4a646700ceb4589fa682f387810fca0e1",
+          "challenge_verdict": "0xd40ff220e04c793c98c5ad08c32739ac11ee109c4f482ce62df0c3fe26887ec9",
+          "resolve_challenge_by_timeout": "0x8be700c77a533c502d42d09e40bff04fb0ebf538ddd199d60fb0801f2122592b",
+          "finalize_verdict": "0x8bc6dc22f37cf143d5fbb1d5f1df1ab01ff15d6e29db0a8bd7d3689baae83d8e",
+          "authorize_settlement": "0xe6cba7da42da67ffed1df542c9f2cc843306e92aa0f24b854bb3ca0f5ab3a220",
+          "record_settlement": "0x657ea444b06e888cb99bd5166c02a4765712d86d1ba1e7a795542f5cc3c705c2"
+        },
+        "transaction_consensus": "Explorer shows FINALIZED, GenVM SUCCESS, consensus Accepted for deployment, both module registrations, policy registration, and each listed lifecycle call."
       },
-      "live_read_evidence": "get_agreement(A-2) returned SETTLED; get_settlement(A-2) returned S-1, status EXECUTED, amount_atto 0; get_challenge(C-1) returned TIMEOUT_REJECTED with the timeout audit message."
+      "live_read_evidence": "get_agreement(A-2) returned SETTLED; get_settlement(A-2) returned S-1, status EXECUTED, amount_atto 0; get_challenge(C-1) returned TIMEOUT_REJECTED with the timeout audit message.",
+      "challenge_limit_scope": "One full challenge timeout lifecycle verified on-chain. Attempt-three upheld-challenge terminalization is not separately live-exercised; it is covered by direct-mode regression tests."
     },
     "verification": {
       "direct_contract_tests": "94 passed",
@@ -335,7 +401,7 @@
       "frontend_tests": "39 passed",
       "typescript": "passed",
       "production_build": "passed",
-      "deployment": "StudioNet contract at 0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40 was interacted with successfully; deployment receipt/source identity remains uncaptured"
+      "deployment": "Superseded by the separately verified Stage 12 Studio UI deployment at 0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40; this record retains the failed CLI attempts only"
     },
     "deployment_attempts": [
       {

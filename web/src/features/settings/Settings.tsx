@@ -46,8 +46,10 @@ export default function Settings() {
         <h2>Deployed contract address</h2>
         <p className="field-help">
           This build defaults to <strong>Stage 12</strong> (<code>{shortenAddress(STAGE_12_CONTRACT_ADDRESS)}</code>), the
-          StudioNet deployment with attempt-exhaustion terminalization and the earlier correctness fixes
-          (see <code>deployments/studionet.json</code>). Override it below to point at a different
+          current StudioNet target. Its deployed source hash matches this repository; timeout recovery
+          and zero-value settlement were verified live. Attempt-three terminalization has direct-mode
+          regression coverage but has not been separately exercised on-chain (see <code>deployments/studionet.json</code>).
+          Override it below to point at a different
           deployment (e.g. V1, historical, see below) or your own. Stored only in this browser's
           localStorage — a client preference, never canonical protocol state.
         </p>
