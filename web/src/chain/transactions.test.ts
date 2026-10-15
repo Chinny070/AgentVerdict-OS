@@ -60,6 +60,47 @@ describe("runWrite finality and wallet safety", () => {
     expect(result.executionResult).toBe(ExecutionResult.FINISHED_WITH_RETURN);
   });
 
+  it("accepts the successful leader return when StudioNet records a validator quorum cancellation", async () => {
+    mocks.waitForTransactionReceipt.mockResolvedValue({
+      status: TransactionStatus.FINALIZED,
+      statusName: TransactionStatus.FINALIZED,
+      resultName: "MAJORITY_AGREE",
+      consensus_data: {
+        leader_receipt: [
+          {
+            execution_result: "SUCCESS",
+            result: { status: "return", payload: { readable: '"A-6"' } },
+            genvm_result: null,
+          },
+          {
+            execution_result: "ERROR",
+            result: { status: "contract_error", payload: "idle" },
+            genvm_result: { error_code: "CONSENSUS_VALIDATOR_QUORUM_REACHED" },
+          },
+        ],
+      },
+    });
+    const result = await runWrite({ account, provider: provider("0xf22f", [account]), address, functionName: "create_agreement" });
+    expect(result.phase).toBe("FINALIZED");
+    expect(result.executionResult).toBe(ExecutionResult.FINISHED_WITH_RETURN);
+    expect(result.returnValue).toBe("A-6");
+  });
+
+  it("does not ignore an ordinary conflicting leader execution result", async () => {
+    mocks.waitForTransactionReceipt.mockResolvedValue({
+      statusName: TransactionStatus.FINALIZED,
+      consensus_data: {
+        leader_receipt: [
+          { execution_result: "SUCCESS", result: '"A-6"' },
+          { execution_result: "ERROR", error: "contract rejected execution" },
+        ],
+      },
+    });
+    const result = await runWrite({ account, provider: provider("0xf22f", [account]), address, functionName: "create_agreement" });
+    expect(result.phase).toBe("FAILED");
+    expect(result.executionResult).toBeUndefined();
+  });
+
   it("rejects a finalized transaction whose contract execution failed", async () => {
     mocks.waitForTransactionReceipt.mockResolvedValue({ statusName: TransactionStatus.FINALIZED, txExecutionResultName: ExecutionResult.FINISHED_WITH_ERROR });
     const result = await runWrite({ account, provider: provider("0xf22f", [account]), address, functionName: "create_agreement" });

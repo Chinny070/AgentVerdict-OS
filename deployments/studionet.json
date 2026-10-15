@@ -335,11 +335,30 @@
         "rubric_shape": "{\"criteria\":[{\"id\":\"endpoint_coverage\",\"description\":\"Synthetic frontend smoke test: GET https://example.org returns HTTP 200\"}]}",
         "note": "A separate earlier transaction to historical Stage 11 rolled back with invalid rubric data; the successful Stage 12 transaction verifies the wrapped-object payload. This signed transaction predates the receipt-parser fix below."
       },
+      "post_fix_receipt_regression": {
+        "transaction_hash": "0xdadeab03361858ce6d17f3a7e59ef57f4985d763788a811c1981078d8f27c91d",
+        "explorer_url": "https://explorer-studio.genlayer.com/tx/0xdadeab03361858ce6d17f3a7e59ef57f4985d763788a811c1981078d8f27c91d",
+        "method": "create_agreement",
+        "contract": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
+        "sender": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+        "counterparty": "0x1Af111b06E6f6A05Bd41572A016318f1356aF85c",
+        "policy_id": "smoke-test-v2",
+        "module_id": "api-delivery",
+        "amount_atto": 0,
+        "agreement_id": "A-6",
+        "transaction_status": "FINALIZED",
+        "consensus": "Accepted",
+        "genvm_execution": "SUCCESS",
+        "return_value": "A-6",
+        "frontend_release_at_submission": "7f399b6; displayed FAILED despite the successful finalized receipt",
+        "receipt_diagnosis": "GenLayer JS 1.1.8 leader_receipt contained a successful leader return and a validator row cancelled after quorum (CONSENSUS_VALIDATOR_QUORUM_REACHED). The old parser treated the cancellation row as a conflicting execution.",
+        "fixed_frontend_retested_live": false
+      },
       "receipt_finality_fix": {
         "source": "GenLayer JS 1.1.8 StudioNet execution result is nested in consensus_data.leader_receipt[]",
-        "implementation": "Frontend normalizes nested leader receipt SUCCESS/ERROR and fails closed for missing results",
-        "tests": "Three regression cases: nested success, nested error, missing execution result",
-        "post_fix_wallet_write": "Not independently re-exercised; no second signed transaction submitted after the parser release"
+        "implementation": "Frontend ignores only the explicit validator quorum-cancellation marker, preserves failures for ordinary ERROR/conflicting rows and missing results, and extracts the successful leader return value",
+        "tests": "Focused receipt suite 9/9; full frontend suite 44/44; TypeScript and production build passed",
+        "post_fix_wallet_write": "Local source fix implemented; hosted frontend retest pending Vercel deployment"
       }
     },
     "final_followup_verification": {
@@ -347,7 +366,7 @@
       "attempt_three_live_path": "Not exercised; no wallet signer exposed in the available browser session",
       "local_genvm_integration": "BLOCKED; Docker client installed but Docker daemon pipe unavailable; seven integration tests remain skipped for diagnosed GLSim storage-registration mismatch and missing evaluator LLM credential",
       "live_stage12_read": "Production Telemetry page successfully read the current contract counters",
-      "frontend_tests": "42 passed",
+      "frontend_tests": "44 passed",
       "typescript": "PASS",
       "production_build": "PASS; existing large-chunk warning remains"
     },

@@ -24,6 +24,23 @@
 > finality has not been independently re-exercised. See the Stage 12 addendum
 > and deployment ledger.
 
+> **Receipt-fix follow-up (2026-10-15):** A new Chrome/MetaMask signed
+> `create_agreement` against Stage 12 finalized successfully as agreement
+> `A-6` with amount 0. Explorer shows FINALIZED, accepted consensus, GenVM
+> SUCCESS, and return value `A-6`:
+> [transaction](https://explorer-studio.genlayer.com/tx/0xdadeab03361858ce6d17f3a7e59ef57f4985d763788a811c1981078d8f27c91d).
+> The earlier hosted frontend release displayed FAILED for this transaction.
+> Inspection of the GenLayer JS 1.1.8 receipt showed the successful leader
+> return alongside a validator execution explicitly cancelled after quorum
+> (`CONSENSUS_VALIDATOR_QUORUM_REACHED`). The client incorrectly treated that
+> cancellation row as a conflicting execution. The receipt parser now ignores
+> only this explicit quorum-cancellation code, still fails closed on ordinary
+> errors/conflicts, and surfaces the return value so Agreement Forge can load
+> the new ID. Focused receipt tests pass (9/9); full frontend tests pass
+> (44/44), TypeScript and production build pass. These local changes are not yet
+> deployed, so corrected hosted-UI finality and automatic A-6 loading remain
+> unverified until the next Vercel release is live and exercised.
+
 > **Verification record (2026-10-15):** contract suite 94 passed, 7 skipped;
 > the focused attempt-three upheld-challenge regression passed (1/1), confirming
 > terminal `TERMINATED` state, a `VOID` verdict, no settlement or reputation

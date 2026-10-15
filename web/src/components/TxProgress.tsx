@@ -54,6 +54,9 @@ export function TxProgress({ update }: { update: TxUpdate | null }) {
         {update.hash && <CopyHash value={update.hash} label="tx hash" />}
         {update.consensusStatus && <span className="field-help">consensus: {update.consensusStatus}</span>}
         {update.executionResult && <span className="field-help">execution: {update.executionResult}</span>}
+        {update.returnValue !== undefined && (
+          <span className="field-help">return: {typeof update.returnValue === "string" ? update.returnValue : JSON.stringify(update.returnValue)}</span>
+        )}
       </div>
     </div>
   );

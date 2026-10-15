@@ -144,7 +144,13 @@ export default function AgreementForge() {
       );
       setCreateUpdate(result);
       if (result.phase !== "FAILED") {
-        toast.push("success", "Agreement created. Check the transaction receipt for the new agreement_id.");
+        if (typeof result.returnValue === "string" && result.returnValue.startsWith("A-")) {
+          setAgreementId(result.returnValue);
+          setParams({ id: result.returnValue });
+          toast.push("success", `Agreement ${result.returnValue} finalized. Loading its on-chain state.`);
+        } else {
+          toast.push("success", "Agreement finalized. Check the transaction receipt for its agreement_id.");
+        }
       } else {
         toast.push("error", `Create failed: ${result.error}`);
       }

@@ -14,7 +14,10 @@
  * successful. StudioNet 1.1.8 may provide that result only in the simplified
  * `consensus_data.leader_receipt[].execution_result` field ("SUCCESS" or
  * "ERROR"), rather than the top-level `txExecutionResultName` used on other
- * network transports. A consensus status alone is never treated as success.
+ * network transports. StudioNet can also include a validator row cancelled
+ * after quorum (`CONSENSUS_VALIDATOR_QUORUM_REACHED`); that row is not a
+ * competing execution outcome. A consensus status alone is never treated as
+ * success.
  */
 import { ExecutionResult, TransactionStatus } from "genlayer-js/types";
 import type { Hash } from "genlayer-js/types";
@@ -137,6 +140,8 @@ export async function runWrite(args: RunWriteArgs): Promise<TxUpdate> {
       return update;
     }
     const update: TxUpdate = { phase: "FINALIZED", hash, consensusStatus, executionResult };
+    const returnValue = getSuccessfulReturnValue(receipt);
+    if (returnValue !== undefined) update.returnValue = returnValue;
     emit(update);
     return update;
   } catch (err) {
@@ -160,6 +165,7 @@ function getExecutionResult(receipt: {
   const leaderReceipts = receipt.consensus_data?.leader_receipt;
   const rows = Array.isArray(leaderReceipts) ? leaderReceipts : leaderReceipts ? [leaderReceipts] : [];
   const results = rows
+    .filter((row) => !isQuorumCancellation(row))
     .map((row) => (row && typeof row === "object" ? (row as { execution_result?: unknown }).execution_result : undefined))
     .filter((result): result is string => typeof result === "string")
     .map((result) => result.toUpperCase());
@@ -174,6 +180,44 @@ function getExecutionResult(receipt: {
     return ExecutionResult.FINISHED_WITH_ERROR;
   }
   return undefined;
+}
+
+/**
+ * StudioNet records validator executions cancelled after quorum in the same
+ * leader_receipt array as the successful leader execution. Ignore only that
+ * explicit runtime cancellation; a normal ERROR or conflicting result must
+ * still prevent the UI from claiming success.
+ */
+function isQuorumCancellation(row: unknown): boolean {
+  if (!row || typeof row !== "object") return false;
+  const genvmResult = (row as { genvm_result?: unknown }).genvm_result;
+  if (!genvmResult || typeof genvmResult !== "object") return false;
+  const details = genvmResult as { error_code?: unknown; stderr?: unknown; raw_error?: { causes?: unknown } };
+  if (details.error_code === "CONSENSUS_VALIDATOR_QUORUM_REACHED") return true;
+  if (typeof details.stderr === "string" && /validator execution cancelled after quorum/i.test(details.stderr)) return true;
+  return Array.isArray(details.raw_error?.causes) && details.raw_error.causes.includes("VALIDATOR_QUORUM_REACHED");
+}
+
+function getSuccessfulReturnValue(receipt: {
+  consensus_data?: { leader_receipt?: unknown };
+}): unknown {
+  const leaderReceipts = receipt.consensus_data?.leader_receipt;
+  const rows = Array.isArray(leaderReceipts) ? leaderReceipts : leaderReceipts ? [leaderReceipts] : [];
+  const successful = rows.find((row) => {
+    if (!row || typeof row !== "object" || isQuorumCancellation(row)) return false;
+    const result = (row as { execution_result?: unknown }).execution_result;
+    return typeof result === "string" && (result.toUpperCase() === "SUCCESS" || result === ExecutionResult.FINISHED_WITH_RETURN);
+  }) as { result?: unknown } | undefined;
+  if (!successful?.result || typeof successful.result !== "object") return undefined;
+  const result = successful.result as { status?: unknown; payload?: unknown };
+  if (result.status !== "return" || !result.payload || typeof result.payload !== "object") return undefined;
+  const readable = (result.payload as { readable?: unknown }).readable;
+  if (typeof readable !== "string") return undefined;
+  try {
+    return JSON.parse(readable) as unknown;
+  } catch {
+    return readable;
+  }
 }
 
 function describeWriteError(err: unknown): string {
