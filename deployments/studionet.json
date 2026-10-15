@@ -359,7 +359,7 @@
         "source": "GenLayer JS 1.1.8 StudioNet execution result is nested in consensus_data.leader_receipt[]",
         "implementation": "Frontend ignores only the explicit validator quorum-cancellation marker, preserves failures for ordinary ERROR/conflicting rows and missing results, and extracts the successful leader return value",
         "tests": "Focused receipt suite 9/9; full frontend suite 44/44; TypeScript and production build passed",
-        "post_fix_wallet_write": "Fix deployed to Vercel production as dpl_2qkWHqb7nKEmY6EmgHZEj8Ntdfcr; a signed wallet write through the corrected UI is still pending. The desktop screenshot showed the Windows lock screen during this verification, so no further browser UI interaction was attempted."
+        "post_fix_wallet_write": "Fix deployed to Vercel production as dpl_2qkWHqb7nKEmY6EmgHZEj8Ntdfcr. The hosted page visibly showed the Stage 12 app connected to MetaMask admin 0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b on chain 61999. A signed wallet write through the corrected UI remains pending: Chrome window capture timed out twice after navigation, and no new transaction was submitted."
       }
     },
     "final_followup_verification": {
