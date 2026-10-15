@@ -188,3 +188,27 @@ chunk warning. Three representative Stage 11 receipts (deployment, timeout
 recovery, and settlement) were independently read and showed FINALIZED,
 MAJORITY_AGREE, SUCCESS. The deployed source identity matched the recorded
 SHA-256 `710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`.
+
+## Stage 12 deployment attempt (2026-10-15)
+
+The attempt-exhaustion candidate (source SHA-256
+`897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe`) has
+**not** been deployed. Two submissions using GenLayer CLI `0.40.0-rc.3`
+finalized as `NO_MAJORITY`; both receipts showed zero committed votes and zero
+rounds, and neither returned a contract address:
+
+- `0x8a2b9a44eb9dbd144ec8fdd9891db0f7baa3bf542670a2167d97bc1756a899af`
+- `0xb616056203ed9eda4ff21ad4566e0085db98a977671581dce07110e0426c5c4d`
+
+The CLI's read-only fee estimation request also returned `Method not found:
+sim_getFeeConfig` from the StudioNet RPC. That incompatibility is verified,
+but its causal relationship to the no-majority outcomes is not established.
+The downloaded/cached `0.39.2` CLI could not be launched in this environment,
+and Chrome desktop control timed out while opening the authenticated Studio
+session. No more deployment attempts were made. Stage 11 remains the active
+contract at `0xab972c3af9878b7CD4631CD21639B20E981B0702`.
+
+To complete deployment, use Studio's web deployment flow with the unlocked
+wallet or restore a verified StudioNet-compatible CLI. After submission,
+verify a finalized receipt with successful execution and record its contract
+address before initialization. These two failed hashes are not deployments.

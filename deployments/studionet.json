@@ -297,7 +297,7 @@
       },
       "post_fix_wallet_signed_create": "NOT VERIFIED: this agent browser has no injected wallet provider; user must submit one signed test through Chrome",
       "browser_wallet_provider": "Earlier user screenshot confirmed MetaMask connected to StudioNet chain 61999; current in-app browser has no injected provider",
-      "contract_deployment": "Unchanged Stage 11 deployment; no contract write or redeployment performed",
+      "contract_deployment": "No Stage 12 contract deployed. Two attempts finalized NO_MAJORITY with zero votes and no address; Stage 11 remains canonical and unchanged.",
       "candidate_contract_fix": "Attempt-3 upheld-challenge terminalization is source-tested only and is not deployed"
     },
     "note": "Latest frontend source is deployed and the live rubric preview was checked at the production alias. The previously signed malformed create_agreement was conclusively rolled back and created no agreement. A successful post-fix signed frontend write still requires the user Chrome wallet session."
@@ -317,6 +317,39 @@
       "typescript": "passed",
       "production_build": "passed",
       "deployment": "NOT DEPLOYED; explicit approval required before a new contract deployment"
+    },
+    "deployment_attempts": [
+      {
+        "transaction_hash": "0x8a2b9a44eb9dbd144ec8fdd9891db0f7baa3bf542670a2167d97bc1756a899af",
+        "status": "FINALIZED_NO_MAJORITY",
+        "result": "NO_MAJORITY",
+        "validator_votes_committed": 0,
+        "rounds": "0",
+        "contract_address": null,
+        "source_hash": "sha256:897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe",
+        "cli": "GenLayer CLI 0.40.0-rc.3",
+        "date": "2026-10-15",
+        "note": "The tx was finalized without validator votes or a contract address. CLI surfaced leader execution as UNKNOWN. Read-only stdout/stderr were empty."
+      },
+      {
+        "transaction_hash": "0xb616056203ed9eda4ff21ad4566e0085db98a977671581dce07110e0426c5c4d",
+        "status": "FINALIZED_NO_MAJORITY",
+        "result": "NO_MAJORITY",
+        "validator_votes_committed": 0,
+        "rounds": "0",
+        "contract_address": null,
+        "source_hash": "sha256:897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe",
+        "cli": "GenLayer CLI 0.40.0-rc.3",
+        "date": "2026-10-15",
+        "note": "Single retry after the first no-majority result; receipt again had no validator votes, no rounds, and no contract address. Not a contract execution failure."
+      }
+    ],
+    "deployment_blocker": {
+      "verified": "Both CLI deployment receipts finalized as NO_MAJORITY with zero votes and no contract address.",
+      "environment": "The installed CLI is 0.40.0-rc.3. Its read-only fee estimate call fails because StudioNet RPC does not implement sim_getFeeConfig.",
+      "causality": "The RPC method mismatch is verified; whether it directly caused the no-majority receipts is not proven.",
+      "browser_fallback": "The authenticated Chrome Studio window timed out under the available desktop-control runtime after one documented retry. No wallet dialog was automated.",
+      "next_safe_path": "Use GenLayer Studio web UI or a verified StudioNet-compatible CLI release with the connected deployment wallet. Do not treat either hash as a deployed contract."
     }
   },
   "stage11_post_deployment_audit": {
