@@ -1,31 +1,48 @@
 # Submission Readiness Report
 
-> **Latest release addendum (2026-10-15):** the user deployed Stage 12 via GenLayer
+> **Latest release addendum (2026-10-15):** Stage 12 is deployed via GenLayer
 > Studio at `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. A synthetic, zero-value
 > A-2 lifecycle reached `SETTLED` after evaluation, challenge timeout recovery,
 > finalization, and receipt-only settlement. This supersedes the older Stage 12
 > “not deployed” statements below. Explorer deployment transaction
 > `0x25c9111c7c75f5b202d5c84bb07ed47cee85bc9419c217e988b33c94705464dd` is
 > finalized/accepted; SHA-256 of embedded deployed `contract_code` exactly
-> matches candidate source `897ad39a…92ca1abe`. Frontend deployment `dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh`
-> is READY and targets Stage 12. The public Settings page reports `SCHEMA MATCHES`,
+> matches candidate source `897ad39a…92ca1abe`. Latest frontend deployment
+> `dpl_2MCWXALuMEimAF8zmKoQPn4ZuE8o` is READY and targets Stage 12 at
+> [the production URL](https://web-gqjwiv8go-chinny070s-projects.vercel.app)
+> (stable alias: https://web-omega-amber-37.vercel.app), from commit `7f399b6`.
+> The public Settings page reports `SCHEMA MATCHES`,
 > Protocol Telemetry returns live counters, all 14 screens passed five viewport
 > widths without page-level overflow, and an Appeals Tribunal hash route survived
 > refresh. A Chrome/MetaMask signed write created Stage 12 agreement `A-5` with
 > zero GEN; Explorer confirms the Stage 12 target, wrapped rubric JSON, GenVM
-> success, and accepted consensus. A separate Stage 11 attempt rolled back
-> without creating an agreement. See the Stage 12 addendum and deployment ledger.
+> success, and accepted consensus. The earlier Stage 11 malformed attempt rolled
+> back without creating an agreement. The receipt parser was subsequently fixed
+> to inspect GenLayer JS 1.1.8's nested `consensus_data.leader_receipt` execution
+> result; three regression cases cover success, error, and missing result. The
+> live A-5 transaction predates this parser deployment, so post-fix wallet UI
+> finality has not been independently re-exercised. See the Stage 12 addendum
+> and deployment ledger.
 
-> **Current update (Stage 11, 2026-10-15):** Stage 11 hardening is deployed
+> **Verification record for commit `7f399b6`:** contract suite 94 passed, 7
+> skipped (local GenVM integration runtime unavailable); TypeScript check passed;
+> frontend suite 42 passed in the recorded implementation run; production Vercel
+> deployment is READY. A fresh local contract-suite rerun also reported 94
+> passed and 7 skipped. In this final documentation-only pass, the sandbox
+> blocked a fresh Vitest/Vite run while resolving the Vite config from a parent
+> directory, and the local production build hit the same environment restriction;
+> the deployed build remains READY and the source code has not changed since it.
+
+> **Historical Stage 11 snapshot (2026-10-15):** Stage 11 hardening is deployed
 > at `0xab972c3af9878b7CD4631CD21639B20E981B0702`, and its two synthetic
 > zero-value lifecycles completed through settlement. The production frontend
-> now defaults to Stage 11 (Vercel deployment `DCZArRbeK923gwJFRnv3E9GyuDbD`,
+> then defaulted to Stage 11 (Vercel deployment `DCZArRbeK923gwJFRnv3E9GyuDbD`,
 > source commit `241df400ccf4f1e410d8f46884bdc9c08aca4c58`). Its rubric payload
-> correction is live; a successful post-fix signed wallet write remains pending. The older assessment below is historical;
-> its source-candidate, deployment, and frontend-target statements have been
-> superseded. A successful post-fix wallet-signed frontend write and a live non-admin timeout
-> caller remain unverified. The earlier signed malformed call rolled back without
-> creating an agreement. The candidate hardens settlement,
+> correction was live at that stage. This snapshot is superseded by the Stage 12
+> release above: Stage 12 has a successful signed frontend write (A-5), while a
+> post-receipt-parser signed write and live non-admin timeout caller remain
+> unverified. The earlier signed malformed Stage 11 call rolled back without
+> creating an agreement. Stage 11 hardens settlement,
 > bounded challenges, adjudication validation, retry accounting, policy and
 > delegation scope, and frontend transaction finality. It is deployed. V1/V2
 > remain historical immutable deployments. Consult

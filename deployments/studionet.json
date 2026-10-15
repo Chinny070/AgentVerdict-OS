@@ -305,10 +305,10 @@
   "stage_12_frontend_release": {
     "status": "READY",
     "project": "chinny070s-projects/web",
-    "deployment_id": "dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh",
-    "deployment_url": "https://web-eehf52mul-chinny070s-projects.vercel.app",
+    "deployment_id": "dpl_2MCWXALuMEimAF8zmKoQPn4ZuE8o",
+    "deployment_url": "https://web-gqjwiv8go-chinny070s-projects.vercel.app",
     "production_alias": "https://web-omega-amber-37.vercel.app",
-    "source_commit": "b2871fe",
+    "source_commit": "7f399b6",
     "contract_target": "0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40",
     "network": "studionet",
     "chain_id": 61999,
@@ -333,13 +333,19 @@
         "genvm_execution": "SUCCESS",
         "consensus": "Accepted",
         "rubric_shape": "{\"criteria\":[{\"id\":\"endpoint_coverage\",\"description\":\"Synthetic frontend smoke test: GET https://example.org returns HTTP 200\"}]}",
-        "note": "A separate earlier transaction to historical Stage 11 rolled back with invalid rubric data; the successful Stage 12 transaction verifies the wrapped-object payload."
+        "note": "A separate earlier transaction to historical Stage 11 rolled back with invalid rubric data; the successful Stage 12 transaction verifies the wrapped-object payload. This signed transaction predates the receipt-parser fix below."
+      },
+      "receipt_finality_fix": {
+        "source": "GenLayer JS 1.1.8 StudioNet execution result is nested in consensus_data.leader_receipt[]",
+        "implementation": "Frontend normalizes nested leader receipt SUCCESS/ERROR and fails closed for missing results",
+        "tests": "Three regression cases: nested success, nested error, missing execution result",
+        "post_fix_wallet_write": "Not independently re-exercised; no second signed transaction submitted after the parser release"
       }
     },
     "superseded_production_deployment": {
       "deployment_id": "dpl_9LZJV9oBqg6fgqyT33np9mWMUJxh",
       "source_commit": "b2871fe",
-      "status": "READY; superseded by final source release"
+      "status": "READY; superseded by deployment dpl_2MCWXALuMEimAF8zmKoQPn4ZuE8o"
     }
   },
   "stage_12_candidate": {

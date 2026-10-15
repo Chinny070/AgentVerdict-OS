@@ -15,18 +15,28 @@ Attempt-three terminalization remains source/direct-test
 verified, not live-branch verified. See `deployments/studionet.json` and the
 Stage 12 addendum in `docs/STAGE_11_CORRECTNESS_AUDIT.md`.
 
-## Current status — Stage 11 deployed
+The production frontend is at [web-omega-amber-37.vercel.app](https://web-omega-amber-37.vercel.app), with latest READY deployment
+`dpl_2MCWXALuMEimAF8zmKoQPn4ZuE8o` from commit `7f399b6`.
+Chrome/MetaMask submitted zero-value agreement A-5 through the hosted UI;
+[the finalized StudioNet transaction](https://explorer-studio.genlayer.com/tx/0xad9d78f663573f2fbd956bee582147a62426c4cd7c37a0bd74b4fca960b618c2)
+confirms GenVM success and accepted consensus. A receipt-status bug was fixed
+to read the execution result nested in the GenLayer JS StudioNet leader receipt;
+the new parser has regression coverage, but a second wallet-signed write was
+not submitted after deployment of that fix. The successful A-5 transaction is
+pre-fix evidence of chain execution, not post-fix UI receipt handling.
 
-This handoff's original body below is historical (Stage 0–8) and is superseded
+## Historical status — Stage 11 deployed
+
+The Stage 11 snapshot below is historical and superseded by the Stage 12 addendum
+above. This handoff's original body below is historical (Stage 0–8) and is superseded
 by [`STAGE_11_CORRECTNESS_AUDIT.md`](STAGE_11_CORRECTNESS_AUDIT.md) and the
 latest release addendum there. Stage 11 source SHA-256 is
 `710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b`; it is
 deployed at `0xab972c3af9878b7CD4631CD21639B20E981B0702`. It completed two
-synthetic, zero-value StudioNet lifecycles. The current Vercel production frontend defaults to Stage 11 (deployment
+synthetic, zero-value StudioNet lifecycles. At that snapshot the Vercel production frontend defaulted to Stage 11 (deployment
 `DCZArRbeK923gwJFRnv3E9GyuDbD`, source commit
 `241df400ccf4f1e410d8f46884bdc9c08aca4c58`). The corrected rubric preview is
-verified live. A successful post-fix signed frontend transaction and a live
-non-admin timeout call remain unverified in this agent browser.
+verified live at that time. Those statements are retained as historical evidence.
 
 **Date:** 2026-10-13
 **Agent:** Claude Sonnet 5, acting as implementing engineer for AgentVerdict OS

@@ -234,3 +234,21 @@ Stage 12 is live, source-identity matched, initialized, and lifecycle-tested.
 The attempt-three upheld-challenge terminal transition is not separately
 live-exercised; it remains direct-test verified. Stage 11 remains available at
 `0xab972c3af9878b7CD4631CD21639B20E981B0702`; V1 and V2 remain unchanged.
+
+## Stage 12 hosted frontend and receipt-status correction (2026-10-15)
+
+Latest READY Vercel deployment is `dpl_2MCWXALuMEimAF8zmKoQPn4ZuE8o` from
+commit `7f399b6`, serving `https://web-omega-amber-37.vercel.app`. Through the
+hosted UI, Chrome/MetaMask submitted zero-value `create_agreement`, producing
+Stage 12 agreement A-5; the explorer receipt confirms FINALIZED, Accepted, and
+GenVM SUCCESS. The transaction is linked from the README and deployment ledger.
+
+That hosted transaction exposed a frontend receipt-decoding defect: the pinned
+GenLayer JS 1.1.8 StudioNet result is nested in
+`consensus_data.leader_receipt[]`, whereas the UI initially read only the
+top-level execution field. The frontend now normalizes nested SUCCESS/ERROR
+values and fails closed when the result is absent. Three regression cases cover
+those outcomes; the frontend suite recorded 42 passing tests. The successful
+A-5 call predates this parser release, so post-fix wallet receipt rendering has
+not been re-exercised with another signed transaction. The source has no changes
+after the deployed commit; this final pass only reconciles records.
