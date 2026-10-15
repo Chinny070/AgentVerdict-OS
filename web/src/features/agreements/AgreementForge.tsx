@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ConfigGate } from "../../components/ConfigGate";
 import { IdPicker } from "../../components/IdPicker";
-import { AgreementEditor, type AgreementDraft } from "../../components/AgreementEditor";
+import { AgreementEditor, serializeRubric, validateAgreementDraft, type AgreementDraft } from "../../components/AgreementEditor";
 import { StatusBadge } from "../../components/StatusBadge";
 import { TxProgress } from "../../components/TxProgress";
 import { SkeletonLines } from "../../components/Skeleton";
@@ -112,7 +112,7 @@ export default function AgreementForge() {
   const canFetch = agreementId.trim().length > 0;
   const agreementState = useContractRead<AgreementView>(canFetch ? fetcher : null, [agreementId]);
 
-  const rubricJson = useMemo(() => JSON.stringify(draft.rubric), [draft.rubric]);
+  const rubricJson = useMemo(() => serializeRubric(draft.rubric), [draft.rubric]);
 
   const handleOpenId = (id: string) => {
     setAgreementId(id);
@@ -122,6 +122,11 @@ export default function AgreementForge() {
   const handleCreate = async () => {
     if (!wallet || !address) {
       toast.push("error", "Connect a wallet and configure a contract address first.");
+      return;
+    }
+    const validationError = validateAgreementDraft(draft);
+    if (validationError) {
+      toast.push("error", validationError);
       return;
     }
     setCreating(true);

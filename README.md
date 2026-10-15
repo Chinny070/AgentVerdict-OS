@@ -31,6 +31,11 @@ wallet/browser verification status. Latest production deployment:
 [this deployment URL](https://web-drltkcgme-chinny070s-projects.vercel.app)
 and the stable alias above.
 
+The Agreement Forge candidate serializes rubric JSON in the contract's
+required object shape and rejects a missing or invalid deadline before it
+opens MetaMask. The attempt-3 challenge terminalization change is source-tested
+but requires a new contract deployment; it is not on the live Stage 11 address.
+
 **Architecture:** one GenLayer Python Intelligent Contract
 (`contracts/agentverdict.py`) plus a static frontend (`web/`). No backend
 server, no hosted database, no relayer — see `docs/PROTOCOL_ARCHITECTURE.md`.

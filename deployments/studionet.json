@@ -254,12 +254,56 @@
         "settlement_native_transfer_enabled": false
       },
       "navigation": "All 14 screens opened and expected heading verified",
-      "wallet_provider": "Not detected in available browser; signed UI write unverified",
-      "non_admin_timeout_transaction": "Not live-verified; available browser has no injected wallet"
+      "wallet_provider": "MetaMask connected on StudioNet chain 61999, confirmed by user-provided Chrome screenshot",
+      "non_admin_timeout_transaction": "Not live-verified; available browser has no injected wallet",
+      "wallet_signed_write": {
+        "transaction_hash": "0x9a57318c151930a6b967b3f2f885f87740160e05220b2b78704853060ddab1f1",
+        "consensus": "FINALIZED",
+        "result": "MAJORITY_AGREE",
+        "genvm_execution": "ERROR",
+        "outcome": "ROLLBACK",
+        "error": "[EXPECTED] rubric must declare 1-20 criteria",
+        "empty_deadline_in_calldata": true,
+        "agreement_created": false
+      }
     },
     "production_contract_address_override": "Removed; production now uses the Stage 11 built-in default",
-    "note": "Vercel production deployment completed and aliased to the stable URL. Stage 11 schema and live protocol stats were read successfully from the public website. No wallet was available in this browser session, so no signed UI transaction was attempted.",
+    "note": "MetaMask connection and signature confirmed by user screenshots. The signed create_agreement attempt finalized by consensus but rolled back because rubric_json was an array rather than the required criteria object and deadline was empty; no agreement was created. Corrected frontend source is pending Vercel deployment.",
     "responsive_sweep": "14 screens x 5 viewport widths (320, 375, 390, 768, 1280); zero page-level horizontal overflow",
     "browser_console_errors": 0
+  },
+  "stage_12_candidate": {
+    "status": "SOURCE_AND_TESTS_VERIFIED_NOT_DEPLOYED",
+    "based_on_commit": "3858a8cd24dbeba656daf88346a60ee27f1ab827",
+    "source_file": "contracts/agentverdict.py",
+    "source_hash": "sha256:897ad39a52d721b714c3b387a6fc830a4c30bd33747a5fd526e2c50892ca1abe",
+    "attempt_exhaustion_fix": "Upheld challenge on attempt 3 invalidates the provisional verdict and terminates the agreement atomically",
+    "deployment_status": "NOT_DEPLOYED",
+    "deployment_gate": "A separate user approval is required before replacing the live StudioNet instance"
+  },
+  "stage11_post_deployment_audit": {
+    "source_identity_commit": "fcb1199c489d",
+    "source_sha256": "710b02a083dcb551fde345f94f87381ea07b8fa5a4bf3c66965ee5a1ecaf526b",
+    "matches_deployment_record": true,
+    "receipt_checks": [
+      {
+        "transaction_hash": "0x8c1979122f3103f865bba60646d699217b2bb3ecd283ce232532bdb4aad4821b",
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS"
+      },
+      {
+        "transaction_hash": "0x8d50e59baeaa88cc5695fe60b26ed19b6c36a6c5aeec3cb486000ce502a726d3",
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS"
+      },
+      {
+        "transaction_hash": "0x2d5f438eae752aefe011198c7e3bc7481554bf0d39f2ae6643d494783ec18c75",
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS"
+      }
+    ]
   }
 }

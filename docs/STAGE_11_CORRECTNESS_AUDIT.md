@@ -2,6 +2,11 @@
 
 **Status (updated 2026-10-15):** Stage 11 is deployed and initialized on StudioNet at `0xab972c3af9878b7CD4631CD21639B20E981B0702`. The original zero-value A-1/A-2 agreements remain `PROPOSED` because their fixed counterparty has not accepted. Replacement agreements A-3/A-4 completed live synthetic lifecycles with a dedicated counterparty; both are `SETTLED` at amount zero. Deployment and transaction evidence are recorded in `docs/STAGE_11_STUDIONET_DEPLOYMENT_ATTEMPT.md` and `deployments/studionet.json`.
 
+## Follow-up findings (2026-10-15)
+
+- Screenshot transaction `0x9a57318c151930a6b967b3f2f885f87740160e05220b2b78704853060ddab1f1` was inspected with the GenLayer CLI. Consensus status is `FINALIZED`, but leader execution is `ERROR` and the result payload is `[EXPECTED] rubric must declare 1-20 criteria`. Its calldata also contains an empty deadline. The transaction was rolled back; no agreement was created. The wallet signature succeeded. The frontend candidate now serializes the required `{"criteria":[...]}` object and rejects missing, invalid, or past deadlines before prompting MetaMask.
+- A source-level liveness edge was confirmed: if the admin upholds a challenge on attempt 3, the prior source wrote `REEVALUATING`, while `request_evaluation` correctly rejects attempt 4. The candidate fix atomically marks that challenged verdict `VOID`, records the terminal reason on the upheld challenge, and moves the agreement to `TERMINATED`; it cannot authorize settlement or reputation. A direct-mode regression test covers the full three-attempt cycle. This contract candidate is **not deployed**; Stage 11 remains unchanged pending deployment authorization.
+
 ## Scope and release boundary
 
 This pass addresses the ordered correctness findings supplied for Stage 11: agreement finality and settlement guards; bounded challenges; validator-equivalent verdict validation; retry and reputation accounting; frozen policy and delegation/evidence scope; and wallet write finality. Stage 11 is deployed at its own address; V1 and V2 remain separate historical instances.

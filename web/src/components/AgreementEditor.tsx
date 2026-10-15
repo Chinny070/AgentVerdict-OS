@@ -10,6 +10,26 @@ export interface AgreementDraft {
   rubric: RubricCriterion[];
 }
 
+/** Serialize rubric data in the object shape required by the contract. */
+export function serializeRubric(criteria: RubricCriterion[]): string {
+  return JSON.stringify({ criteria });
+}
+
+export function validateAgreementDraft(draft: AgreementDraft, now = Date.now()): string | null {
+  const deadlineMs = Date.parse(draft.deadline);
+  if (!draft.deadline || !Number.isFinite(deadlineMs) || deadlineMs <= now) {
+    return "Choose a valid future agreement deadline before creating it.";
+  }
+  const criterionIds = draft.rubric.map((criterion) => criterion.id.trim());
+  if (
+    criterionIds.length === 0 || criterionIds.length > 20 ||
+    criterionIds.some((id) => !id) || new Set(criterionIds).size !== criterionIds.length
+  ) {
+    return "The rubric needs 1–20 criteria with unique, non-empty IDs.";
+  }
+  return null;
+}
+
 interface AgreementEditorProps {
   draft: AgreementDraft;
   onChange: (draft: AgreementDraft) => void;
@@ -28,7 +48,7 @@ const MODULE_OPTIONS = ["api-delivery", "agent-task"];
  */
 export function AgreementEditor({ draft, onChange, frozen = false }: AgreementEditorProps) {
   const [showJson, setShowJson] = useState(false);
-  const rubricJson = JSON.stringify(draft.rubric);
+  const rubricJson = serializeRubric(draft.rubric);
 
   const set = <K extends keyof AgreementDraft>(key: K, value: AgreementDraft[K]) =>
     onChange({ ...draft, [key]: value });

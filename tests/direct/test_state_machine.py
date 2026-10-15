@@ -19,6 +19,16 @@ def test_create_agreement_rejects_empty_rubric(deployed, direct_vm, direct_alice
         deployed.create_agreement(direct_bob, POLICY_ID, API_MODULE, 1000, FAR_FUTURE_DEADLINE, "")
 
 
+def test_create_agreement_rejects_bare_criteria_array(deployed, direct_vm, direct_alice, direct_bob):
+    """Criteria must be wrapped in the contract's {criteria: [...]} schema."""
+    import json
+
+    direct_vm.sender = direct_alice
+    bare_array = json.dumps([{"id": "endpoint_coverage", "description": "GET returns 200"}])
+    with direct_vm.expect_revert():
+        deployed.create_agreement(direct_bob, POLICY_ID, API_MODULE, 0, FAR_FUTURE_DEADLINE, bare_array)
+
+
 def test_create_agreement_rejects_inactive_policy(deployed, direct_vm, direct_alice, direct_bob, direct_owner):
     direct_vm.sender = direct_owner
     deployed.update_policy_template(POLICY_ID, "0xhash2", 3600, "repo", False)

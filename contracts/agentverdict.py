@@ -1378,7 +1378,26 @@ class AgentVerdictOS(gl.Contract):
         ch.resolution = resolution[:500]
         self.challenges[challenge_id] = ch
 
-        if upheld:
+        if upheld and ag.attempt_no >= MAX_ATTEMPTS:
+            # The upheld verdict cannot be re-evaluated because the protocol's
+            # attempt budget is exhausted. Resolve that edge atomically here:
+            # invalidate the provisional verdict and terminate the agreement.
+            # This avoids leaving it in REEVALUATING, where only an admin could
+            # later call terminate_agreement. No settlement or reputation is
+            # created for this challenged, non-final verdict.
+            ch.resolution = (
+                resolution[:300]
+                + " [TERMINAL: challenge upheld on the final allowed attempt; "
+                + "agreement terminated because no evaluation attempts remain]"
+            )[:500]
+            self.challenges[challenge_id] = ch
+            verdict = self.verdicts[ag.agreement_id]
+            verdict.state = "VOID"
+            self.verdicts[ag.agreement_id] = verdict
+            self.verdicts[ag.agreement_id + "#" + str(int(verdict.attempt_no))] = verdict
+            ag.state = ST_TERMINATED
+            self.agreements[ch.agreement_id] = ag
+        elif upheld:
             ag.state = ST_REEVALUATING
             self.agreements[ch.agreement_id] = ag
         else:
