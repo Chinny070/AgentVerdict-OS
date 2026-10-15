@@ -589,7 +589,10 @@
     "challenged_attempts_upheld": [1, 2, 3],
     "transactions": {
       "create_agreement": "0x472939c03a159ee1a980bb55c36ffbe3f8842c337ee2f5af6ae4310fc0f0ebcf",
+      "propose_agreement": "0xed6f62dc45d066760fbadc497fc433f0b8c3240a31c3547242a754caae573cf5",
       "accept_agreement": "0xa613fe04459de489ff58404faf2df360f6548e5355f7a17a07c7b561573317ac",
+      "activate_agreement": "0xa8e24f49fd1a2630b9b7ab4a67848ba8b7dcf1715ff067f69292ca5b881f09b7",
+      "open_evidence": "0x5f5e76efa815d19db2872f37479e2b0a5970c41a799cfaf5890b77e36b810bfa",
       "submit_evidence": "0xeefe2c0a613df27269d4f89f8dfe2ca38f9bc2690b4d540e2ba7d4140cab1bf9",
       "request_evaluation_attempt_1": "0xf84c599e14bdcaa8e6dff7e6ae8da01871f33740ca902ece757d6b2439557571",
       "challenge_attempt_1": "0xd766eb41645d86b530ab5ce49f187a5043f373af3ff3eb790ea69e1457dca5c5",
@@ -601,7 +604,7 @@
       "challenge_attempt_3": "0x0b64dc86e7818016d288ce1e6f36e14cae1ea116d7b5829d69ce80bc31fe9fca",
       "resolve_challenge_attempt_3_upheld_terminal": "0xf0bc4c93dd7d3b995609347625220459b1f2f725273532f523b6c7abd2f7324f"
     },
-    "uncaptured_transaction_hashes": ["propose_agreement", "activate_agreement", "open_evidence"],
+    "uncaptured_transaction_hashes": [],
     "final_reads": {
       "get_agreement": "TERMINATED; attempt_no 3; amount_atto 0",
       "get_verdict": "V-A-9-3; decision PASS; state VOID; attempt_no 3",
@@ -609,6 +612,6 @@
     },
     "settlement_or_reputation_effect": "None created by terminalization; no settlement calls were made for A-9.",
     "receipt_status": "All supplied write receipts were FINALIZED with Accepted consensus, five initial validators, and GenVM SUCCESS.",
-    "evidence_source": "User-supplied Studio Explorer transaction records and accepted Studio read responses"
+    "evidence_source": "Studio Explorer contract transaction list (read-only browser verification) and user-supplied transaction details/read responses"
   }
 }

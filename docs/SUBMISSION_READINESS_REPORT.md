@@ -1,5 +1,31 @@
 # Submission Readiness Report
 
+> **Verification follow-up (2026-10-15):** The previously uncaptured A-9 setup
+> transaction hashes have now been recovered from the read-only Studio Explorer
+> history and added to `deployments/studionet.json`: propose
+> `0xed6f62dc45d066760fbadc497fc433f0b8c3240a31c3547242a754caae573cf5`,
+> activate `0xa8e24f49fd1a2630b9b7ab4a67848ba8b7dcf1715ff067f69292ca5b881f09b7`,
+> and open evidence
+> `0x5f5e76efa815d19db2872f37479e2b0a5970c41a799cfaf5890b77e36b810bfa`.
+> Explorer shows all three FINALIZED, GenVM SUCCESS, and Accepted consensus.
+> A fresh verification run reports 94 direct contract tests passed, 7 local
+> integration tests skipped, 45 frontend tests passed, TypeScript passed,
+> production build passed, and `genvm-lint` passed (40 methods). The skipped
+> integration tests still require an available local GenVM/GLSim runtime and,
+> for evaluation consensus cases, an LLM provider. The production bundle emits
+> the existing large-chunk warning. Wallet-backed coverage remains a signed
+> create-agreement flow rather than every write action; no additional live
+> transactions were submitted during this follow-up. Evidence content hashes
+> are not verified against fetched bytes, merit challenges remain
+> administrator-resolved, and native GEN transfers remain disabled by design.
+
+> **Attempt-three evidence correction:** The A-9 terminal path is live-verified,
+> not merely covered by regression tests. Explorer records C-2, C-3, and C-4
+> upheld for attempts 1–3; final reads show A-9 `TERMINATED`, verdict
+> `V-A-9-3` `VOID`, and no settlement or reputation effects. This supersedes
+> older historical paragraphs below that say the Stage 12 terminal path had
+> not been run live.
+
 > **Latest release addendum (2026-10-15):** Stage 12 is deployed via GenLayer
 > Studio at `0x78ABE3E68cb5ca3325a482f23AA8F2AA4173DC40`. A synthetic, zero-value
 > A-2 lifecycle reached `SETTLED` after evaluation, challenge timeout recovery,

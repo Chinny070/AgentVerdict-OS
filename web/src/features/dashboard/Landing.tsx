@@ -30,8 +30,7 @@ export default function Landing() {
           <ul>
             <li>
               Stage 12 is deployed on StudioNet. Finality, bounded challenges, evidence validation,
-              timeout recovery, and receipt-only settlement have live lifecycle evidence.
-              Attempt-exhaustion terminalization is covered by source-level regression tests.
+              timeout recovery, receipt-only settlement, and attempt-exhaustion terminalization have live lifecycle evidence. A-9 ended after three upheld challenges with the agreement terminated and its final verdict void.
             </li>
             <li>Two real flagship evaluation modules: API Delivery Verification, AI-Agent Task Verification.</li>
             <li>
